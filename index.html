@@ -5,35 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>AI-Tap: Построй свою ИИ-империю</title>
     <style>
-        body { margin: 0; padding: 0; background: linear-gradient(to bottom, #0a0a2a, #1a1a4a); color: #fff; font-family: Arial, sans-serif; overflow: hidden; }
-        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; justify-content: center; align-items: flex-end; z-index: 10; flex-direction: column; padding-bottom: 20%; animation: bgPulse 5s infinite alternate; }
+        body { margin: 0; padding: 0; background: #0a0a2a; color: #fff; font-family: Arial, sans-serif; overflow: hidden; }
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0a2a; display: flex; justify-content: center; align-items: flex-end; z-index: 10; flex-direction: column; padding-bottom: 25%; }
         #loader h1 { font-size: 60px; margin: 0; letter-spacing: 8px; background: linear-gradient(90deg, #3498db, #2ecc71, #e74c3c, #3498db); background-size: 400% 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradientShift 5s ease-in-out infinite; }
         #loader p { font-size: 24px; margin: 10px 0; opacity: 0; animation: fadeIn 2s ease-in forwards; }
-        #loader .spinner { position: relative; width: 180px; height: 180px; margin-bottom: 20px; }
-        #loader .spinner::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 12px solid transparent; border-top: 12px solid #3498db; border-radius: 50%; animation: spin 2s linear infinite; box-shadow: 0 0 20px rgba(52, 152, 219, 0.5); }
-        #loader .spinner::after { content: ''; position: absolute; top: 20px; left: 20px; width: 140px; height: 140px; border: 10px solid transparent; border-right: 10px solid #2ecc71; border-radius: 50%; animation: spin 1.5s linear infinite reverse; box-shadow: 0 0 15px rgba(46, 204, 113, 0.5); }
-        .spinner-inner { position: absolute; top: 40px; left: 40px; width: 100px; height: 100px; border: 8px solid transparent; border-bottom: 8px solid #e74c3c; border-radius: 50%; animation: spin 1s linear infinite; box-shadow: 0 0 10px rgba(231, 76, 60, 0.5); }
-        .particle-bg { position: absolute; width: 5px; height: 5px; background: radial-gradient(circle, #fff, transparent); border-radius: 50%; pointer-events: none; animation: floatParticle 10s linear infinite; }
+        #loader .spinner { position: relative; width: 150px; height: 150px; margin-bottom: 20px; }
+        #loader .spinner::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 10px solid transparent; border-top: 10px solid #3498db; border-radius: 50%; animation: spin 2s linear infinite; box-shadow: 0 0 20px rgba(52, 152, 219, 0.5); }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes bgPulse { 0% { background: #000; } 50% { background: #0a0a2a; } 100% { background: #000; } }
         @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 0.8; } }
-        @keyframes floatParticle { 0% { transform: translateY(100vh); opacity: 0.5; } 100% { transform: translateY(-100vh); opacity: 0; } }
         #game-container { width: 100vw; height: 100vh; display: none; flex-direction: column; align-items: center; justify-content: space-between; position: relative; }
         #header { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 10px; background: rgba(0,0,0,0.5); }
         #profile { width: 50px; height: 50px; background: url('https://via.placeholder.com/50/3498db/fff?text=Profile') no-repeat center/cover; border-radius: 50%; cursor: pointer; transition: transform 0.2s; }
         #profile:hover { transform: scale(1.1); }
-        #energy-container { display: flex; align-items: center; }
-        #energy-bar { width: 150px; height: 25px; background: #f1c40f; border: 2px solid #f1c40f; border-radius: 15px; position: relative; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        #energy-fill { height: 100%; background: #3498db; transition: width 0.5s ease; }
         #score { font-size: 24px; display: flex; align-items: center; }
         #score img { width: 24px; height: 24px; margin-right: 5px; }
         #tap-area { flex: 1; width: 100%; display: flex; justify-content: center; align-items: center; position: relative; }
-        #ai-button { width: 300px; height: 300px; background: url('https://i.imgur.com/Q8q2y7V.png') no-repeat center/cover; border-radius: 50%; cursor: pointer; animation: pulse 1.5s infinite; transition: transform 0.1s, box-shadow 0.3s; box-shadow: 0 0 20px rgba(52, 152, 219, 0.5); }
-        #ai-button:active { transform: scale(1.05); box-shadow: 0 0 30px rgba(52, 152, 219, 0.8); }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7); } 70% { box-shadow: 0 0 0 30px rgba(52, 152, 219, 0); } 100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); } }
+        #ai-button { width: 300px; height: 300px; background: url('https://i.ibb.co/fdRZrwNf/image.jpg') no-repeat center/cover; border-radius: 50%; cursor: pointer; transition: transform 0.1s, box-shadow 0.3s; box-shadow: 0 0 20px #3498db; }
+        #ai-button:active { transform: scale(1.05); }
         .tap-effect { position: absolute; font-size: 32px; color: cyan; pointer-events: none; animation: floatUp 1.2s ease-out forwards, rotate 1s ease; font-weight: bold; }
-        .energy-effect { position: absolute; font-size: 20px; color: #f1c40f; pointer-events: none; animation: floatUp 1.2s ease-out forwards; left: 50%; top: 60px; transform: translateX(-50%); }
+        .energy-effect { position: absolute; font-size: 20px; color: #3498db; pointer-events: none; animation: floatUp 1.2s ease-out forwards; left: 50%; top: 50%; transform: translate(-50%, -150px); }
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-80px); } }
         @keyframes rotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(5deg); } }
         #buttons { width: 100%; display: flex; justify-content: space-around; padding: 10px; background: rgba(0,0,0,0.7); }
@@ -48,19 +39,14 @@
 </head>
 <body>
     <div id="loader">
-        <div class="spinner"><div class="spinner-inner"></div></div>
+        <div class="spinner"></div>
         <h1 id="title"></h1>
         <p>от AI-Технологии</p>
     </div>
     <div id="game-container">
         <div id="header">
             <div id="profile"></div>
-            <div id="energy-container">
-                <div id="energy-bar">
-                    <div id="energy-fill" style="width: 100%;"></div>
-                </div>
-            </div>
-            <div id="score"><img src="https://i.ibb.co/fdRZrwNf/image.jpg" alt="AI"> 0</div>
+            <div id="score"><img src="https://i.ibb.co/0y4cDZNh/bdd6bbe7-1b89-4d15-a9a5-79a5d65e95c9.jpg" alt="AI"> 0</div>
         </div>
         <div id="tap-area">
             <div id="ai-button"></div>
@@ -113,21 +99,9 @@
                     document.getElementById('loader').style.display = 'none';
                     document.getElementById('game-container').style.display = 'flex';
                     initGame();
-                }, 2000);
+                }, 1500);
             }
         }, 400);
-
-        // Background Particles
-        function createBgParticles() {
-            for (let i = 0; i < 20; i++) {
-                const p = document.createElement('div');
-                p.className = 'particle-bg';
-                p.style.left = `${Math.random() * 100}vw`;
-                p.style.animationDelay = `${Math.random() * 10}s`;
-                document.getElementById('loader').appendChild(p);
-            }
-        }
-        createBgParticles();
 
         function initGame() {
             // Game State
@@ -160,12 +134,7 @@
                 setInterval(() => {
                     if (energy < maxEnergy) {
                         energy = Math.min(maxEnergy, energy + energyRegenRate);
-                        const effect = document.createElement('div');
-                        effect.className = 'energy-effect';
-                        effect.innerText = '+0.1';
-                        document.body.appendChild(effect);
-                        setTimeout(() => effect.remove(), 1200);
-                        updateEnergyBar();
+                        updateEnergyRing();
                         saveProgress();
                     }
                 }, 1000);
@@ -174,13 +143,14 @@
             // Update UI
             function updateUI() {
                 document.getElementById('score').innerHTML = `<img src="https://i.ibb.co/0y4cDZNh/bdd6bbe7-1b89-4d15-a9a5-79a5d65e95c9.jpg" alt="AI"> ${Math.floor(ai)}`;
-                updateEnergyBar();
+                updateEnergyRing();
             }
 
-            // Update Energy Bar
-            function updateEnergyBar() {
-                const fill = document.getElementById('energy-fill');
-                fill.style.width = `${(energy / maxEnergy) * 100}%`;
+            // Update Energy Ring
+            function updateEnergyRing() {
+                const button = document.getElementById('ai-button');
+                const shadowWidth = (energy / maxEnergy) * 20;
+                button.style.boxShadow = `0 0 ${shadowWidth}px #3498db`;
             }
 
             // Tap Handling
@@ -248,5 +218,3 @@
     </script>
 </body>
 </html>
-
-
