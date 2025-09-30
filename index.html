@@ -187,6 +187,24 @@
             transform: scale(1.05);
             box-shadow: 0 0.8vw 1.5vw rgba(0,0,0,0.4);
         }
+        #settings-btn {
+            background: linear-gradient(to right, #9b59b6, #8e44ad);
+            color: white;
+            padding: 1.5vw 3vw;
+            border: none;
+            border-radius: 1.5vw;
+            cursor: pointer;
+            font-size: 3vw;
+            font-weight: bold;
+            box-shadow: 0 0.5vw 1vw rgba(0,0,0,0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+            flex: 1;
+            max-width: 150px;
+        }
+        #settings-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0.8vw 1.5vw rgba(0,0,0,0.4);
+        }
         #score { 
             font-size: 5vw; 
             max-width: 40%; 
@@ -245,7 +263,7 @@
         .tap-effect { 
             position: absolute; 
             font-size: 8vw; 
-            max-font-size: 32px; 
+            max-width: 32px; 
             color: cyan; 
             pointer-events: none; 
             animation: floatUp 1.2s ease-out forwards, rotate 1s ease; 
@@ -284,7 +302,7 @@
             transform: scale(1.05); 
             box-shadow: 0 1.5vw 2vw rgba(0,0,0,0.4); 
         }
-        #shop, #quests-panel, #leaders-panel, #workshop-panel, #ai-chat-panel, #admin-panel { 
+        #shop, #quests-panel, #leaders-panel, #workshop-panel, #ai-chat-panel, #admin-panel, #settings-panel { 
             position: fixed; 
             top: 50%; 
             left: 50%; 
@@ -321,6 +339,7 @@
             font-size: 4vw;
             font-weight: bold;
             background: linear-gradient(45deg, #3498db, #2ecc71);
+            background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -464,6 +483,7 @@
             font-size: 4vw;
             font-weight: bold;
             background: linear-gradient(45deg, #e74c3c, #c0392b);
+            background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -607,6 +627,7 @@
         <div id="header">
             <div id="profile"></div>
             <button id="ai-chat-btn">🤖 AI Чат</button>
+            <button id="settings-btn">⚙️ Настройки</button>
             <div id="score"><img src="https://i.ibb.co/vCGzNnjR/generated-image.png" alt="AI"> 0</div>
         </div>
         <div id="tap-area">
@@ -679,6 +700,43 @@
                 </div>
             </div>
         </div>
+        <div id="settings-panel">
+            <h2>⚙️ Настройки</h2>
+            <div style="margin: 20px 0;">
+                <div style="background: rgba(155, 89, 182, 0.2); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    <h3>🌍 Язык приложения</h3>
+                    <p>Выберите язык интерфейса:</p>
+                    <select id="language-select" style="width: 100%; padding: 10px; border-radius: 5px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.3);">
+                        <option value="auto">Автоматически (по устройству)</option>
+                        <option value="ru">Русский</option>
+                        <option value="en">English</option>
+                        <option value="es">Español</option>
+                        <option value="fr">Français</option>
+                        <option value="de">Deutsch</option>
+                        <option value="zh">中文</option>
+                        <option value="ja">日本語</option>
+                        <option value="ko">한국어</option>
+                    </select>
+                </div>
+                <div style="background: rgba(46, 204, 113, 0.2); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    <h3>📁 Отправка файлов</h3>
+                    <p>Загрузите файлы с вашего устройства:</p>
+                    <input type="file" id="file-upload" multiple accept="*/*" style="width: 100%; padding: 10px; border-radius: 5px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.3);">
+                    <div id="file-list" style="margin-top: 10px;"></div>
+                </div>
+                <div style="background: rgba(52, 152, 219, 0.2); padding: 15px; border-radius: 10px;">
+                    <h3>🎮 Игровые настройки</h3>
+                    <p>Звуки:</p>
+                    <input type="checkbox" id="sound-enabled" checked style="margin-right: 10px;">
+                    <label for="sound-enabled">Включить звуки</label>
+                    <br><br>
+                    <p>Анимации:</p>
+                    <input type="checkbox" id="animations-enabled" checked style="margin-right: 10px;">
+                    <label for="animations-enabled">Включить анимации</label>
+                </div>
+            </div>
+            <button class="close-btn" onclick="document.getElementById('settings-panel').style.display = 'none';">Закрыть</button>
+        </div>
         <div id="admin-panel">
             <div class="admin-header">
                 <div class="admin-title">🔧 Админ-панель</div>
@@ -705,6 +763,209 @@
     </div>
     <audio id="tap-sound" src="https://freesound.org/data/previews/571/571811_11955436-lq.mp3" preload="auto"></audio>
     <script>
+        // Multilingual support
+        const translations = {
+            ru: {
+                aiChat: "🤖 AI Чат",
+                settings: "⚙️ Настройки",
+                shop: "Магазин",
+                leaders: "Лидеры",
+                quests: "Задания",
+                workshop: "Мастерская",
+                close: "Закрыть",
+                language: "Язык приложения",
+                fileUpload: "Отправка файлов",
+                gameSettings: "Игровые настройки",
+                soundEnabled: "Включить звуки",
+                animationsEnabled: "Включить анимации",
+                autoLanguage: "Автоматически (по устройству)",
+                fileUploadDesc: "Загрузите файлы с вашего устройства:",
+                selectLanguage: "Выберите язык интерфейса:",
+                sound: "Звуки:",
+                animations: "Анимации:"
+            },
+            en: {
+                aiChat: "🤖 AI Chat",
+                settings: "⚙️ Settings",
+                shop: "Shop",
+                leaders: "Leaders",
+                quests: "Quests",
+                workshop: "Workshop",
+                close: "Close",
+                language: "App Language",
+                fileUpload: "File Upload",
+                gameSettings: "Game Settings",
+                soundEnabled: "Enable Sounds",
+                animationsEnabled: "Enable Animations",
+                autoLanguage: "Auto (Device Language)",
+                fileUploadDesc: "Upload files from your device:",
+                selectLanguage: "Select interface language:",
+                sound: "Sounds:",
+                animations: "Animations:"
+            },
+            es: {
+                aiChat: "🤖 Chat IA",
+                settings: "⚙️ Configuración",
+                shop: "Tienda",
+                leaders: "Líderes",
+                quests: "Misiones",
+                workshop: "Taller",
+                close: "Cerrar",
+                language: "Idioma de la App",
+                fileUpload: "Subida de Archivos",
+                gameSettings: "Configuración del Juego",
+                soundEnabled: "Activar Sonidos",
+                animationsEnabled: "Activar Animaciones",
+                autoLanguage: "Automático (Idioma del Dispositivo)",
+                fileUploadDesc: "Sube archivos desde tu dispositivo:",
+                selectLanguage: "Selecciona el idioma de la interfaz:",
+                sound: "Sonidos:",
+                animations: "Animaciones:"
+            },
+            fr: {
+                aiChat: "🤖 Chat IA",
+                settings: "⚙️ Paramètres",
+                shop: "Boutique",
+                leaders: "Classement",
+                quests: "Quêtes",
+                workshop: "Atelier",
+                close: "Fermer",
+                language: "Langue de l'App",
+                fileUpload: "Téléchargement de Fichiers",
+                gameSettings: "Paramètres du Jeu",
+                soundEnabled: "Activer les Sons",
+                animationsEnabled: "Activer les Animations",
+                autoLanguage: "Auto (Langue de l'Appareil)",
+                fileUploadDesc: "Téléchargez des fichiers depuis votre appareil:",
+                selectLanguage: "Sélectionnez la langue de l'interface:",
+                sound: "Sons:",
+                animations: "Animations:"
+            },
+            de: {
+                aiChat: "🤖 KI Chat",
+                settings: "⚙️ Einstellungen",
+                shop: "Shop",
+                leaders: "Bestenliste",
+                quests: "Quests",
+                workshop: "Werkstatt",
+                close: "Schließen",
+                language: "App-Sprache",
+                fileUpload: "Datei-Upload",
+                gameSettings: "Spiel-Einstellungen",
+                soundEnabled: "Töne aktivieren",
+                animationsEnabled: "Animationen aktivieren",
+                autoLanguage: "Auto (Gerätesprache)",
+                fileUploadDesc: "Laden Sie Dateien von Ihrem Gerät hoch:",
+                selectLanguage: "Wählen Sie die Interface-Sprache:",
+                sound: "Töne:",
+                animations: "Animationen:"
+            },
+            zh: {
+                aiChat: "🤖 AI聊天",
+                settings: "⚙️ 设置",
+                shop: "商店",
+                leaders: "排行榜",
+                quests: "任务",
+                workshop: "工坊",
+                close: "关闭",
+                language: "应用语言",
+                fileUpload: "文件上传",
+                gameSettings: "游戏设置",
+                soundEnabled: "启用声音",
+                animationsEnabled: "启用动画",
+                autoLanguage: "自动（设备语言）",
+                fileUploadDesc: "从您的设备上传文件：",
+                selectLanguage: "选择界面语言：",
+                sound: "声音：",
+                animations: "动画："
+            },
+            ja: {
+                aiChat: "🤖 AIチャット",
+                settings: "⚙️ 設定",
+                shop: "ショップ",
+                leaders: "リーダーボード",
+                quests: "クエスト",
+                workshop: "ワークショップ",
+                close: "閉じる",
+                language: "アプリ言語",
+                fileUpload: "ファイルアップロード",
+                gameSettings: "ゲーム設定",
+                soundEnabled: "音声を有効にする",
+                animationsEnabled: "アニメーションを有効にする",
+                autoLanguage: "自動（デバイス言語）",
+                fileUploadDesc: "デバイスからファイルをアップロード：",
+                selectLanguage: "インターフェース言語を選択：",
+                sound: "音声：",
+                animations: "アニメーション："
+            },
+            ko: {
+                aiChat: "🤖 AI 채팅",
+                settings: "⚙️ 설정",
+                shop: "상점",
+                leaders: "리더보드",
+                quests: "퀘스트",
+                workshop: "워크샵",
+                close: "닫기",
+                language: "앱 언어",
+                fileUpload: "파일 업로드",
+                gameSettings: "게임 설정",
+                soundEnabled: "사운드 활성화",
+                animationsEnabled: "애니메이션 활성화",
+                autoLanguage: "자동 (기기 언어)",
+                fileUploadDesc: "기기에서 파일을 업로드하세요:",
+                selectLanguage: "인터페이스 언어를 선택하세요:",
+                sound: "사운드:",
+                animations: "애니메이션:"
+            }
+        };
+
+        // Current language
+        let currentLanguage = 'ru';
+        
+        // Detect device language
+        function detectDeviceLanguage() {
+            const deviceLang = navigator.language || navigator.userLanguage;
+            const langCode = deviceLang.split('-')[0];
+            
+            if (translations[langCode]) {
+                return langCode;
+            }
+            return 'ru'; // Default to Russian
+        }
+
+        // Initialize language
+        function initLanguage() {
+            const savedLang = localStorage.getItem('appLanguage');
+            if (savedLang && translations[savedLang]) {
+                currentLanguage = savedLang;
+            } else {
+                currentLanguage = detectDeviceLanguage();
+            }
+            applyLanguage();
+        }
+
+        // Apply language to interface
+        function applyLanguage() {
+            const t = translations[currentLanguage];
+            
+            // Update interface elements
+            document.getElementById('ai-chat-btn').textContent = t.aiChat;
+            document.getElementById('settings-btn').textContent = t.settings;
+            document.getElementById('shop-btn').textContent = t.shop;
+            document.getElementById('leaders-btn').textContent = t.leaders;
+            document.getElementById('quests-btn').textContent = t.quests;
+            document.getElementById('workshop-btn').textContent = t.workshop;
+            
+            // Update settings panel
+            const settingsPanel = document.getElementById('settings-panel');
+            if (settingsPanel) {
+                settingsPanel.querySelector('h2').textContent = t.settings;
+                settingsPanel.querySelector('h3').textContent = t.language;
+                settingsPanel.querySelector('p').textContent = t.selectLanguage;
+                settingsPanel.querySelector('input[type="file"]').nextElementSibling.textContent = t.fileUploadDesc;
+            }
+        }
+
         // Telegram Integration for Avatar
         const tg = window.Telegram.WebApp;
         tg.ready();
@@ -734,11 +995,11 @@
                     setTimeout(() => {
                         // Fade out loader with animation
                         document.getElementById('loader').classList.add('fade-out');
-                        setTimeout(() => {
-                            document.getElementById('loader').style.display = 'none';
+                setTimeout(() => {
+                    document.getElementById('loader').style.display = 'none';
                             
-                            // Show AI chat immediately after fade
-                            document.getElementById('ai-chat-panel').style.display = 'flex';
+                            // Show main game interface after fade
+                            document.getElementById('game-container').style.display = 'flex';
                         }, 2000); // Wait for fade animation to complete
                     }, 500);
                 }
@@ -892,6 +1153,9 @@
             });
             document.getElementById('ai-chat-btn').addEventListener('click', () => {
                 document.getElementById('ai-chat-panel').style.display = 'flex';
+            });
+            document.getElementById('settings-btn').addEventListener('click', () => {
+                document.getElementById('settings-panel').style.display = 'block';
             });
             document.getElementById('profile').addEventListener('click', () => {
                 showProfileInfo();
@@ -1213,8 +1477,72 @@
                 };
             }
 
+            // File upload functionality
+            const fileUpload = document.getElementById('file-upload');
+            const fileList = document.getElementById('file-list');
+            
+            fileUpload.addEventListener('change', (e) => {
+                const files = Array.from(e.target.files);
+                fileList.innerHTML = '';
+                
+                files.forEach((file, index) => {
+                    const fileItem = document.createElement('div');
+                    fileItem.style.cssText = `
+                        background: rgba(255,255,255,0.1);
+                        padding: 10px;
+                        margin: 5px 0;
+                        border-radius: 5px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    `;
+                    
+                    fileItem.innerHTML = `
+                        <div>
+                            <strong>${file.name}</strong><br>
+                            <small>${(file.size / 1024).toFixed(1)} KB</small>
+                        </div>
+                        <button onclick="removeFile(${index})" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">✕</button>
+                    `;
+                    
+                    fileList.appendChild(fileItem);
+                });
+            });
+            
+            // Language change functionality
+            const languageSelect = document.getElementById('language-select');
+            languageSelect.addEventListener('change', (e) => {
+                const selectedLang = e.target.value;
+                if (selectedLang === 'auto') {
+                    currentLanguage = detectDeviceLanguage();
+                } else {
+                    currentLanguage = selectedLang;
+                }
+                localStorage.setItem('appLanguage', currentLanguage);
+                applyLanguage();
+            });
+            
+            // Initialize language on page load
+            initLanguage();
+            
+            // Set current language in select
+            languageSelect.value = currentLanguage;
+
             // Auto-save
             setInterval(saveProgress, 30000);
+        }
+        
+        // Global function for file removal
+        function removeFile(index) {
+            const fileInput = document.getElementById('file-upload');
+            const dt = new DataTransfer();
+            const files = Array.from(fileInput.files);
+            files.splice(index, 1);
+            files.forEach(file => dt.items.add(file));
+            fileInput.files = dt.files;
+            
+            // Re-trigger change event
+            fileInput.dispatchEvent(new Event('change'));
         }
     </script>
 </body>
