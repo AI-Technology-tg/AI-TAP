@@ -24,9 +24,16 @@
             background-size: cover;
             background-position: center;
             display: flex;
-            align-items: flex-end;
-            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
             z-index: 1000;
+            opacity: 1;
+            transition: opacity 1s ease-out;
+        }
+        #loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
         }
         #progress-bar-container {
             width: 80%;
@@ -41,6 +48,12 @@
             height: 100%;
             background-color: #00b7ff;
             transition: width 0.1s linear;
+        }
+        #progress-text {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 5px #000;
         }
         #main-content {
             display: none;
@@ -64,15 +77,24 @@
         #tap-button:hover {
             background-color: #0099cc;
         }
+        #profile {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 18px;
+            color: white;
+        }
     </style>
 </head>
 <body>
     <div id="loading-screen">
+        <div id="progress-text">0%</div>
         <div id="progress-bar-container">
             <div id="progress-bar"></div>
         </div>
     </div>
     <div id="main-content">
+        <div id="profile">Профиль</div>
         <div id="coin-counter">0</div>
         <button id="tap-button">Тап</button>
     </div>
@@ -82,16 +104,21 @@
             const loadingScreen = document.getElementById('loading-screen');
             const mainContent = document.getElementById('main-content');
             const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
             let progress = 0;
 
             const loadingInterval = setInterval(() => {
                 progress += 1;
                 progressBar.style.width = `${progress}%`;
+                progressText.textContent = `${progress}%`;
 
                 if (progress >= 100) {
                     clearInterval(loadingInterval);
-                    loadingScreen.style.display = 'none';
-                    mainContent.style.display = 'block';
+                    loadingScreen.classList.add('hidden');
+                    setTimeout(() => {
+                        loadingScreen.style.display = 'none';
+                        mainContent.style.display = 'block';
+                    }, 1000); // Match fade-out duration
                 }
             }, 30); // Adjust speed of loading (30ms per increment)
         };
