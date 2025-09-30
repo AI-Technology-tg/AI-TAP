@@ -5,35 +5,233 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>AI-Tap: Построй свою ИИ-империю</title>
     <style>
-        body { margin: 0; padding: 0; background: #0a0a2a; color: #fff; font-family: Arial, sans-serif; overflow: hidden; }
-        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0a2a; display: flex; justify-content: center; align-items: flex-end; z-index: 10; flex-direction: column; padding-bottom: 25%; }
-        #loader h1 { font-size: 60px; margin: 0; letter-spacing: 8px; background: linear-gradient(90deg, #3498db, #2ecc71, #e74c3c, #3498db); background-size: 400% 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradientShift 5s ease-in-out infinite; }
-        #loader p { font-size: 24px; margin: 10px 0; opacity: 0; animation: fadeIn 2s ease-in forwards; }
-        #loader .spinner { position: relative; width: 150px; height: 150px; margin-bottom: 20px; }
-        #loader .spinner::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 10px solid transparent; border-top: 10px solid #3498db; border-radius: 50%; animation: spin 2s linear infinite; box-shadow: 0 0 20px rgba(52, 152, 219, 0.5); }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 0.8; } }
-        #game-container { width: 100vw; height: 100vh; display: none; flex-direction: column; align-items: center; justify-content: space-between; position: relative; }
-        #header { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 10px; background: rgba(0,0,0,0.5); }
-        #profile { width: 50px; height: 50px; background: url('https://via.placeholder.com/50/3498db/fff?text=Profile') no-repeat center/cover; border-radius: 50%; cursor: pointer; transition: transform 0.2s; }
-        #profile:hover { transform: scale(1.1); }
-        #score { font-size: 24px; display: flex; align-items: center; }
-        #score img { width: 24px; height: 24px; margin-right: 5px; }
-        #tap-area { flex: 1; width: 100%; display: flex; justify-content: center; align-items: center; position: relative; }
-        #ai-button { width: 300px; height: 300px; background: url('https://i.ibb.co/fdRZrwNf/image.jpg') no-repeat center/cover; border-radius: 50%; cursor: pointer; transition: transform 0.1s, box-shadow 0.3s; box-shadow: 0 0 20px #3498db; }
-        #ai-button:active { transform: scale(1.05); }
-        .tap-effect { position: absolute; font-size: 32px; color: cyan; pointer-events: none; animation: floatUp 1.2s ease-out forwards, rotate 1s ease; font-weight: bold; }
-        .energy-effect { position: absolute; font-size: 20px; color: #3498db; pointer-events: none; animation: floatUp 1.2s ease-out forwards; left: 50%; top: 50%; transform: translate(-50%, -150px); }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-80px); } }
-        @keyframes rotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(5deg); } }
-        #buttons { width: 100%; display: flex; justify-content: space-around; padding: 10px; background: rgba(0,0,0,0.7); }
-        .action-btn { background: linear-gradient(to right, #3498db, #2980b9); color: white; padding: 12px 20px; border: none; border-radius: 10px; cursor: pointer; font-size: 16px; width: 22%; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: transform 0.2s, box-shadow 0.2s; }
-        .action-btn:hover { transform: scale(1.05); box-shadow: 0 6px 8px rgba(0,0,0,0.4); }
-        #shop, #quests-panel, #leaders-panel, #workshop-panel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); padding: 20px; border-radius: 10px; display: none; width: 90%; max-height: 80%; overflow-y: auto; z-index: 5; }
-        .close-btn { background: #e74c3c; color: white; padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
-        .particle { position: absolute; width: 15px; height: 15px; background: radial-gradient(circle, cyan, transparent); border-radius: 50%; pointer-events: none; animation: particleBurst 0.8s ease-out forwards; }
-        @keyframes particleBurst { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(0) translate(${Math.random() * 200 - 100}px, ${Math.random() * 200 - 100}px); } }
+        body { 
+            margin: 0; 
+            padding: 0; 
+            background: #0a0a2a; 
+            color: #fff; 
+            font-family: Arial, sans-serif; 
+            overflow: hidden; 
+            touch-action: manipulation; 
+        }
+        #loader { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: #0a0a2a; 
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-end; 
+            z-index: 10; 
+            flex-direction: column; 
+            padding-bottom: 25%; 
+        }
+        #loader h1 { 
+            font-size: 10vw; 
+            max-width: 90%; 
+            margin: 0; 
+            letter-spacing: 2vw; 
+            background: linear-gradient(90deg, #3498db, #2ecc71, #e74c3c, #3498db); 
+            background-size: 400% 100%; 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            animation: gradientShift 5s ease-in-out infinite; 
+            text-align: center; 
+        }
+        #loader p { 
+            font-size: 5vw; 
+            max-width: 90%; 
+            margin: 2vw 0; 
+            opacity: 0; 
+            animation: fadeIn 2s ease-in forwards; 
+            text-align: center; 
+        }
+        #loader .spinner { 
+            position: relative; 
+            width: 30vw; 
+            max-width: 150px; 
+            height: 30vw; 
+            max-height: 150px; 
+            margin: 0 auto 4vw; 
+        }
+        #loader .spinner::before { 
+            content: ''; 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            border: 2vw solid transparent; 
+            border-top: 2vw solid #3498db; 
+            border-radius: 50%; 
+            animation: spin 2s linear infinite; 
+            box-shadow: 0 0 5vw rgba(52, 152, 219, 0.5); 
+        }
+        @keyframes spin { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
+        @keyframes gradientShift { 
+            0% { background-position: 0% 50%; } 
+            50% { background-position: 100% 50%; } 
+            100% { background-position: 0% 50%; } 
+        }
+        @keyframes fadeIn { 
+            from { opacity: 0; } 
+            to { opacity: 0.8; } 
+        }
+        #game-container { 
+            width: 100vw; 
+            height: 100vh; 
+            display: none; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: space-between; 
+            position: relative; 
+        }
+        #header { 
+            width: 100%; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 2vw; 
+            background: rgba(0,0,0,0.5); 
+            box-sizing: border-box; 
+        }
+        #profile { 
+            width: 10vw; 
+            max-width: 50px; 
+            height: 10vw; 
+            max-height: 50px; 
+            background: url('https://via.placeholder.com/50/3498db/fff?text=Profile') no-repeat center/cover; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            transition: transform 0.2s; 
+        }
+        #profile:hover { 
+            transform: scale(1.1); 
+        }
+        #score { 
+            font-size: 5vw; 
+            max-width: 40%; 
+            display: flex; 
+            align-items: center; 
+        }
+        #score img { 
+            width: 5vw; 
+            max-width: 24px; 
+            height: 5vw; 
+            max-height: 24px; 
+            margin-right: 1vw; 
+        }
+        #tap-area { 
+            flex: 1; 
+            width: 100%; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            position: relative; 
+        }
+        #ai-button { 
+            width: 80vw; 
+            max-width: 300px; 
+            min-width: 200px; 
+            height: 80vw; 
+            max-height: 300px; 
+            min-height: 200px; 
+            background: url('https://i.ibb.co/fdRZrwNf/image.jpg') no-repeat center/cover; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            transition: transform 0.1s, box-shadow 0.3s; 
+            box-shadow: 0 0 20px #3498db; 
+        }
+        #ai-button:active { 
+            transform: scale(1.05); 
+        }
+        .tap-effect { 
+            position: absolute; 
+            font-size: 8vw; 
+            max-font-size: 32px; 
+            color: cyan; 
+            pointer-events: none; 
+            animation: floatUp 1.2s ease-out forwards, rotate 1s ease; 
+            font-weight: bold; 
+        }
+        @keyframes floatUp { 
+            0% { opacity: 1; transform: translateY(0); } 
+            100% { opacity: 0; transform: translateY(-20vw); } 
+        }
+        @keyframes rotate { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(5deg); } 
+        }
+        #buttons { 
+            width: 100%; 
+            display: flex; 
+            justify-content: space-around; 
+            padding: 2vw; 
+            background: rgba(0,0,0,0.7); 
+            box-sizing: border-box; 
+        }
+        .action-btn { 
+            background: linear-gradient(to right, #3498db, #2980b9); 
+            color: white; 
+            padding: 2vw 4vw; 
+            border: none; 
+            border-radius: 2vw; 
+            cursor: pointer; 
+            font-size: 3.5vw; 
+            width: 22%; 
+            text-align: center; 
+            box-shadow: 0 1vw 1.5vw rgba(0,0,0,0.3); 
+            transition: transform 0.2s, box-shadow 0.2s; 
+        }
+        .action-btn:hover { 
+            transform: scale(1.05); 
+            box-shadow: 0 1.5vw 2vw rgba(0,0,0,0.4); 
+        }
+        #shop, #quests-panel, #leaders-panel, #workshop-panel { 
+            position: fixed; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            background: rgba(0,0,0,0.9); 
+            padding: 4vw; 
+            border-radius: 2vw; 
+            display: none; 
+            width: 90%; 
+            max-height: 80%; 
+            overflow-y: auto; 
+            z-index: 5; 
+            box-sizing: border-box; 
+        }
+        .close-btn { 
+            background: #e74c3c; 
+            color: white; 
+            padding: 2vw 4vw; 
+            border: none; 
+            border-radius: 1vw; 
+            cursor: pointer; 
+            margin-top: 2vw; 
+            font-size: 3.5vw; 
+        }
+        .particle { 
+            position: absolute; 
+            width: 3vw; 
+            max-width: 15px; 
+            height: 3vw; 
+            max-height: 15px; 
+            background: radial-gradient(circle, cyan, transparent); 
+            border-radius: 50%; 
+            pointer-events: none; 
+            animation: particleBurst 0.8s ease-out forwards; 
+        }
+        @keyframes particleBurst { 
+            0% { opacity: 1; transform: scale(1); } 
+            100% { opacity: 0; transform: scale(0) translate(${Math.random() * 50 - 25}vw, ${Math.random() * 50 - 25}vw); } 
+        }
     </style>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
@@ -41,12 +239,12 @@
     <div id="loader">
         <div class="spinner"></div>
         <h1 id="title"></h1>
-        <p> AI-Технологии</p>
+        <p>от AI-Технологии</p>
     </div>
     <div id="game-container">
         <div id="header">
             <div id="profile"></div>
-            <div id="score"><img src="https://i.ibb.co/0y4cDZNh/bdd6bbe7-1b89-4d15-a9a5-79a5d65e95c9.jpg" alt="AI"> 0</div>
+            <div id="score"><img src="https://i.ibb.co/vCGzNnjR/generated-image.png" alt="AI"> 0</div>
         </div>
         <div id="tap-area">
             <div id="ai-button"></div>
@@ -166,15 +364,7 @@
                     tapEffect.style.left = `${e.clientX - 20}px`;
                     tapEffect.style.top = `${e.clientY - 20}px`;
                     document.body.appendChild(tapEffect);
-                    // Energy effect (-1)
-                    const energyEffect = document.createElement('div');
-                    energyEffect.className = 'energy-effect';
-                    energyEffect.innerText = '-1';
-                    document.body.appendChild(energyEffect);
-                    setTimeout(() => {
-                        tapEffect.remove();
-                        energyEffect.remove();
-                    }, 1200);
+                    setTimeout(() => tapEffect.remove(), 1200);
                     createParticles(5, e.clientX, e.clientY);
                     document.getElementById('tap-sound').play();
                     updateUI();
@@ -218,4 +408,3 @@
     </script>
 </body>
 </html>
-
