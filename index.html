@@ -701,11 +701,46 @@
                 chatMessages.appendChild(typingDiv);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
                 
-                // Simulate AI response for now (CORS issues with direct API calls)
-                setTimeout(() => {
+                try {
+                    // Try real AI API first
+                    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Bearer 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',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            model: 'llama-3.1-8b-instant',
+                            messages: [
+                                { 
+                                    role: 'system', 
+                                    content: 'Ты полезный AI-ассистент на русском языке. Отвечай кратко и по делу. Помогай пользователю с вопросами и задачами. Если спрашивают про игру - давай советы по тап-игре.' 
+                                },
+                                { role: 'user', content: message }
+                            ],
+                            max_tokens: 200,
+                            temperature: 0.7
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`API Error: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
                     chatMessages.removeChild(typingDiv);
                     
-                    // Smart responses based on message content
+                    if (data.choices && data.choices[0] && data.choices[0].message) {
+                        addMessage(data.choices[0].message.content);
+                    } else {
+                        throw new Error('Invalid API response');
+                    }
+                    
+                } catch (error) {
+                    console.log('AI API failed, using fallback:', error.message);
+                    chatMessages.removeChild(typingDiv);
+                    
+                    // Fallback to smart responses if API fails
                     let response = '';
                     const lowerMessage = message.toLowerCase();
                     
@@ -733,7 +768,7 @@
                     }
                     
                     addMessage(response);
-                }, 1000 + Math.random() * 1000); // Random delay 1-2 seconds
+                }
             }
             
             sendBtn.addEventListener('click', sendMessage);
