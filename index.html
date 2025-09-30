@@ -65,7 +65,7 @@
             align-items: flex-end; 
             z-index: 10; 
             flex-direction: column; 
-            padding-bottom: 25%; 
+            padding-bottom: 5%; 
             opacity: 1;
             transition: opacity 2s ease-out;
         }
@@ -75,8 +75,8 @@
         #progress-container {
             width: 80%;
             max-width: 400px;
-            margin: 4vw auto 0;
-            background: rgba(0,0,0,0.5);
+            margin: 0 auto;
+            background: rgba(0,0,0,0.7);
             border-radius: 10px;
             padding: 2vw;
             box-sizing: border-box;
@@ -114,27 +114,21 @@
             0% { transform: translateY(0px); }
             100% { transform: translateY(-2px); }
         }
-        #title-overlay {
-            position: fixed;
+        #energy-timer {
+            position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 15vw;
-            font-weight: bold;
+            font-size: 4vw;
             color: #fff;
-            text-shadow: 0 0 20px rgba(52, 152, 219, 0.8);
-            opacity: 0;
-            z-index: 15;
-            pointer-events: none;
-            letter-spacing: 2vw;
+            text-shadow: 0 0 10px rgba(0,0,0,0.8);
+            font-weight: bold;
+            display: none;
+            z-index: 10;
         }
-        #title-overlay.show {
-            animation: titleAppear 2s ease-in-out forwards;
-        }
-        @keyframes titleAppear {
-            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
-            100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+        .energy-waiting {
+            background: rgba(0,0,0,0.5) !important;
+            cursor: not-allowed !important;
         }
         #progress-text {
             text-align: center;
@@ -207,6 +201,24 @@
             cursor: pointer; 
             transition: transform 0.1s, box-shadow 0.3s; 
             box-shadow: 0 0 20px #3498db; 
+            position: relative;
+            border: 6px solid #3498db;
+            box-sizing: border-box;
+        }
+        #energy-ring {
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            width: calc(100% + 12px);
+            height: calc(100% + 12px);
+            border-radius: 50%;
+            border: 6px solid transparent;
+            background: conic-gradient(from 0deg, #e74c3c 0%, #e74c3c 0%, #3498db 0%, #3498db 100%);
+            transition: background 0.3s ease;
+            pointer-events: none;
+        }
+        .energy-empty {
+            background: conic-gradient(from 0deg, #e74c3c 0%, #e74c3c 100%, #e74c3c 100%, #e74c3c 100%) !important;
         }
         #ai-button:active { 
             transform: scale(1.05); 
@@ -307,14 +319,16 @@
             <div id="progress-text">0%</div>
         </div>
     </div>
-    <div id="title-overlay">AI-TAP</div>
     <div id="game-container">
         <div id="header">
             <div id="profile"></div>
             <div id="score"><img src="https://i.ibb.co/vCGzNnjR/generated-image.png" alt="AI"> 0</div>
         </div>
         <div id="tap-area">
-            <div id="ai-button"></div>
+            <div id="ai-button">
+                <div id="energy-ring"></div>
+                <div id="energy-timer"></div>
+            </div>
         </div>
         <div id="buttons">
             <button class="action-btn" id="shop-btn">Магазин</button>
@@ -324,10 +338,23 @@
         </div>
         <div id="shop">
             <h2>Магазин</h2>
+            <p>Магазин находится в разработке!</p>
             <button class="close-btn" onclick="document.getElementById('shop').style.display = 'none';">Закрыть</button>
         </div>
         <div id="quests-panel">
             <h2>Задания</h2>
+            <div style="margin: 20px 0;">
+                <div style="background: rgba(52, 152, 219, 0.2); padding: 15px; border-radius: 10px; margin-bottom: 10px;">
+                    <h3>📢 Подписаться на канал</h3>
+                    <p>Подпишитесь на наш канал для получения бонусов!</p>
+                    <a href="https://t.me/ai_technology_tg" target="_blank" style="color: #3498db; text-decoration: none;">👉 Перейти к каналу</a>
+                </div>
+                <div style="background: rgba(46, 204, 113, 0.2); padding: 15px; border-radius: 10px;">
+                    <h3>🚀 Буст канала</h3>
+                    <p>Поставьте буст на наш канал для получения наград!</p>
+                    <a href="https://t.me/boost/ai_technology_tg" target="_blank" style="color: #2ecc71; text-decoration: none;">👉 Поставить буст</a>
+                </div>
+            </div>
             <button class="close-btn" onclick="document.getElementById('quests-panel').style.display = 'none';">Закрыть</button>
         </div>
         <div id="leaders-panel">
@@ -376,16 +403,9 @@
                         setTimeout(() => {
                             document.getElementById('loader').style.display = 'none';
                             
-                            // Show AI-TAP title animation
-                            const titleOverlay = document.getElementById('title-overlay');
-                            titleOverlay.classList.add('show');
-                            
-                            setTimeout(() => {
-                                // Hide title and show game
-                                titleOverlay.style.display = 'none';
-                                document.getElementById('game-container').style.display = 'flex';
-                                initGame();
-                            }, 2000); // Wait for title animation to complete
+                            // Show game immediately after fade
+                            document.getElementById('game-container').style.display = 'flex';
+                            initGame();
                         }, 2000); // Wait for fade animation to complete
                     }, 500);
                 }
@@ -397,18 +417,28 @@
 
         function initGame() {
             // Game State
-            let ai = 0;
+            let ai = 1000; // Стартовый баланс
             let tapValue = 1;
             let energy = 100;
             let maxEnergy = 100;
             let energyRegenRate = 0.1;
+            let energyTimer = null;
+
+            // Format balance
+            function formatBalance(amount) {
+                if (amount >= 1000) {
+                    return (amount / 1000).toFixed(1) + 'к';
+                }
+                return Math.floor(amount).toString();
+            }
 
             // Load Progress
             function loadProgress() {
                 const data = JSON.parse(localStorage.getItem('aiTapProgress')) || {};
-                ai = data.ai || 0;
+                ai = data.ai || 1000;
                 energy = data.energy || maxEnergy;
                 updateUI();
+                updateEnergyRing();
                 startEnergyRegen();
             }
             loadProgress();
@@ -427,30 +457,44 @@
                     if (energy < maxEnergy) {
                         energy = Math.min(maxEnergy, energy + energyRegenRate);
                         updateEnergyRing();
+                        updateUI();
                         saveProgress();
+                        
+                        // Check if we can start tapping again
+                        if (energy >= 30 && document.getElementById('ai-button').classList.contains('energy-waiting')) {
+                            document.getElementById('ai-button').classList.remove('energy-waiting');
+                            document.getElementById('energy-timer').style.display = 'none';
+                        }
                     }
                 }, 1000);
             }
 
             // Update UI
             function updateUI() {
-                document.getElementById('score').innerHTML = `<img src="https://i.ibb.co/vCGzNnjR/generated-image.png" alt="AI"> ${Math.floor(ai)}`;
-                updateEnergyRing();
+                document.getElementById('score').innerHTML = `<img src="https://i.ibb.co/vCGzNnjR/generated-image.png" alt="AI"> ${formatBalance(ai)}`;
             }
 
             // Update Energy Ring
             function updateEnergyRing() {
-                const button = document.getElementById('ai-button');
-                const shadowWidth = (energy / maxEnergy) * 20;
-                button.style.boxShadow = `0 0 ${shadowWidth}px #3498db`;
+                const energyRing = document.getElementById('energy-ring');
+                const energyPercent = (energy / maxEnergy) * 100;
+                
+                if (energy <= 0) {
+                    energyRing.classList.add('energy-empty');
+                } else {
+                    energyRing.classList.remove('energy-empty');
+                    const redPercent = 100 - energyPercent;
+                    energyRing.style.background = `conic-gradient(from 0deg, #e74c3c 0%, #e74c3c ${redPercent}%, #3498db ${redPercent}%, #3498db 100%)`;
+                }
             }
 
             // Tap Handling
             const tapArea = document.getElementById('ai-button');
             tapArea.addEventListener('click', (e) => {
-                if (energy >= tapValue) {
+                if (energy >= tapValue && !tapArea.classList.contains('energy-waiting')) {
                     ai += tapValue;
                     energy -= tapValue;
+                    
                     // Tap effect (+1)
                     const tapEffect = document.createElement('div');
                     tapEffect.className = 'tap-effect';
@@ -460,13 +504,35 @@
                     document.body.appendChild(tapEffect);
                     setTimeout(() => tapEffect.remove(), 1200);
                     createParticles(5, e.clientX, e.clientY);
-                    document.getElementById('tap-sound').play();
+                    
                     updateUI();
+                    updateEnergyRing();
                     saveProgress();
-                } else {
-                    alert('Недостаточно энергии! Подожди восстановления.');
+                    
+                    // Check if energy is depleted
+                    if (energy <= 0) {
+                        tapArea.classList.add('energy-waiting');
+                        document.getElementById('energy-timer').style.display = 'block';
+                        showEnergyTimer();
+                    }
                 }
             });
+            
+            // Show energy timer
+            function showEnergyTimer() {
+                const timerElement = document.getElementById('energy-timer');
+                const timeNeeded = Math.ceil((30 - energy) / energyRegenRate);
+                timerElement.textContent = `⏱️ ${timeNeeded}с`;
+                
+                const timerInterval = setInterval(() => {
+                    if (energy >= 30) {
+                        clearInterval(timerInterval);
+                        return;
+                    }
+                    const timeLeft = Math.ceil((30 - energy) / energyRegenRate);
+                    timerElement.textContent = `⏱️ ${timeLeft}с`;
+                }, 1000);
+            }
 
             // Particles
             function createParticles(count, x, y) {
@@ -493,8 +559,30 @@
                 document.getElementById('workshop-panel').style.display = 'block';
             });
             document.getElementById('profile').addEventListener('click', () => {
-                alert('Профиль пока в разработке!');
+                showProfileInfo();
             });
+            
+            function showProfileInfo() {
+                const user = tg.initDataUnsafe.user;
+                const profileInfo = `
+                    👤 Профиль
+                    ${user ? `
+                    Имя: ${user.first_name} ${user.last_name || ''}
+                    Username: @${user.username || 'не указан'}
+                    ID: ${user.id}
+                    ` : 'Данные пользователя недоступны'}
+                    
+                    📊 Статистика
+                    Баланс: ${formatBalance(ai)} AI
+                    Энергия: ${Math.floor(energy)}/100
+                    Тапов: ${ai - 1000}
+                    
+                    🎮 Игра
+                    Версия: 1.0
+                    Платформа: Telegram Web App
+                `;
+                alert(profileInfo);
+            }
 
             // Auto-save
             setInterval(saveProgress, 30000);
