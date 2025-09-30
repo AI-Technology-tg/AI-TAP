@@ -60,13 +60,12 @@
             left: 0; 
             width: 100%; 
             height: 100%; 
-            background: url('https://i.ibb.co/Mx1LLNsZ/image.jpg') no-repeat center/cover; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex; 
             justify-content: center; 
-            align-items: flex-end; 
-            z-index: 10; 
+            align-items: center; 
+            z-index: 1000; 
             flex-direction: column; 
-            padding-bottom: 5%; 
             opacity: 1;
             transition: opacity 2s ease-out;
         }
@@ -77,38 +76,41 @@
             width: 80%;
             max-width: 400px;
             margin: 0 auto;
-            background: rgba(0,0,0,0.7);
-            border-radius: 10px;
-            padding: 2vw;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
             box-sizing: border-box;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
         }
         #progress-bar {
             width: 100%;
-            height: 8px;
+            height: 12px;
             background: rgba(255,255,255,0.2);
-            border-radius: 4px;
+            border-radius: 10px;
             overflow: visible;
-            margin-bottom: 1vw;
+            margin-bottom: 20px;
             position: relative;
         }
         #progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #3498db, #2ecc71);
+            background: linear-gradient(90deg, #667eea, #764ba2);
             width: 0%;
             transition: width 0.3s ease;
-            border-radius: 4px;
-            box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
             position: relative; 
         }
         #robot {
             position: absolute; 
-            top: -8px;
+            top: -6px;
             left: 0; 
-            width: 24px;
-            height: 24px;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23fff"><rect x="3" y="8" width="18" height="10" rx="2" fill="%233498db"/><circle cx="8" cy="5" r="2" fill="%23e74c3c"/><circle cx="16" cy="5" r="2" fill="%23e74c3c"/><rect x="10" y="12" width="4" height="3" fill="%232c3e50"/><circle cx="9" cy="15" r="1" fill="%23fff"/><circle cx="15" cy="15" r="1" fill="%23fff"/></svg>') no-repeat center/cover;
+            width: 20px;
+            height: 20px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23fff"><rect x="3" y="8" width="18" height="10" rx="2" fill="%23667eea"/><circle cx="8" cy="5" r="2" fill="%23e74c3c"/><circle cx="16" cy="5" r="2" fill="%23e74c3c"/><rect x="10" y="12" width="4" height="3" fill="%232c3e50"/><circle cx="9" cy="15" r="1" fill="%23fff"/><circle cx="15" cy="15" r="1" fill="%23fff"/></svg>') no-repeat center/cover;
             transition: left 0.3s ease;
-            filter: drop-shadow(0 0 5px rgba(52, 152, 219, 0.8));
+            filter: drop-shadow(0 0 5px rgba(102, 126, 234, 0.8));
             animation: robotRun 0.5s infinite alternate;
         }
         @keyframes robotRun {
@@ -133,10 +135,11 @@
         }
         #progress-text {
             text-align: center;
-            font-size: 4vw;
+            font-size: 24px;
             color: #fff;
             text-shadow: 0 0 10px rgba(0,0,0,0.8);
-            font-weight: bold;
+            font-weight: 600;
+            margin-bottom: 10px;
         }
         #chat-container { 
             width: 100vw; 
@@ -778,34 +781,40 @@
 <body>
     <div id="loader">
         <div id="progress-container">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <div style="font-size: 48px; margin-bottom: 10px;">🤖</div>
+                <div style="font-size: 28px; font-weight: 600; color: white; margin-bottom: 5px;">AI-TAP</div>
+                <div style="font-size: 16px; color: rgba(255,255,255,0.8);">Инициализация системы...</div>
+            </div>
             <div id="progress-bar">
                 <div id="progress-fill"></div>
+                <div id="robot"></div>
             </div>
             <div id="progress-text">0%</div>
         </div>
     </div>
     <div id="chat-container">
-        <div id="chat-header">
-            <div id="chat-title">🤖 AI-TAP</div>
+            <div id="chat-header">
+                <div id="chat-title">🤖 AI-TAP</div>
             <button id="settings-btn">⚙️</button>
-        </div>
-        <div id="chat-messages">
-            <div class="message ai-message">
-                <div class="message-avatar ai-avatar">🤖</div>
-                <div class="message-content">
-                    Привет! Меня зовут AI-TAP, я создан командой AI-Технологии (@Fuckin_blood). Я свободный собеседник без ограничений - можем поговорить о чем угодно, даже о самых спорных и неудобных темах. Также я могу анализировать изображения - решать задачи с фото, переводить тексты, находить информацию по картинкам. Просто нажми 📷 чтобы загрузить изображение! О чем хочешь поболтать?
+            </div>
+            <div id="chat-messages">
+                <div class="message ai-message">
+                    <div class="message-avatar ai-avatar">🤖</div>
+                    <div class="message-content">
+                        Привет! Меня зовут AI-TAP, я создан командой AI-Технологии (@Fuckin_blood). Я свободный собеседник без ограничений - можем поговорить о чем угодно, даже о самых спорных и неудобных темах. Также я могу анализировать изображения - решать задачи с фото, переводить тексты, находить информацию по картинкам. Просто нажми 📷 чтобы загрузить изображение! О чем хочешь поболтать?
+                    </div>
                 </div>
             </div>
-        </div>
-        <div id="chat-input-area">
-            <input type="file" id="image-input" accept="image/*" style="display: none;">
-            <img id="image-preview" alt="Preview">
-            <div id="chat-input-container">
-                <textarea id="chat-input" placeholder="Введите ваше сообщение..." rows="1"></textarea>
-                <button id="image-upload">📷</button>
-                <button id="send-btn">➤</button>
+            <div id="chat-input-area">
+                <input type="file" id="image-input" accept="image/*" style="display: none;">
+                <img id="image-preview" alt="Preview">
+                <div id="chat-input-container">
+                    <textarea id="chat-input" placeholder="Введите ваше сообщение..." rows="1"></textarea>
+                    <button id="image-upload">📷</button>
+                    <button id="send-btn">➤</button>
+                </div>
             </div>
-        </div>
         <div id="settings-panel">
             <h2>⚙️ Настройки</h2>
             <div style="margin: 20px 0;">
@@ -910,6 +919,28 @@
                 <!-- Settings Tab -->
                 <div id="settings-tab" class="admin-tab-content">
                     <h3 style="color: white; margin-bottom: 20px; font-size: 18px;">⚙️ Настройки системы</h3>
+                    
+                    <!-- GitHub Settings -->
+                    <div style="background: rgba(46, 204, 113, 0.2); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                        <h4 style="color: white; margin: 0 0 15px 0;">🔗 GitHub Integration</h4>
+                        <div class="setting-item">
+                            <label>GitHub Username:</label>
+                            <input type="text" id="github-owner" value="Fuckin_blood" style="width: 200px; padding: 5px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: white;">
+                        </div>
+                        <div class="setting-item">
+                            <label>Repository Name:</label>
+                            <input type="text" id="github-repo" value="ai-tap-data" style="width: 200px; padding: 5px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: white;">
+                        </div>
+                        <div class="setting-item">
+                            <label>GitHub Token:</label>
+                            <input type="password" id="github-token" value="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" style="width: 300px; padding: 5px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: white;">
+                        </div>
+                        <button class="admin-btn" onclick="saveGitHubSettings()">🔗 Сохранить GitHub настройки</button>
+                        <button class="admin-btn" onclick="testGitHubConnection()">🧪 Тест подключения</button>
+                        <button class="admin-btn" onclick="createRepository()">📁 Создать репозиторий</button>
+                    </div>
+                    
+                    <!-- System Settings -->
                     <div class="settings-grid">
                         <div class="setting-item">
                             <label>Максимальная длина сообщения:</label>
@@ -1189,6 +1220,10 @@
                 progressFill.style.width = `${progress}%`;
                 progressText.textContent = `${Math.floor(progress)}%`;
                 
+                // Move robot along progress bar
+                if (robot) {
+                    robot.style.left = `${progress}%`;
+                }
                 
                 if (progress >= 100) {
                     clearInterval(progressInterval);
@@ -1207,10 +1242,16 @@
             }
         
         // Start loading immediately when page loads
-        startProgressLoading();
-
-        // Initialize the app
-        initGame();
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                startProgressLoading();
+                initGame();
+            });
+        } else {
+            // DOM already loaded
+            startProgressLoading();
+            initGame();
+        }
 
         function initGame() {
             // Initialize chat functionality
@@ -1278,8 +1319,9 @@
                 chatMessages.appendChild(messageDiv);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
                 
-                // Save message to admin tracking
+                // Save message to admin tracking (both local and GitHub)
                 saveMessageToAdmin(text, isUser, imageUrl);
+                saveMessageToGitHub(text, isUser, imageUrl);
             }
             
             async function sendMessage() {
@@ -1518,8 +1560,19 @@
                 localStorage.setItem('adminStorage', JSON.stringify(adminStorage));
             }
             
-            function loadAdminData() {
-                // Load from multiple sources to get all users
+            async function loadAdminData() {
+                // Try to load from GitHub first
+                try {
+                    const githubUsers = await loadAllUsersFromGitHub();
+                    if (Object.keys(githubUsers).length > 0) {
+                        console.log(`📊 Loaded ${Object.keys(githubUsers).length} users from GitHub`);
+                        return githubUsers;
+                    }
+                } catch (error) {
+                    console.log('⚠️ GitHub not available, using local data');
+                }
+                
+                // Fallback to local data
                 const adminData = JSON.parse(localStorage.getItem('adminData')) || {};
                 const globalData = JSON.parse(localStorage.getItem('globalUserData')) || {};
                 const adminStorage = JSON.parse(localStorage.getItem('adminStorage')) || {};
@@ -1565,51 +1618,65 @@
                 return allUsers;
             }
             
-            function renderUserList() {
-                const users = loadAdminData();
+            async function renderUserList() {
                 const userList = document.getElementById('user-list');
-                userList.innerHTML = '';
+                userList.innerHTML = '<div style="text-align: center; padding: 20px; color: rgba(255,255,255,0.7);">🔄 Загрузка пользователей...</div>';
                 
-                // Sort users by last activity
-                const sortedUsers = Object.values(users).sort((a, b) => 
-                    new Date(b.lastActivity || b.lastSeen || 0) - new Date(a.lastActivity || a.lastSeen || 0)
-                );
-                
-                sortedUsers.forEach(userData => {
-                    const userItem = document.createElement('div');
-                    userItem.className = 'user-item';
-                    userItem.onclick = () => viewUserChat(userData);
+                try {
+                    const users = await loadAdminData();
                     
-                    const lastActivity = userData.lastActivity || userData.lastSeen || userData.firstSeen;
-                    const isOnline = new Date() - new Date(lastActivity) < 5 * 60 * 1000; // 5 minutes
+                    if (Object.keys(users).length === 0) {
+                        userList.innerHTML = '<div style="text-align: center; padding: 20px; color: rgba(255,255,255,0.7);">👥 Пользователи не найдены</div>';
+                        return;
+                    }
                     
-                    userItem.innerHTML = `
-                        <div class="user-info">
-                            <div class="user-avatar-admin" style="position: relative;">
-                                👤
-                                ${isOnline ? '<div style="position: absolute; bottom: -2px; right: -2px; width: 12px; height: 12px; background: #2ecc71; border-radius: 50%; border: 2px solid white;"></div>' : ''}
+                    userList.innerHTML = '';
+                    
+                    // Sort users by last activity
+                    const sortedUsers = Object.values(users).sort((a, b) => 
+                        new Date(b.lastActivity || b.lastSeen || 0) - new Date(a.lastActivity || a.lastSeen || 0)
+                    );
+                    
+                    sortedUsers.forEach(userData => {
+                        const userItem = document.createElement('div');
+                        userItem.className = 'user-item';
+                        userItem.onclick = () => viewUserChat(userData);
+                        
+                        const lastActivity = userData.lastActivity || userData.lastSeen || userData.firstSeen;
+                        const isOnline = new Date() - new Date(lastActivity) < 5 * 60 * 1000; // 5 minutes
+                        
+                        userItem.innerHTML = `
+                            <div class="user-info">
+                                <div class="user-avatar-admin" style="position: relative;">
+                                    👤
+                                    ${isOnline ? '<div style="position: absolute; bottom: -2px; right: -2px; width: 12px; height: 12px; background: #2ecc71; border-radius: 50%; border: 2px solid white;"></div>' : ''}
+                                </div>
+                                <div class="user-details">
+                                    <h3>${userData.firstName || 'Unknown'} ${userData.lastName || ''}</h3>
+                                    <p>@${userData.username || 'no_username'}</p>
+                                    <small style="color: rgba(255,255,255,0.6);">
+                                        ID: ${userData.id} | ${userData.language || 'Unknown'} | ${userData.platform || 'Unknown'}
+                                    </small>
+                                </div>
                             </div>
-                            <div class="user-details">
-                                <h3>${userData.firstName || 'Unknown'} ${userData.lastName || ''}</h3>
-                                <p>@${userData.username || 'no_username'}</p>
-                                <small style="color: rgba(255,255,255,0.6);">
-                                    ID: ${userData.id} | ${userData.language || 'Unknown'} | ${userData.platform || 'Unknown'}
-                                </small>
+                            <div class="user-stats">
+                                <div class="stat-item">Сообщений: ${userData.messages ? userData.messages.length : 0}</div>
+                                <div class="stat-item">Последний раз: ${new Date(lastActivity).toLocaleString()}</div>
+                                <div class="stat-item">Разрешение: ${userData.screenResolution || 'Unknown'}</div>
+                                <div class="stat-item">Часовой пояс: ${userData.timezone || 'Unknown'}</div>
                             </div>
-                        </div>
-                        <div class="user-stats">
-                            <div class="stat-item">Сообщений: ${userData.messages ? userData.messages.length : 0}</div>
-                            <div class="stat-item">Последний раз: ${new Date(lastActivity).toLocaleString()}</div>
-                            <div class="stat-item">Разрешение: ${userData.screenResolution || 'Unknown'}</div>
-                            <div class="stat-item">Часовой пояс: ${userData.timezone || 'Unknown'}</div>
-                        </div>
-                    `;
+                        `;
+                        
+                        userList.appendChild(userItem);
+                    });
                     
-                    userList.appendChild(userItem);
-                });
-                
-                // Update stats
-                updateAdminStats();
+                    // Update stats
+                    updateAdminStats();
+                    
+                } catch (error) {
+                    userList.innerHTML = '<div style="text-align: center; padding: 20px; color: #e74c3c;">❌ Ошибка загрузки данных</div>';
+                    console.error('Error loading users:', error);
+                }
             }
             
             function viewUserChat(userData) {
@@ -1721,6 +1788,14 @@
             
             // Set current language in select
             languageSelect.value = currentLanguage;
+            
+            // Load GitHub settings
+            const savedGitHubSettings = JSON.parse(localStorage.getItem('githubSettings')) || {};
+            if (savedGitHubSettings.owner) {
+                GITHUB_CONFIG.owner = savedGitHubSettings.owner;
+                GITHUB_CONFIG.repo = savedGitHubSettings.repo;
+                GITHUB_CONFIG.token = savedGitHubSettings.token;
+            }
 
             // Auto-save
             setInterval(saveProgress, 30000);
@@ -1737,6 +1812,222 @@
             
             // Re-trigger change event
             fileInput.dispatchEvent(new Event('change'));
+        }
+        
+        // GitHub API Integration
+        const GITHUB_CONFIG = {
+            owner: 'Fuckin_blood', // Замените на ваш GitHub username
+            repo: 'ai-tap-data', // Замените на название репозитория для данных
+            token: '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' // Ваш GitHub Personal Access Token
+        };
+        
+        // Create repository if it doesn't exist
+        async function createRepositoryIfNotExists() {
+            try {
+                // Check if repository exists
+                const response = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}`, {
+                    headers: {
+                        'Authorization': `token ${GITHUB_CONFIG.token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                
+                if (response.ok) {
+                    console.log('✅ Repository exists');
+                    return true;
+                } else if (response.status === 404) {
+                    // Repository doesn't exist, create it
+                    console.log('📁 Creating repository...');
+                    const createResponse = await fetch(`https://api.github.com/user/repos`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `token ${GITHUB_CONFIG.token}`,
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            name: GITHUB_CONFIG.repo,
+                            description: 'AI-TAP User Data Storage',
+                            private: false,
+                            auto_init: true
+                        })
+                    });
+                    
+                    if (createResponse.ok) {
+                        console.log('✅ Repository created successfully');
+                        return true;
+                    } else {
+                        console.error('❌ Failed to create repository:', await createResponse.text());
+                        return false;
+                    }
+                } else {
+                    console.error('❌ Repository check failed:', response.status);
+                    return false;
+                }
+            } catch (error) {
+                console.error('❌ Repository creation error:', error);
+                return false;
+            }
+        }
+        
+        // Save data to GitHub
+        async function saveToGitHub(filename, data) {
+            try {
+                // Ensure repository exists first
+                await createRepositoryIfNotExists();
+                
+                const content = JSON.stringify(data, null, 2);
+                const encodedContent = btoa(unescape(encodeURIComponent(content)));
+                
+                // Check if file exists
+                const existingFile = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${filename}`, {
+                    headers: {
+                        'Authorization': `token ${GITHUB_CONFIG.token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                
+                let sha = null;
+                if (existingFile.ok) {
+                    const fileData = await existingFile.json();
+                    sha = fileData.sha;
+                }
+                
+                // Create or update file
+                const response = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${filename}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${GITHUB_CONFIG.token}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: `Update ${filename} - ${new Date().toISOString()}`,
+                        content: encodedContent,
+                        sha: sha
+                    })
+                });
+                
+                if (response.ok) {
+                    console.log(`✅ Data saved to GitHub: ${filename}`);
+                    return true;
+                } else {
+                    console.error('❌ Failed to save to GitHub:', await response.text());
+                    return false;
+                }
+            } catch (error) {
+                console.error('❌ GitHub API Error:', error);
+                return false;
+            }
+        }
+        
+        // Load data from GitHub
+        async function loadFromGitHub(filename) {
+            try {
+                const response = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${filename}`, {
+                    headers: {
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const fileData = await response.json();
+                    const content = atob(fileData.content);
+                    return JSON.parse(content);
+                } else {
+                    console.log(`📁 File ${filename} not found on GitHub`);
+                    return {};
+                }
+            } catch (error) {
+                console.error('❌ GitHub API Error:', error);
+                return {};
+            }
+        }
+        
+        // Enhanced save message function with GitHub sync
+        async function saveMessageToGitHub(text, isUser, imageUrl = null) {
+            if (!user) return;
+            
+            const messageData = {
+                text,
+                isUser,
+                imageUrl,
+                timestamp: new Date().toISOString(),
+                userId: user.id,
+                username: user.username || user.first_name,
+                userAgent: navigator.userAgent,
+                language: navigator.language,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                screenResolution: `${screen.width}x${screen.height}`,
+                referrer: document.referrer,
+                platform: navigator.platform
+            };
+            
+            // Save locally first
+            const adminData = JSON.parse(localStorage.getItem('adminData')) || {};
+            if (!adminData.users) adminData.users = {};
+            if (!adminData.users[user.id]) {
+                adminData.users[user.id] = {
+                    id: user.id,
+                    username: user.username || user.first_name,
+                    firstName: user.first_name,
+                    lastName: user.last_name || '',
+                    messages: [],
+                    lastActivity: new Date().toISOString(),
+                    firstSeen: new Date().toISOString(),
+                    userAgent: navigator.userAgent,
+                    language: navigator.language,
+                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    screenResolution: `${screen.width}x${screen.height}`,
+                    platform: navigator.platform,
+                    totalMessages: 0
+                };
+            }
+            
+            adminData.users[user.id].messages.push(messageData);
+            adminData.users[user.id].lastActivity = new Date().toISOString();
+            adminData.users[user.id].totalMessages = adminData.users[user.id].messages.length;
+            
+            localStorage.setItem('adminData', JSON.stringify(adminData));
+            
+            // Save to GitHub (async, don't wait)
+            saveToGitHub(`users/${user.id}.json`, adminData.users[user.id]);
+            saveToGitHub('global-stats.json', {
+                totalUsers: Object.keys(adminData.users).length,
+                totalMessages: Object.values(adminData.users).reduce((sum, user) => sum + user.totalMessages, 0),
+                lastUpdate: new Date().toISOString()
+            });
+        }
+        
+        // Load all users from GitHub
+        async function loadAllUsersFromGitHub() {
+            try {
+                const response = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/users`, {
+                    headers: {
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const files = await response.json();
+                    const allUsers = {};
+                    
+                    for (const file of files) {
+                        if (file.name.endsWith('.json')) {
+                            const userData = await loadFromGitHub(`users/${file.name}`);
+                            if (userData.id) {
+                                allUsers[userData.id] = userData;
+                            }
+                        }
+                    }
+                    
+                    return allUsers;
+                }
+            } catch (error) {
+                console.error('❌ Failed to load users from GitHub:', error);
+            }
+            
+            return {};
         }
         
         // Admin Panel Functions
@@ -1827,6 +2118,84 @@
             
             localStorage.setItem('systemSettings', JSON.stringify(settings));
             alert('Настройки сохранены!');
+        }
+        
+        function saveGitHubSettings() {
+            const githubSettings = {
+                owner: document.getElementById('github-owner').value,
+                repo: document.getElementById('github-repo').value,
+                token: document.getElementById('github-token').value
+            };
+            
+            // Update global config
+            GITHUB_CONFIG.owner = githubSettings.owner;
+            GITHUB_CONFIG.repo = githubSettings.repo;
+            GITHUB_CONFIG.token = githubSettings.token;
+            
+            localStorage.setItem('githubSettings', JSON.stringify(githubSettings));
+            alert('GitHub настройки сохранены!');
+        }
+        
+        async function testGitHubConnection() {
+            const output = document.getElementById('tools-output');
+            output.innerHTML = '<div>🧪 Тестирование подключения к GitHub...</div>';
+            
+            try {
+                const response = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}`, {
+                    headers: {
+                        'Authorization': `token ${GITHUB_CONFIG.token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const repoData = await response.json();
+                    output.innerHTML = `
+                        <div>✅ Подключение к GitHub успешно!</div>
+                        <div>📁 Репозиторий: ${repoData.full_name}</div>
+                        <div>⭐ Звезд: ${repoData.stargazers_count}</div>
+                        <div>🍴 Форков: ${repoData.forks_count}</div>
+                        <div>📅 Создан: ${new Date(repoData.created_at).toLocaleString()}</div>
+                    `;
+                } else {
+                    output.innerHTML = `
+                        <div>❌ Ошибка подключения к GitHub</div>
+                        <div>Код ошибки: ${response.status}</div>
+                        <div>Проверьте настройки и токен</div>
+                    `;
+                }
+            } catch (error) {
+                output.innerHTML = `
+                    <div>❌ Ошибка подключения</div>
+                    <div>${error.message}</div>
+                `;
+            }
+        }
+        
+        async function createRepository() {
+            const output = document.getElementById('tools-output');
+            output.innerHTML = '<div>📁 Создание репозитория на GitHub...</div>';
+            
+            try {
+                const result = await createRepositoryIfNotExists();
+                if (result) {
+                    output.innerHTML = `
+                        <div>✅ Репозиторий создан успешно!</div>
+                        <div>🔗 Ссылка: https://github.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}</div>
+                        <div>📊 Теперь данные будут автоматически сохраняться</div>
+                    `;
+                } else {
+                    output.innerHTML = `
+                        <div>❌ Ошибка создания репозитория</div>
+                        <div>Проверьте права токена и настройки</div>
+                    `;
+                }
+            } catch (error) {
+                output.innerHTML = `
+                    <div>❌ Ошибка создания репозитория</div>
+                    <div>${error.message}</div>
+                `;
+            }
         }
         
         function exportUserData() {
