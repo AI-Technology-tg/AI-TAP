@@ -7,42 +7,54 @@
     <style>
         body { margin: 0; padding: 0; background: linear-gradient(to bottom, #0a0a2a, #1a1a4a); color: #fff; font-family: Arial, sans-serif; overflow: hidden; }
         #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; justify-content: center; align-items: center; z-index: 10; flex-direction: column; animation: bgPulse 5s infinite alternate; }
-        #loader h1 { font-size: 48px; margin: 0; letter-spacing: 5px; background: linear-gradient(90deg, #3498db, #2ecc71, #3498db); background-size: 200% 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradientShift 3s ease-in-out infinite; }
-        #loader p { font-size: 24px; margin: 10px; opacity: 0.8; }
-        #loader .spinner { border: 16px solid #f3f3f3; border-top: 16px solid #3498db; border-radius: 50%; width: 120px; height: 120px; animation: spin 2s linear infinite; position: relative; }
-        #loader .spinner::before { content: ''; position: absolute; top: 50%; left: 50%; width: 80px; height: 80px; border: 8px solid transparent; border-top: 8px solid #2ecc71; border-radius: 50%; animation: spin 1.5s linear infinite reverse; transform: translate(-50%, -50%); }
+        #loader h1 { font-size: 48px; margin: 0; letter-spacing: 5px; background: linear-gradient(90deg, #3498db, #2ecc71, #e74c3c, #3498db); background-size: 400% 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradientShift 5s ease-in-out infinite; }
+        #loader p { font-size: 24px; margin: 10px; opacity: 0.8; animation: fadeIn 2s ease-in; }
+        #loader .spinner { position: relative; width: 150px; height: 150px; }
+        #loader .spinner::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 10px solid transparent; border-top: 10px solid #3498db; border-radius: 50%; animation: spin 2s linear infinite; }
+        #loader .spinner::after { content: ''; position: absolute; top: 20px; left: 20px; width: 110px; height: 110px; border: 10px solid transparent; border-right: 10px solid #2ecc71; border-radius: 50%; animation: spin 1.5s linear infinite reverse; }
+        .spinner-inner { position: absolute; top: 40px; left: 40px; width: 70px; height: 70px; border: 5px solid transparent; border-bottom: 5px solid #e74c3c; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes bgPulse { 0% { background: #000; } 100% { background: #1a1a4a; } }
+        @keyframes bgPulse { 0% { background: #000; } 50% { background: #0a0a2a; } 100% { background: #000; } }
         @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 0.8; } }
         #game-container { width: 100vw; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: space-between; position: relative; display: none; }
-        #header { width: 100%; text-align: center; padding: 10px; background: rgba(0,0,0,0.5); }
+        #header { width: 100%; text-align: center; padding: 10px; background: rgba(0,0,0,0.5); position: relative; }
         #score { font-size: 32px; }
+        #energy-bar { width: 80%; height: 20px; background: #333; border-radius: 10px; margin: 10px auto; position: relative; overflow: hidden; }
+        #energy-fill { height: 100%; background: linear-gradient(to right, #2ecc71, #3498db); transition: width 0.5s ease; }
+        #energy-text { position: absolute; top: 0; left: 50%; transform: translateX(-50%); color: #fff; font-size: 14px; }
         #tap-area { flex: 1; width: 100%; display: flex; justify-content: center; align-items: center; position: relative; }
-        #ai-button { width: 200px; height: 200px; background: url('https://via.placeholder.com/200/3498db/fff?text=AI+Core') no-repeat center/cover; border-radius: 50%; cursor: pointer; animation: pulse 2s infinite; transition: transform 0.1s; }
-        #ai-button:active { transform: scale(1.1); }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7); } 70% { box-shadow: 0 0 0 20px rgba(52, 152, 219, 0); } 100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); } }
-        .tap-effect { position: absolute; font-size: 24px; color: cyan; pointer-events: none; animation: floatUp 1s ease-out forwards; }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-50px); } }
+        #ai-button { width: 250px; height: 250px; background: url('https://via.placeholder.com/250/3498db/fff?text=AI+Core') no-repeat center/cover; border-radius: 50%; cursor: pointer; animation: pulse 1.5s infinite; transition: transform 0.1s, box-shadow 0.3s; box-shadow: 0 0 20px rgba(52, 152, 219, 0.5); }
+        #ai-button:active { transform: scale(1.05); box-shadow: 0 0 30px rgba(52, 152, 219, 0.8); }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7); } 70% { box-shadow: 0 0 0 30px rgba(52, 152, 219, 0); } 100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); } }
+        .tap-effect { position: absolute; font-size: 28px; color: cyan; pointer-events: none; animation: floatUp 1.2s ease-out forwards, rotate 1s ease; }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-60px); } }
+        @keyframes rotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(10deg); } }
         #upgrades { width: 100%; background: rgba(0,0,0,0.7); padding: 10px; display: flex; flex-wrap: wrap; justify-content: center; }
-        .upgrade-btn { background: #3498db; color: white; padding: 8px 16px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; text-align: center; width: 120px; }
-        .upgrade-btn:disabled { background: #555; }
-        .upgrade-btn:hover { background: #2980b9; }
+        .upgrade-btn { background: linear-gradient(to right, #3498db, #2980b9); color: white; padding: 10px 20px; margin: 5px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; text-align: center; width: 140px; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .upgrade-btn:disabled { background: #555; box-shadow: none; }
+        .upgrade-btn:hover { transform: scale(1.05); box-shadow: 0 6px 8px rgba(0,0,0,0.4); }
         #quests { width: 100%; background: rgba(0,0,0,0.7); padding: 10px; display: flex; flex-direction: column; align-items: center; }
-        .quest { background: #2ecc71; color: white; padding: 8px; margin: 5px; border-radius: 5px; width: 80%; text-align: center; }
-        .quest.completed { background: #27ae60; }
-        #chat-container { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.8); padding: 10px; display: none; flex-direction: column; }
-        #chat-messages { height: 200px; overflow-y: auto; margin-bottom: 10px; }
-        .message { padding: 5px; margin: 5px 0; border-radius: 5px; }
+        .quest { background: linear-gradient(to right, #2ecc71, #27ae60); color: white; padding: 10px; margin: 5px; border-radius: 8px; width: 90%; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: transform 0.2s; }
+        .quest.completed { background: linear-gradient(to right, #f1c40f, #f39c12); transform: scale(1.02); }
+        #daily-rewards { width: 100%; background: rgba(0,0,0,0.7); padding: 10px; text-align: center; }
+        #daily-btn { background: #e67e22; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        #boosts { width: 100%; background: rgba(0,0,0,0.7); padding: 10px; display: flex; justify-content: center; flex-wrap: wrap; }
+        .boost-btn { background: #9b59b6; color: white; padding: 10px 20px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        #chat-container { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.8); padding: 10px; display: none; flex-direction: column; box-shadow: 0 -4px 10px rgba(0,0,0,0.5); }
+        #chat-messages { height: 250px; overflow-y: auto; margin-bottom: 10px; padding: 10px; background: #222; border-radius: 10px; }
+        .message { padding: 8px 12px; margin: 5px 0; border-radius: 10px; max-width: 80%; word-wrap: break-word; }
         .user-msg { background: #3498db; align-self: flex-end; }
         .ai-msg { background: #2ecc71; align-self: flex-start; }
-        #chat-input { width: 100%; padding: 10px; box-sizing: border-box; background: #222; color: #fff; border: none; border-radius: 5px; }
-        #chat-btn { position: absolute; top: 10px; right: 10px; background: #e74c3c; color: white; padding: 5px 10px; border: none; border-radius: 50%; cursor: pointer; }
-        #leaderboard-btn { position: absolute; top: 10px; left: 10px; background: #f39c12; color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; }
-        #notifications-btn { position: absolute; top: 50px; left: 10px; background: #9b59b6; color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; }
-        #leaderboard { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); padding: 20px; border-radius: 10px; display: none; text-align: center; z-index: 5; }
-        #invite-btn { background: #2ecc71; color: white; padding: 10px; margin-top: 10px; border: none; border-radius: 5px; cursor: pointer; }
-        .particle { position: absolute; width: 10px; height: 10px; background: radial-gradient(circle, cyan, transparent); border-radius: 50%; pointer-events: none; }
-        #online-counter { position: absolute; top: 10px; right: 50px; font-size: 18px; }
+        #chat-input { width: 100%; padding: 12px; box-sizing: border-box; background: #333; color: #fff; border: none; border-radius: 20px; font-size: 16px; }
+        #chat-btn { position: absolute; top: 10px; right: 10px; background: #e74c3c; color: white; padding: 8px 16px; border: none; border-radius: 20px; cursor: pointer; font-size: 16px; }
+        #leaderboard-btn { position: absolute; top: 10px; left: 10px; background: #f39c12; color: white; padding: 8px 16px; border: none; border-radius: 20px; cursor: pointer; font-size: 16px; }
+        #notifications-btn { position: absolute; top: 50px; left: 10px; background: #9b59b6; color: white; padding: 8px 16px; border: none; border-radius: 20px; cursor: pointer; font-size: 16px; }
+        #leaderboard { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); padding: 20px; border-radius: 10px; display: none; text-align: center; z-index: 5; width: 80%; max-height: 80%; overflow-y: auto; }
+        #invite-btn { background: #2ecc71; color: white; padding: 10px 20px; margin-top: 10px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        .particle { position: absolute; width: 15px; height: 15px; background: radial-gradient(circle, cyan, transparent); border-radius: 50%; pointer-events: none; animation: particleBurst 0.8s ease-out forwards; }
+        @keyframes particleBurst { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(0) translate(${Math.random() * 200 - 100}px, ${Math.random() * 200 - 100}px); } }
+        #online-counter { position: absolute; top: 10px; right: 50px; font-size: 18px; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 10px; }
     </style>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js"></script>
@@ -52,7 +64,7 @@
 </head>
 <body>
     <div id="loader">
-        <div class="spinner"></div>
+        <div class="spinner"><div class="spinner-inner"></div></div>
         <h1 id="title"></h1>
         <p>от AI-Технологии</p>
     </div>
@@ -64,8 +76,20 @@
             <button id="notifications-btn">Уведомления</button>
             <button id="chat-btn">AI Чат</button>
         </div>
+        <div id="energy-bar">
+            <div id="energy-fill" style="width: 100%;"></div>
+            <div id="energy-text">Энергия: 1000/1000</div>
+        </div>
         <div id="tap-area">
             <div id="ai-button"></div>
+        </div>
+        <div id="daily-rewards">
+            <button id="daily-btn">Ежедневная награда</button>
+        </div>
+        <div id="boosts">
+            <button class="boost-btn" id="tap-boost">Буст тапа (x2)</button>
+            <button class="boost-btn" id="energy-boost">Восстановить энергию</button>
+            <button class="boost-btn" id="income-boost">Буст дохода (x1.5)</button>
         </div>
         <div id="quests"></div>
         <div id="upgrades"></div>
@@ -83,6 +107,8 @@
     <audio id="tap-sound" src="https://freesound.org/data/previews/571/571811_11955436-lq.mp3" preload="auto"></audio>
     <audio id="upgrade-sound" src="https://freesound.org/data/previews/571/571814_11955436-lq.mp3" preload="auto"></audio>
     <audio id="quest-sound" src="https://freesound.org/data/previews/571/571816_11955436-lq.mp3" preload="auto"></audio>
+    <audio id="boost-sound" src="https://freesound.org/data/previews/571/571817_11955436-lq.mp3" preload="auto"></audio>
+    <audio id="daily-sound" src="https://freesound.org/data/previews/571/571818_11955436-lq.mp3" preload="auto"></audio>
     <script>
         // Animate Title
         const titleText = 'AI-TAP';
@@ -94,30 +120,35 @@
                 index++;
             } else {
                 clearInterval(typeInterval);
-                // Start gradient animation (already in CSS)
                 setTimeout(() => {
                     document.getElementById('loader').style.display = 'none';
                     document.getElementById('game-container').style.display = 'flex';
-                    initGame(); // Initialize game after loading
-                }, 2000); // Wait 2s after full text
+                    initGame();
+                }, 3000); // Extended wait for full animation
             }
-        }, 300); // 300ms per letter
+        }, 400); // Slower typing for dramatic effect
 
         function initGame() {
-            // Firebase Config - Замени на свои! Если не заменено, игра не запустится полностью.
-            const firebaseConfig = {
-                apiKey: "YOUR_API_KEY",
-                authDomain: "YOUR_PROJECT.firebaseapp.com",
-                projectId: "YOUR_PROJECT_ID",
-                storageBucket: "YOUR_PROJECT.appspot.com",
-                messagingSenderId: "YOUR_SENDER_ID",
-                appId: "YOUR_APP_ID",
-                databaseURL: "https://YOUR_PROJECT.firebaseio.com" // Добавь для Realtime Database
-            };
-            firebase.initializeApp(firebaseConfig);
-            const db = firebase.firestore();
-            const realtimeDb = firebase.database();
-            const auth = firebase.auth();
+            let firebaseInitialized = false;
+            try {
+                // Firebase Config - Замени на свои для полной функциональности
+                const firebaseConfig = {
+                    apiKey: "YOUR_API_KEY",
+                    authDomain: "YOUR_PROJECT.firebaseapp.com",
+                    projectId: "YOUR_PROJECT_ID",
+                    storageBucket: "YOUR_PROJECT.appspot.com",
+                    messagingSenderId: "YOUR_SENDER_ID",
+                    appId: "YOUR_APP_ID",
+                    databaseURL: "https://YOUR_PROJECT.firebaseio.com"
+                };
+                firebase.initializeApp(firebaseConfig);
+                firebaseInitialized = true;
+            } catch (e) {
+                console.warn('Firebase not initialized. Using local storage for testing.');
+            }
+            const db = firebaseInitialized ? firebase.firestore() : null;
+            const realtimeDb = firebaseInitialized ? firebase.database() : null;
+            const auth = firebaseInitialized ? firebase.auth() : null;
 
             // Telegram Integration
             const tg = window.Telegram.WebApp;
@@ -125,90 +156,145 @@
             const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : 'guest_' + Math.random().toString(36).substr(2, 9);
             const username = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.username || 'Аноним' : 'Аноним';
 
-            // Auth anonymously
-            auth.signInAnonymously().then(() => {
-                console.log('Аутентифицирован');
-                loadProgress();
-            }).catch(error => {
-                console.error('Ошибка аутентификации:', error);
-                // Продолжить без Firebase, если ошибка (для тестирования)
-                loadProgress();
-            });
+            // Local Storage for fallback
+            function getLocalProgress() {
+                return JSON.parse(localStorage.getItem('aiTapProgress')) || {};
+            }
+            function saveLocalProgress(data) {
+                localStorage.setItem('aiTapProgress', JSON.stringify(data));
+            }
 
-            // Game State
+            // Auth or fallback
+            if (auth) {
+                auth.signInAnonymously().then(() => console.log('Аутентифицирован')).catch(error => console.error(error));
+            }
+
+            // Game State - Expanded with energy, boosts, daily
             let tokens = 0;
             let tapValue = 1;
             let passiveIncome = 0;
-            let upgrades = [
-                { name: 'Модуль глубокого обучения', cost: 100, income: 1, level: 0 },
-                { name: 'Процессор ИИ', cost: 500, income: 5, level: 0 },
-                { name: 'Квантовая матрица', cost: 2000, income: 20, level: 0 },
-                { name: 'Нейронная сеть', cost: 10000, income: 100, level: 0 }
-            ];
+            let energy = 1000;
+            let maxEnergy = 1000;
+            let energyRegenRate = 1; // Per second
             let referrals = 0;
             let tapsToday = 0;
+            let lastDailyClaim = 0;
+            let boostActive = { tap: false, income: false };
+            let boostTimers = { tap: 0, income: 0 };
             let quests = [
                 { id: 1, description: 'Сделай 100 тапов', target: 100, reward: 500, progress: 0, completed: false },
-                { id: 2, description: 'Купи 1 апгрейд', target: 1, reward: 1000, progress: 0, completed: false },
-                { id: 3, description: 'Пригласи 1 друга', target: 1, reward: 2000, progress: 0, completed: false }
+                { id: 2, description: 'Купи 2 апгрейда', target: 2, reward: 1000, progress: 0, completed: false },
+                { id: 3, description: 'Пригласи 2 друга', target: 2, reward: 2000, progress: 0, completed: false },
+                { id: 4, description: 'Заработай 5000 токенов пассивно', target: 5000, reward: 3000, progress: 0, completed: false }
+            ];
+            let upgrades = [
+                { name: 'Модуль глубокого обучения', cost: 100, income: 1, level: 0, description: 'Увеличивает пассивный доход' },
+                { name: 'Процессор ИИ', cost: 500, income: 5, level: 0, description: 'Более эффективный процессор' },
+                { name: 'Квантовая матрица', cost: 2000, income: 20, level: 0, description: 'Квантовая вычислительная мощь' },
+                { name: 'Нейронная сеть', cost: 10000, income: 100, level: 0, description: 'Полная нейронная интеграция' },
+                { name: 'AI Оптимизатор', cost: 50000, income: 500, level: 0, description: 'Оптимизирует все процессы' },
+                { name: 'Квантовый Ускоритель', cost: 100000, income: 1000, level: 0, description: 'Ускоряет вычисления' }
             ];
 
-            // Sounds
+            // Sounds - Expanded
             const tapSound = document.getElementById('tap-sound');
             const upgradeSound = document.getElementById('upgrade-sound');
             const questSound = document.getElementById('quest-sound');
+            const boostSound = document.getElementById('boost-sound');
+            const dailySound = document.getElementById('daily-sound');
 
             // Load Progress
-            function loadProgress() {
-                db.collection('players').doc(userId.toString()).get().then(doc => {
-                    if (doc.exists) {
-                        const data = doc.data();
-                        tokens = data.tokens || 0;
-                        passiveIncome = data.passiveIncome || 0;
-                        upgrades = data.upgrades || upgrades;
-                        referrals = data.referrals || 0;
-                        quests = data.quests || quests;
-                        tapsToday = data.tapsToday || 0;
-                    }
-                    updateUI();
-                    updateQuests();
-                    startPassiveIncome();
-                    startRealtimeLeaderboard();
-                    setupPresence();
-                }).catch(error => {
-                    console.error('Ошибка загрузки прогресса:', error);
-                    // Продолжить с дефолтными значениями
-                    updateUI();
-                    updateQuests();
-                    startPassiveIncome();
-                    startRealtimeLeaderboard();
-                    setupPresence();
-                });
+            async function loadProgress() {
+                let data;
+                if (db) {
+                    const doc = await db.collection('players').doc(userId.toString()).get();
+                    if (doc.exists) data = doc.data();
+                } else {
+                    data = getLocalProgress();
+                }
+                if (data) {
+                    tokens = data.tokens || 0;
+                    passiveIncome = data.passiveIncome || 0;
+                    upgrades = data.upgrades || upgrades;
+                    referrals = data.referrals || 0;
+                    quests = data.quests || quests;
+                    tapsToday = data.tapsToday || 0;
+                    energy = data.energy || maxEnergy;
+                    lastDailyClaim = data.lastDailyClaim || 0;
+                    boostActive = data.boostActive || boostActive;
+                    boostTimers = data.boostTimers || boostTimers;
+                }
+                updateUI();
+                updateQuests();
+                startPassiveIncome();
+                startEnergyRegen();
+                startBoostTimers();
+                if (realtimeDb) startRealtimeLeaderboard();
+                if (realtimeDb) setupPresence();
             }
+            loadProgress();
 
             // Save Progress
             function saveProgress() {
-                db.collection('players').doc(userId.toString()).set({
+                const data = {
                     username,
                     tokens,
                     passiveIncome,
                     upgrades,
                     referrals,
                     quests,
-                    tapsToday
-                }).catch(error => console.error('Ошибка сохранения:', error));
+                    tapsToday,
+                    energy,
+                    lastDailyClaim,
+                    boostActive,
+                    boostTimers
+                };
+                if (db) {
+                    db.collection('players').doc(userId.toString()).set(data);
+                } else {
+                    saveLocalProgress(data);
+                }
             }
 
-            // Passive Income Loop
+            // Passive Income
             function startPassiveIncome() {
                 setInterval(() => {
-                    tokens += passiveIncome / 60;
+                    let income = passiveIncome;
+                    if (boostActive.income) income *= 1.5;
+                    tokens += income / 60;
+                    quests.find(q => q.id === 4).progress += income / 60;
+                    checkQuestProgress(4);
                     updateUI();
                     saveProgress();
                 }, 1000);
             }
 
-            // Update UI
+            // Energy Regeneration
+            function startEnergyRegen() {
+                setInterval(() => {
+                    if (energy < maxEnergy) {
+                        energy = Math.min(maxEnergy, energy + energyRegenRate);
+                        updateEnergyBar();
+                    }
+                }, 1000);
+            }
+
+            // Boost Timers
+            function startBoostTimers() {
+                setInterval(() => {
+                    if (boostTimers.tap > 0) {
+                        boostTimers.tap--;
+                        if (boostTimers.tap === 0) boostActive.tap = false;
+                    }
+                    if (boostTimers.income > 0) {
+                        boostTimers.income--;
+                        if (boostTimers.income === 0) boostActive.income = false;
+                    }
+                    saveProgress();
+                }, 1000);
+            }
+
+            // Update UI - Expanded
             function updateUI() {
                 document.getElementById('score').innerText = `AI Tokens: ${Math.floor(tokens)}`;
                 const upgradesDiv = document.getElementById('upgrades');
@@ -216,14 +302,24 @@
                 upgrades.forEach((up, i) => {
                     const btn = document.createElement('button');
                     btn.className = 'upgrade-btn';
-                    btn.innerText = `${up.name} Ур.${up.level}\nСтоимость: ${up.cost}\nДоход: +${up.income}`;
+                    btn.innerText = `${up.name} Ур.${up.level}\nСтоимость: ${up.cost}\nДоход: +${up.income}\n${up.description}`;
                     btn.disabled = tokens < up.cost;
                     btn.onclick = () => buyUpgrade(i);
                     upgradesDiv.appendChild(btn);
                 });
+                updateEnergyBar();
+                document.getElementById('tap-boost').innerText = boostActive.tap ? `Буст тапа (осталось ${boostTimers.tap}s)` : 'Буст тапа (x2 на 60s)';
+                document.getElementById('income-boost').innerText = boostActive.income ? `Буст дохода (осталось ${boostTimers.income}s)` : 'Буст дохода (x1.5 на 120s)';
             }
 
-            // Buy Upgrade
+            // Update Energy Bar
+            function updateEnergyBar() {
+                const fill = document.getElementById('energy-fill');
+                fill.style.width = `${(energy / maxEnergy) * 100}%`;
+                document.getElementById('energy-text').innerText = `Энергия: ${Math.floor(energy)}/${maxEnergy}`;
+            }
+
+            // Buy Upgrade - Expanded
             function buyUpgrade(index) {
                 const up = upgrades[index];
                 if (tokens >= up.cost) {
@@ -232,58 +328,60 @@
                     passiveIncome += up.income;
                     up.cost = Math.floor(up.cost * 1.5);
                     up.income = Math.floor(up.income * 1.2);
-                    createParticles(5, window.innerWidth / 2, window.innerHeight / 2);
+                    createParticles(10, window.innerWidth / 2, window.innerHeight / 2);
                     upgradeSound.play();
+                    quests.find(q => q.id === 2).progress++;
                     checkQuestProgress(2);
                     updateUI();
                     saveProgress();
                 }
             }
 
-            // Tap Handling
+            // Tap Handling - With energy
             const tapArea = document.getElementById('ai-button');
             tapArea.addEventListener('click', (e) => {
-                tokens += tapValue;
-                tapsToday++;
-                const effect = document.createElement('div');
-                effect.className = 'tap-effect';
-                effect.innerText = `+${tapValue}`;
-                effect.style.left = `${e.clientX - 20}px`;
-                effect.style.top = `${e.clientY - 20}px`;
-                document.body.appendChild(effect);
-                setTimeout(() => effect.remove(), 1000);
-                createParticles(3, e.clientX, e.clientY);
-                tapSound.play();
-                checkQuestProgress(1);
-                updateUI();
-                saveProgress();
+                if (energy >= tapValue) {
+                    let value = tapValue;
+                    if (boostActive.tap) value *= 2;
+                    tokens += value;
+                    energy -= tapValue;
+                    tapsToday++;
+                    const effect = document.createElement('div');
+                    effect.className = 'tap-effect';
+                    effect.innerText = `+${value}`;
+                    effect.style.left = `${e.clientX - 20}px`;
+                    effect.style.top = `${e.clientY - 20}px`;
+                    document.body.appendChild(effect);
+                    setTimeout(() => effect.remove(), 1200);
+                    createParticles(5, e.clientX, e.clientY);
+                    tapSound.play();
+                    checkQuestProgress(1);
+                    updateUI();
+                    saveProgress();
+                } else {
+                    tg.showPopup({ message: 'Недостаточно энергии! Подожди восстановления.' });
+                }
             });
 
-            // Particles
+            // Particles - Enhanced
             function createParticles(count, x, y) {
                 for (let i = 0; i < count; i++) {
                     const p = document.createElement('div');
                     p.className = 'particle';
                     p.style.left = `${x}px`;
                     p.style.top = `${y}px`;
-                    p.style.transform = `translate(${Math.random() * 40 - 20}px, ${Math.random() * 40 - 20}px)`;
                     document.body.appendChild(p);
-                    setTimeout(() => {
-                        p.style.opacity = 0;
-                        p.style.transform = `translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px) scale(0)`;
-                        setTimeout(() => p.remove(), 500);
-                    }, 10);
                 }
             }
 
-            // Quests
+            // Quests - Expanded
             function updateQuests() {
                 const questsDiv = document.getElementById('quests');
                 questsDiv.innerHTML = '<h3>Квесты</h3>';
                 quests.forEach(q => {
                     const div = document.createElement('div');
                     div.className = `quest ${q.completed ? 'completed' : ''}`;
-                    div.innerText = `${q.description} (${q.progress}/${q.target}) Награда: ${q.reward}`;
+                    div.innerText = `${q.description} (${Math.floor(q.progress)}/${q.target}) Награда: ${q.reward}`;
                     questsDiv.appendChild(div);
                 });
             }
@@ -292,8 +390,7 @@
                 const q = quests.find(q => q.id === questId);
                 if (q && !q.completed) {
                     if (questId === 1) q.progress = tapsToday;
-                    if (questId === 2) q.progress++;
-                    if (questId === 3) q.progress = referrals;
+                    if (questId === 4) return; // Passive handled in income loop
                     if (q.progress >= q.target) {
                         q.completed = true;
                         tokens += q.reward;
@@ -306,7 +403,53 @@
                 }
             }
 
-            // AI Chat Simulation
+            // Daily Rewards
+            document.getElementById('daily-btn').addEventListener('click', () => {
+                const now = Date.now();
+                if (now - lastDailyClaim > 86400000) { // 24 hours
+                    tokens += 1000;
+                    lastDailyClaim = now;
+                    dailySound.play();
+                    tg.showPopup({ message: 'Ежедневная награда получена! +1000 AI Tokens' });
+                    updateUI();
+                    saveProgress();
+                } else {
+                    tg.showPopup({ message: 'Награда уже получена сегодня!' });
+                }
+            });
+
+            // Boosts
+            document.getElementById('tap-boost').addEventListener('click', () => {
+                if (!boostActive.tap && tokens >= 500) {
+                    tokens -= 500;
+                    boostActive.tap = true;
+                    boostTimers.tap = 60;
+                    boostSound.play();
+                    updateUI();
+                    saveProgress();
+                }
+            });
+            document.getElementById('energy-boost').addEventListener('click', () => {
+                if (tokens >= 200) {
+                    tokens -= 200;
+                    energy = maxEnergy;
+                    boostSound.play();
+                    updateEnergyBar();
+                    saveProgress();
+                }
+            });
+            document.getElementById('income-boost').addEventListener('click', () => {
+                if (!boostActive.income && tokens >= 1000) {
+                    tokens -= 1000;
+                    boostActive.income = true;
+                    boostTimers.income = 120;
+                    boostSound.play();
+                    updateUI();
+                    saveProgress();
+                }
+            });
+
+            // AI Chat - Enhanced with more responses
             const chatMessages = document.getElementById('chat-messages');
             const chatInput = document.getElementById('chat-input');
             chatInput.addEventListener('keypress', (e) => {
@@ -328,17 +471,22 @@
             function simulateAIResponse(query) {
                 let response = 'Интересный запрос!';
                 if (query.toLowerCase().includes('совет')) {
-                    response = 'Покупай апгрейды и приглашай друзей для бонусов!';
-                    tokens += 50;
-                    updateUI();
+                    response = 'Покупай апгрейды, активируй бусты и выполняй квесты для максимального роста!';
+                    tokens += 100; // Bonus
                 } else if (query.toLowerCase().includes('квест')) {
-                    response = 'Квест: Сделай 100 тапов за минуту для +1000 AI Tokens!';
+                    response = 'Текущие квесты: ' + quests.map(q => q.description).join(', ');
+                } else if (query.toLowerCase().includes('бусть')) {
+                    response = 'Бусты помогут удвоить тапы или доход. Используй wisely!';
+                    tokens += 50;
+                } else if (query.toLowerCase().includes('энергия')) {
+                    response = 'Энергия восстанавливается автоматически. Купи буст для полного восстановления.';
                 } else if (query.toLowerCase().includes('ai') || query.toLowerCase().includes('ии')) {
-                    response = 'AI-Tap — это твоя империя ИИ! Продолжай строить с AI Технология.';
+                    response = 'AI-Tap — это твоя империя ИИ! Строим будущее вместе с AI Технология.';
                 } else {
-                    response = 'Продолжай тапать, чтобы развивать свою AI-империю!';
+                    response = 'Продолжай тапать и развивай империю! Может, спроси о совете?';
                 }
-                setTimeout(() => addMessage('ai', response), 1000);
+                setTimeout(() => addMessage('ai', response), 1500); // Delay for realism
+                updateUI();
             }
 
             // Toggle Chat
@@ -347,18 +495,17 @@
                 chat.style.display = chat.style.display === 'none' ? 'flex' : 'none';
             });
 
-            // Realtime Leaderboard
+            // Realtime Leaderboard and Online
             function startRealtimeLeaderboard() {
                 const leaderboardRef = realtimeDb.ref('leaderboard');
                 leaderboardRef.on('value', (snapshot) => {
-                    console.log('Онлайн обновление:', snapshot.val());
+                    // Real-time update if needed
                 });
                 setInterval(() => {
                     realtimeDb.ref('leaderboard/' + userId).set({ username, tokens: Math.floor(tokens) });
-                }, 5000);
+                }, 3000); // More frequent
             }
 
-            // Online Presence
             function setupPresence() {
                 const connectedRef = realtimeDb.ref('.info/connected');
                 const presenceRef = realtimeDb.ref('presence/' + userId);
@@ -368,18 +515,19 @@
                         presenceRef.onDisconnect().remove();
                     }
                 });
-                // Count online users
                 realtimeDb.ref('presence').on('value', (snap) => {
                     const onlineCount = snap.numChildren();
                     document.getElementById('online-counter').innerText = `Онлайн: ${onlineCount}`;
                 });
             }
 
-            // Leaderboard Display
+            // Leaderboard
             document.getElementById('leaderboard-btn').addEventListener('click', showLeaderboard);
-            function showLeaderboard() {
+            async function showLeaderboard() {
                 document.getElementById('leaderboard').style.display = 'block';
-                db.collection('players').orderBy('tokens', 'desc').limit(10).get().then(query => {
+                let query;
+                if (db) {
+                    query = await db.collection('players').orderBy('tokens', 'desc').limit(10).get();
                     const list = document.getElementById('leaderboard-list');
                     list.innerHTML = '';
                     query.forEach(doc => {
@@ -388,12 +536,14 @@
                         li.innerText = `${data.username}: ${Math.floor(data.tokens)} AI Tokens`;
                         list.appendChild(li);
                     });
-                }).catch(error => console.error('Ошибка лидерборда:', error));
+                } else {
+                    tg.showPopup({ message: 'Лидерборд доступен только с Firebase.' });
+                }
             }
 
-            // Invite Friend
+            // Invite
             document.getElementById('invite-btn').addEventListener('click', () => {
-                tg.showPopup({ message: 'Пригласи друга и получи 1000 AI Tokens!' });
+                tg.showShareUrlButton({ url: 'https://t.me/your_bot?start=ref_' + userId, text: 'Присоединяйся к AI-Tap и получи бонус!' });
                 referrals++;
                 tokens += 1000;
                 checkQuestProgress(3);
@@ -404,9 +554,13 @@
             // Notifications
             document.getElementById('notifications-btn').addEventListener('click', () => {
                 tg.requestWriteAccess(() => {
-                    tg.showPopup({ message: 'Уведомления включены! Бот будет напоминать о возвращении.' });
+                    tg.showPopup({ message: 'Уведомления включены! Получай напоминания о бустах и наградах.' });
+                    // Backend for bot to send notifications would be needed
                 });
             });
+
+            // Auto-save every 30s
+            setInterval(saveProgress, 30000);
         }
     </script>
 </body>
