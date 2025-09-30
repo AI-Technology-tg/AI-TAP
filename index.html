@@ -145,6 +145,7 @@
             transition: transform 0.1s; 
             position: relative; 
             box-sizing: border-box; 
+            border: 10px solid transparent; 
         }
         #ai-button::before { 
             content: ''; 
@@ -155,7 +156,7 @@
             bottom: -10px; 
             border-radius: 50%; 
             z-index: -1; 
-            transition: background 0.3s; 
+            transition: background-image 0.3s; 
         }
         #ai-button:active { 
             transform: scale(1.05); 
@@ -357,9 +358,8 @@
             // Update Energy Ring
             function updateEnergyRing() {
                 const button = document.getElementById('ai-button');
-                const energyPercent = (energy / maxEnergy) * 100;
-                button.style.border = `10px solid`;
-                button.style.borderImage = `conic-gradient(#3498db ${energyPercent}%, #e74c3c ${energyPercent}%) 1`;
+                const energyPercent = (energy / maxEnergy) * 360; // Convert to degrees for conic-gradient
+                button.style.borderImage = `conic-gradient(#3498db ${energyPercent}deg, #e74c3c ${energyPercent}deg 360deg) 1`;
             }
 
             // Tap Handling
