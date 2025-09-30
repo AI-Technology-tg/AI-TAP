@@ -26,7 +26,6 @@
         #energy-container { display: flex; align-items: center; }
         #energy-bar { width: 150px; height: 25px; background: #f1c40f; border: 2px solid #f1c40f; border-radius: 15px; position: relative; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
         #energy-fill { height: 100%; background: #3498db; transition: width 0.5s ease; }
-        #energy-capacity { font-size: 18px; margin-left: 10px; }
         #score { font-size: 24px; display: flex; align-items: center; }
         #score img { width: 24px; height: 24px; margin-right: 5px; }
         #tap-area { flex: 1; width: 100%; display: flex; justify-content: center; align-items: center; position: relative; }
@@ -34,6 +33,7 @@
         #ai-button:active { transform: scale(1.05); box-shadow: 0 0 30px rgba(52, 152, 219, 0.8); }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7); } 70% { box-shadow: 0 0 0 30px rgba(52, 152, 219, 0); } 100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); } }
         .tap-effect { position: absolute; font-size: 32px; color: cyan; pointer-events: none; animation: floatUp 1.2s ease-out forwards, rotate 1s ease; font-weight: bold; }
+        .energy-effect { position: absolute; font-size: 20px; color: #f1c40f; pointer-events: none; animation: floatUp 1.2s ease-out forwards; left: 50%; top: 60px; transform: translateX(-50%); }
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-80px); } }
         @keyframes rotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(5deg); } }
         #buttons { width: 100%; display: flex; justify-content: space-around; padding: 10px; background: rgba(0,0,0,0.7); }
@@ -59,7 +59,6 @@
                 <div id="energy-bar">
                     <div id="energy-fill" style="width: 100%;"></div>
                 </div>
-                <div id="energy-capacity">100</div>
             </div>
             <div id="score"><img src="https://i.imgur.com/8z9z5rX.png" alt="AI"> 0</div>
         </div>
@@ -136,7 +135,7 @@
             let tapValue = 1;
             let energy = 100;
             let maxEnergy = 100;
-            let energyRegenRate = 0.5;
+            let energyRegenRate = 0.1;
 
             // Load Progress
             function loadProgress() {
@@ -161,6 +160,11 @@
                 setInterval(() => {
                     if (energy < maxEnergy) {
                         energy = Math.min(maxEnergy, energy + energyRegenRate);
+                        const effect = document.createElement('div');
+                        effect.className = 'energy-effect';
+                        effect.innerText = '+0.1';
+                        document.body.appendChild(effect);
+                        setTimeout(() => effect.remove(), 1200);
                         updateEnergyBar();
                         saveProgress();
                     }
@@ -177,7 +181,6 @@
             function updateEnergyBar() {
                 const fill = document.getElementById('energy-fill');
                 fill.style.width = `${(energy / maxEnergy) * 100}%`;
-                document.getElementById('energy-capacity').innerText = `${maxEnergy}`;
             }
 
             // Tap Handling
@@ -186,13 +189,22 @@
                 if (energy >= tapValue) {
                     ai += tapValue;
                     energy -= tapValue;
-                    const effect = document.createElement('div');
-                    effect.className = 'tap-effect';
-                    effect.innerText = `+${tapValue}`;
-                    effect.style.left = `${e.clientX - 20}px`;
-                    effect.style.top = `${e.clientY - 20}px`;
-                    document.body.appendChild(effect);
-                    setTimeout(() => effect.remove(), 1200);
+                    // Tap effect (+1)
+                    const tapEffect = document.createElement('div');
+                    tapEffect.className = 'tap-effect';
+                    tapEffect.innerText = `+${tapValue}`;
+                    tapEffect.style.left = `${e.clientX - 20}px`;
+                    tapEffect.style.top = `${e.clientY - 20}px`;
+                    document.body.appendChild(tapEffect);
+                    // Energy effect (-1)
+                    const energyEffect = document.createElement('div');
+                    energyEffect.className = 'energy-effect';
+                    energyEffect.innerText = '-1';
+                    document.body.appendChild(energyEffect);
+                    setTimeout(() => {
+                        tapEffect.remove();
+                        energyEffect.remove();
+                    }, 1200);
                     createParticles(5, e.clientX, e.clientY);
                     document.getElementById('tap-sound').play();
                     updateUI();
