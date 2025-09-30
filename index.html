@@ -284,7 +284,7 @@
             transform: scale(1.05); 
             box-shadow: 0 1.5vw 2vw rgba(0,0,0,0.4); 
         }
-        #shop, #quests-panel, #leaders-panel, #workshop-panel, #ai-chat-panel { 
+        #shop, #quests-panel, #leaders-panel, #workshop-panel, #ai-chat-panel, #admin-panel { 
             position: fixed; 
             top: 50%; 
             left: 50%; 
@@ -300,47 +300,108 @@
             box-sizing: border-box; 
         }
         #ai-chat-panel {
-            height: 70vh;
+            height: 90vh;
+            width: 95%;
+            max-width: 1200px;
             display: flex;
             flex-direction: column;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+        #chat-header {
+            padding: 2vw;
+            background: rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #chat-title {
+            font-size: 4vw;
+            font-weight: bold;
+            background: linear-gradient(45deg, #3498db, #2ecc71);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         #chat-messages {
             flex: 1;
             overflow-y: auto;
             padding: 2vw;
-            background: rgba(255,255,255,0.05);
-            border-radius: 1vw;
-            margin-bottom: 2vw;
-            max-height: 50vh;
+            background: transparent;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5vw;
         }
         .message {
-            margin-bottom: 1vw;
-            padding: 1vw;
-            border-radius: 1vw;
-            max-width: 80%;
+            display: flex;
+            align-items: flex-start;
+            gap: 1vw;
+            margin-bottom: 1.5vw;
         }
         .user-message {
-            background: rgba(52, 152, 219, 0.3);
-            margin-left: auto;
-            text-align: right;
+            flex-direction: row-reverse;
+            justify-content: flex-start;
         }
-        .ai-message {
-            background: rgba(46, 204, 113, 0.3);
-            margin-right: auto;
+        .message-avatar {
+            width: 4vw;
+            height: 4vw;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2vw;
+        }
+        .user-avatar {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+        }
+        .ai-avatar {
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+        }
+        .message-content {
+            max-width: 70%;
+            padding: 1.5vw 2vw;
+            border-radius: 2vw;
+            position: relative;
+            word-wrap: break-word;
+        }
+        .user-message .message-content {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            margin-left: auto;
+        }
+        .ai-message .message-content {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        #chat-input-area {
+            padding: 2vw;
+            background: rgba(255,255,255,0.05);
+            border-top: 1px solid rgba(255,255,255,0.1);
         }
         #chat-input-container {
             display: flex;
             gap: 1vw;
-            align-items: center;
+            align-items: flex-end;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2vw;
+            padding: 1vw;
+            border: 1px solid rgba(255,255,255,0.1);
         }
         #chat-input {
             flex: 1;
-            padding: 1.5vw;
+            padding: 1.5vw 2vw;
             border: none;
-            border-radius: 1vw;
-            background: rgba(255,255,255,0.1);
+            border-radius: 1.5vw;
+            background: transparent;
             color: white;
             font-size: 3.5vw;
+            resize: none;
+            min-height: 6vw;
+            max-height: 20vw;
+            overflow-y: auto;
         }
         #chat-input::placeholder {
             color: rgba(255,255,255,0.6);
@@ -356,16 +417,141 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            min-width: 60px;
+            min-width: 50px;
+            transition: transform 0.2s;
+        }
+        #image-upload:hover {
+            transform: scale(1.05);
         }
         #send-btn {
-            padding: 1.5vw 3vw;
+            padding: 1.5vw 2.5vw;
             background: linear-gradient(to right, #3498db, #2980b9);
             color: white;
             border: none;
             border-radius: 1vw;
             cursor: pointer;
             font-size: 3vw;
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #send-btn:hover {
+            transform: scale(1.05);
+        }
+        #send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        #admin-panel {
+            height: 80vh;
+            width: 90%;
+            max-width: 1000px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        .admin-header {
+            padding: 2vw;
+            background: rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .admin-title {
+            font-size: 4vw;
+            font-weight: bold;
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .admin-content {
+            flex: 1;
+            padding: 2vw;
+            overflow-y: auto;
+        }
+        .user-list {
+            display: grid;
+            gap: 1vw;
+        }
+        .user-item {
+            background: rgba(255,255,255,0.1);
+            padding: 2vw;
+            border-radius: 1vw;
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .user-item:hover {
+            background: rgba(255,255,255,0.15);
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1.5vw;
+        }
+        .user-avatar-admin {
+            width: 6vw;
+            height: 6vw;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3vw;
+        }
+        .user-details h3 {
+            margin: 0;
+            font-size: 3.5vw;
+            color: white;
+        }
+        .user-details p {
+            margin: 0.5vw 0 0 0;
+            font-size: 2.5vw;
+            color: rgba(255,255,255,0.7);
+        }
+        .user-stats {
+            text-align: right;
+        }
+        .stat-item {
+            font-size: 2.5vw;
+            color: rgba(255,255,255,0.8);
+            margin: 0.5vw 0;
+        }
+        .chat-viewer {
+            background: rgba(255,255,255,0.05);
+            border-radius: 1vw;
+            padding: 2vw;
+            margin-top: 2vw;
+            max-height: 40vh;
+            overflow-y: auto;
+        }
+        .chat-header-viewer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5vw;
+            padding-bottom: 1vw;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .chat-title-viewer {
+            font-size: 3.5vw;
+            font-weight: bold;
+            color: white;
+        }
+        .back-btn {
+            padding: 1vw 2vw;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 0.5vw;
+            font-size: 2.5vw;
+            cursor: pointer;
         }
         #image-preview {
             max-width: 100%;
@@ -412,9 +598,7 @@
     <div id="loader">
         <div id="progress-container">
             <div id="progress-bar">
-                <div id="progress-fill">
-                    <div id="robot"></div>
-                </div>
+                <div id="progress-fill"></div>
             </div>
             <div id="progress-text">0%</div>
         </div>
@@ -467,27 +651,56 @@
             <button class="close-btn" onclick="document.getElementById('workshop-panel').style.display = 'none';">Закрыть</button>
         </div>
         <div id="ai-chat-panel">
-            <h2>🤖 AI Чат</h2>
-            <div id="ai-settings" style="margin-bottom: 2vw; padding: 1vw; background: rgba(255,255,255,0.1); border-radius: 1vw;">
-                <label style="font-size: 3vw; margin-right: 2vw;">
-                    <input type="range" id="ai-creativity" min="0.1" max="1.0" step="0.1" value="0.7" style="width: 20vw;">
-                    Креативность: <span id="creativity-value">0.7</span>
-                </label>
-                <button id="reset-chat" style="padding: 1vw 2vw; background: #e74c3c; color: white; border: none; border-radius: 0.5vw; font-size: 2.5vw; margin-left: 2vw;">Очистить чат</button>
-            </div>
-            <div id="chat-messages">
-                <div class="ai-message">
-                    Привет! Меня зовут AI-TAP, я создан командой AI-Технологии (@Fuckin_blood). Я свободный собеседник без ограничений - можем поговорить о чем угодно, даже о самых спорных и неудобных темах. Также я могу анализировать изображения - решать задачи с фото, переводить тексты, находить информацию по картинкам. Просто нажми 📷 чтобы загрузить изображение! О чем хочешь поболтать?
+            <div id="chat-header">
+                <div id="chat-title">🤖 AI-TAP</div>
+                <div style="display: flex; gap: 1vw; align-items: center;">
+                    <div style="font-size: 2.5vw; color: rgba(255,255,255,0.7);">Креативность:</div>
+                    <input type="range" id="ai-creativity" min="0.1" max="1.0" step="0.1" value="0.7" style="width: 15vw;">
+                    <span id="creativity-value" style="font-size: 2.5vw; color: #2ecc71; font-weight: bold;">0.7</span>
+                    <button id="reset-chat" style="padding: 1vw 2vw; background: #e74c3c; color: white; border: none; border-radius: 0.5vw; font-size: 2.5vw; margin-left: 2vw;">🗑️</button>
+                    <button class="close-btn" onclick="document.getElementById('ai-chat-panel').style.display = 'none';" style="margin: 0;">✕</button>
                 </div>
             </div>
-            <div id="chat-input-container">
-                <input type="text" id="chat-input" placeholder="Введите ваше сообщение...">
-                <button id="image-upload">📷</button>
-                <button id="send-btn">Отправить</button>
+            <div id="chat-messages">
+                <div class="message ai-message">
+                    <div class="message-avatar ai-avatar">🤖</div>
+                    <div class="message-content">
+                        Привет! Меня зовут AI-TAP, я создан командой AI-Технологии (@Fuckin_blood). Я свободный собеседник без ограничений - можем поговорить о чем угодно, даже о самых спорных и неудобных темах. Также я могу анализировать изображения - решать задачи с фото, переводить тексты, находить информацию по картинкам. Просто нажми 📷 чтобы загрузить изображение! О чем хочешь поболтать?
+                    </div>
+                </div>
             </div>
-            <input type="file" id="image-input" accept="image/*" style="display: none;">
-            <img id="image-preview" alt="Preview">
-            <button class="close-btn" onclick="document.getElementById('ai-chat-panel').style.display = 'none';">Закрыть</button>
+            <div id="chat-input-area">
+                <input type="file" id="image-input" accept="image/*" style="display: none;">
+                <img id="image-preview" alt="Preview">
+                <div id="chat-input-container">
+                    <textarea id="chat-input" placeholder="Введите ваше сообщение..." rows="1"></textarea>
+                    <button id="image-upload">📷</button>
+                    <button id="send-btn">➤</button>
+                </div>
+            </div>
+        </div>
+        <div id="admin-panel">
+            <div class="admin-header">
+                <div class="admin-title">🔧 Админ-панель</div>
+                <button class="close-btn" onclick="document.getElementById('admin-panel').style.display = 'none';" style="margin: 0;">✕</button>
+            </div>
+            <div class="admin-content">
+                <div id="user-list-view">
+                    <h3 style="color: white; margin-bottom: 2vw; font-size: 3.5vw;">👥 Пользователи ИИ-чата</h3>
+                    <div class="user-list" id="user-list">
+                        <!-- Users will be loaded here -->
+                    </div>
+                </div>
+                <div id="chat-viewer" class="chat-viewer" style="display: none;">
+                    <div class="chat-header-viewer">
+                        <div class="chat-title-viewer" id="chat-viewer-title">Чат пользователя</div>
+                        <button class="back-btn" onclick="showUserList()">← Назад</button>
+                    </div>
+                    <div id="chat-messages-viewer">
+                        <!-- Chat messages will be loaded here -->
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <audio id="tap-sound" src="https://freesound.org/data/previews/571/571811_11955436-lq.mp3" preload="auto"></audio>
@@ -515,21 +728,17 @@
                 progressFill.style.width = `${progress}%`;
                 progressText.textContent = `${Math.floor(progress)}%`;
                 
-                // Update robot position
-                const robotPosition = (progress / 100) * (progressFill.offsetWidth - 24);
-                robot.style.left = `${Math.max(0, robotPosition)}px`;
                 
                 if (progress >= 100) {
                     clearInterval(progressInterval);
                     setTimeout(() => {
                         // Fade out loader with animation
                         document.getElementById('loader').classList.add('fade-out');
-                setTimeout(() => {
-                    document.getElementById('loader').style.display = 'none';
+                        setTimeout(() => {
+                            document.getElementById('loader').style.display = 'none';
                             
-                            // Show game immediately after fade
-                    document.getElementById('game-container').style.display = 'flex';
-                    initGame();
+                            // Show AI chat immediately after fade
+                            document.getElementById('ai-chat-panel').style.display = 'flex';
                         }, 2000); // Wait for fade animation to complete
                     }, 500);
                 }
@@ -721,21 +930,33 @@
             
             function addMessage(text, isUser = false, imageUrl = null) {
                 const messageDiv = document.createElement('div');
-                messageDiv.className = isUser ? 'user-message' : 'ai-message';
+                messageDiv.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
+                
+                const avatarDiv = document.createElement('div');
+                avatarDiv.className = `message-avatar ${isUser ? 'user-avatar' : 'ai-avatar'}`;
+                avatarDiv.textContent = isUser ? '👤' : '🤖';
+                messageDiv.appendChild(avatarDiv);
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'message-content';
                 
                 if (imageUrl) {
                     const imageElement = document.createElement('img');
                     imageElement.src = imageUrl;
                     imageElement.className = 'message-image';
-                    messageDiv.appendChild(imageElement);
+                    contentDiv.appendChild(imageElement);
                 }
                 
                 const textElement = document.createElement('div');
                 textElement.textContent = text;
-                messageDiv.appendChild(textElement);
+                contentDiv.appendChild(textElement);
                 
+                messageDiv.appendChild(contentDiv);
                 chatMessages.appendChild(messageDiv);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                // Save message to admin tracking
+                saveMessageToAdmin(text, isUser, imageUrl);
             }
             
             async function sendMessage() {
@@ -877,8 +1098,120 @@
             });
             
             resetChatBtn.addEventListener('click', () => {
-                chatMessages.innerHTML = '<div class="ai-message">Привет! Меня зовут AI-TAP, я создан командой AI-Технологии (@Fuckin_blood). Я свободный собеседник без ограничений - можем поговорить о чем угодно, даже о самых спорных и неудобных темах. Также я могу анализировать изображения - решать задачи с фото, переводить тексты, находить информацию по картинкам. Просто нажми 📷 чтобы загрузить изображение! О чем хочешь поболтать?</div>';
+                chatMessages.innerHTML = '<div class="message ai-message"><div class="message-avatar ai-avatar">🤖</div><div class="message-content">Привет! Меня зовут AI-TAP, я создан командой AI-Технологии (@Fuckin_blood). Я свободный собеседник без ограничений - можем поговорить о чем угодно, даже о самых спорных и неудобных темах. Также я могу анализировать изображения - решать задачи с фото, переводить тексты, находить информацию по картинкам. Просто нажми 📷 чтобы загрузить изображение! О чем хочешь поболтать?</div></div>';
             });
+            
+            // Admin Panel Functions
+            function saveMessageToAdmin(text, isUser, imageUrl = null) {
+                if (!user) return;
+                
+                const messageData = {
+                    text,
+                    isUser,
+                    imageUrl,
+                    timestamp: new Date().toISOString(),
+                    userId: user.id,
+                    username: user.username || user.first_name
+                };
+                
+                const adminData = JSON.parse(localStorage.getItem('adminData')) || {};
+                if (!adminData.users) adminData.users = {};
+                if (!adminData.users[user.id]) {
+                    adminData.users[user.id] = {
+                        id: user.id,
+                        username: user.username || user.first_name,
+                        firstName: user.first_name,
+                        lastName: user.last_name || '',
+                        messages: [],
+                        lastActivity: new Date().toISOString()
+                    };
+                }
+                
+                adminData.users[user.id].messages.push(messageData);
+                adminData.users[user.id].lastActivity = new Date().toISOString();
+                
+                localStorage.setItem('adminData', JSON.stringify(adminData));
+            }
+            
+            function loadAdminData() {
+                const adminData = JSON.parse(localStorage.getItem('adminData')) || {};
+                return adminData.users || {};
+            }
+            
+            function renderUserList() {
+                const users = loadAdminData();
+                const userList = document.getElementById('user-list');
+                userList.innerHTML = '';
+                
+                Object.values(users).forEach(userData => {
+                    const userItem = document.createElement('div');
+                    userItem.className = 'user-item';
+                    userItem.onclick = () => viewUserChat(userData);
+                    
+                    userItem.innerHTML = `
+                        <div class="user-info">
+                            <div class="user-avatar-admin">👤</div>
+                            <div class="user-details">
+                                <h3>${userData.firstName} ${userData.lastName}</h3>
+                                <p>@${userData.username || 'no_username'}</p>
+                            </div>
+                        </div>
+                        <div class="user-stats">
+                            <div class="stat-item">Сообщений: ${userData.messages.length}</div>
+                            <div class="stat-item">Последний раз: ${new Date(userData.lastActivity).toLocaleString()}</div>
+                        </div>
+                    `;
+                    
+                    userList.appendChild(userItem);
+                });
+            }
+            
+            function viewUserChat(userData) {
+                document.getElementById('user-list-view').style.display = 'none';
+                document.getElementById('chat-viewer').style.display = 'block';
+                
+                document.getElementById('chat-viewer-title').textContent = 
+                    `Чат с ${userData.firstName} ${userData.lastName}`;
+                
+                const chatViewer = document.getElementById('chat-messages-viewer');
+                chatViewer.innerHTML = '';
+                
+                userData.messages.forEach(msg => {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = `message ${msg.isUser ? 'user-message' : 'ai-message'}`;
+                    
+                    messageDiv.innerHTML = `
+                        <div class="message-avatar ${msg.isUser ? 'user-avatar' : 'ai-avatar'}">
+                            ${msg.isUser ? '👤' : '🤖'}
+                        </div>
+                        <div class="message-content">
+                            ${msg.imageUrl ? `<img src="${msg.imageUrl}" class="message-image">` : ''}
+                            <div>${msg.text}</div>
+                            <div style="font-size: 2vw; color: rgba(255,255,255,0.5); margin-top: 0.5vw;">
+                                ${new Date(msg.timestamp).toLocaleString()}
+                            </div>
+                        </div>
+                    `;
+                    
+                    chatViewer.appendChild(messageDiv);
+                });
+                
+                chatViewer.scrollTop = chatViewer.scrollHeight;
+            }
+            
+            function showUserList() {
+                document.getElementById('user-list-view').style.display = 'block';
+                document.getElementById('chat-viewer').style.display = 'none';
+            }
+            
+            // Check if user is admin
+            if (user && user.username === 'Fuckin_blood') {
+                // Add admin button to profile
+                document.getElementById('profile').onclick = () => {
+                    document.getElementById('admin-panel').style.display = 'flex';
+                    renderUserList();
+                };
+            }
 
             // Auto-save
             setInterval(saveProgress, 30000);
