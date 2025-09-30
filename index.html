@@ -23,13 +23,14 @@
         #header { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 10px; background: rgba(0,0,0,0.5); }
         #profile { width: 50px; height: 50px; background: url('https://via.placeholder.com/50/3498db/fff?text=Profile') no-repeat center/cover; border-radius: 50%; cursor: pointer; transition: transform 0.2s; }
         #profile:hover { transform: scale(1.1); }
-        #energy-bar { width: 50%; height: 25px; background: #333; border-radius: 15px; position: relative; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        #energy-fill { height: 100%; background: linear-gradient(to right, #2ecc71, #3498db); transition: width 0.5s ease; }
-        #energy-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #fff; font-size: 14px; text-shadow: 0 0 5px #000; }
+        #energy-container { display: flex; align-items: center; }
+        #energy-bar { width: 150px; height: 25px; background: #f1c40f; border: 2px solid #f1c40f; border-radius: 15px; position: relative; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        #energy-fill { height: 100%; background: #3498db; transition: width 0.5s ease; }
+        #energy-capacity { font-size: 18px; margin-left: 10px; }
         #score { font-size: 24px; display: flex; align-items: center; }
         #score img { width: 24px; height: 24px; margin-right: 5px; }
         #tap-area { flex: 1; width: 100%; display: flex; justify-content: center; align-items: center; position: relative; }
-        #ai-button { width: 300px; height: 300px; background: url('https://via.placeholder.com/300/3498db/fff?text=AI+Core') no-repeat center/cover; border-radius: 50%; cursor: pointer; animation: pulse 1.5s infinite; transition: transform 0.1s, box-shadow 0.3s; box-shadow: 0 0 20px rgba(52, 152, 219, 0.5); }
+        #ai-button { width: 300px; height: 300px; background: url('https://i.imgur.com/Q8q2y7V.png') no-repeat center/cover; border-radius: 50%; cursor: pointer; animation: pulse 1.5s infinite; transition: transform 0.1s, box-shadow 0.3s; box-shadow: 0 0 20px rgba(52, 152, 219, 0.5); }
         #ai-button:active { transform: scale(1.05); box-shadow: 0 0 30px rgba(52, 152, 219, 0.8); }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7); } 70% { box-shadow: 0 0 0 30px rgba(52, 152, 219, 0); } 100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); } }
         .tap-effect { position: absolute; font-size: 32px; color: cyan; pointer-events: none; animation: floatUp 1.2s ease-out forwards, rotate 1s ease; font-weight: bold; }
@@ -38,16 +39,12 @@
         #buttons { width: 100%; display: flex; justify-content: space-around; padding: 10px; background: rgba(0,0,0,0.7); }
         .action-btn { background: linear-gradient(to right, #3498db, #2980b9); color: white; padding: 12px 20px; border: none; border-radius: 10px; cursor: pointer; font-size: 16px; width: 22%; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: transform 0.2s, box-shadow 0.2s; }
         .action-btn:hover { transform: scale(1.05); box-shadow: 0 6px 8px rgba(0,0,0,0.4); }
-        #shop, #quests-panel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); padding: 20px; border-radius: 10px; display: none; width: 90%; max-height: 80%; overflow-y: auto; z-index: 5; }
-        .upgrade-btn { background: linear-gradient(to right, #2ecc71, #27ae60); color: white; padding: 10px; margin: 5px 0; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; width: 100%; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: transform 0.2s; }
-        .upgrade-btn:disabled { background: #555; box-shadow: none; }
-        .upgrade-btn:hover { transform: scale(1.02); }
-        .quest { background: linear-gradient(to right, #f1c40f, #f39c12); color: white; padding: 10px; margin: 5px 0; border-radius: 8px; width: 100%; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        .quest.completed { background: linear-gradient(to right, #7f8c8d, #95a5a6); }
+        #shop, #quests-panel, #leaders-panel, #workshop-panel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); padding: 20px; border-radius: 10px; display: none; width: 90%; max-height: 80%; overflow-y: auto; z-index: 5; }
         .close-btn { background: #e74c3c; color: white; padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
         .particle { position: absolute; width: 15px; height: 15px; background: radial-gradient(circle, cyan, transparent); border-radius: 50%; pointer-events: none; animation: particleBurst 0.8s ease-out forwards; }
         @keyframes particleBurst { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(0) translate(${Math.random() * 200 - 100}px, ${Math.random() * 200 - 100}px); } }
     </style>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
     <div id="loader">
@@ -58,11 +55,13 @@
     <div id="game-container">
         <div id="header">
             <div id="profile"></div>
-            <div id="energy-bar">
-                <div id="energy-fill" style="width: 100%;"></div>
-                <div id="energy-text">Энергия: 1000/1000</div>
+            <div id="energy-container">
+                <div id="energy-bar">
+                    <div id="energy-fill" style="width: 100%;"></div>
+                </div>
+                <div id="energy-capacity">100</div>
             </div>
-            <div id="score"><img src="https://via.placeholder.com/24/ffd700/fff?text=AI" alt="AI"> 0</div>
+            <div id="score"><img src="https://i.imgur.com/8z9z5rX.png" alt="AI"> 0</div>
         </div>
         <div id="tap-area">
             <div id="ai-button"></div>
@@ -75,19 +74,32 @@
         </div>
         <div id="shop">
             <h2>Магазин</h2>
-            <div id="upgrades"></div>
             <button class="close-btn" onclick="document.getElementById('shop').style.display = 'none';">Закрыть</button>
         </div>
         <div id="quests-panel">
             <h2>Задания</h2>
-            <div id="quests"></div>
             <button class="close-btn" onclick="document.getElementById('quests-panel').style.display = 'none';">Закрыть</button>
+        </div>
+        <div id="leaders-panel">
+            <h2>Лидеры</h2>
+            <button class="close-btn" onclick="document.getElementById('leaders-panel').style.display = 'none';">Закрыть</button>
+        </div>
+        <div id="workshop-panel">
+            <h2>Мастерская</h2>
+            <button class="close-btn" onclick="document.getElementById('workshop-panel').style.display = 'none';">Закрыть</button>
         </div>
     </div>
     <audio id="tap-sound" src="https://freesound.org/data/previews/571/571811_11955436-lq.mp3" preload="auto"></audio>
-    <audio id="upgrade-sound" src="https://freesound.org/data/previews/571/571814_11955436-lq.mp3" preload="auto"></audio>
-    <audio id="quest-sound" src="https://freesound.org/data/previews/571/571816_11955436-lq.mp3" preload="auto"></audio>
     <script>
+        // Telegram Integration for Avatar
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        const user = tg.initDataUnsafe.user;
+        const profile = document.getElementById('profile');
+        if (user && user.photo_url) {
+            profile.style.backgroundImage = `url(${user.photo_url})`;
+        }
+
         // Animate Loader
         const titleText = 'AI-TAP';
         const titleElement = document.getElementById('title');
@@ -102,7 +114,7 @@
                     document.getElementById('loader').style.display = 'none';
                     document.getElementById('game-container').style.display = 'flex';
                     initGame();
-                }, 2000); // Wait for animation
+                }, 2000);
             }
         }, 400);
 
@@ -122,42 +134,16 @@
             // Game State
             let ai = 0;
             let tapValue = 1;
-            let passiveIncome = 0;
-            let energy = 1000;
-            let maxEnergy = 1000;
-            let energyRegenRate = 1;
-            let tapsToday = 0;
-            let upgrades = [
-                { name: 'Модуль ИИ', cost: 100, income: 1, level: 0, description: 'Базовый модуль ИИ' },
-                { name: 'Процессор ИИ', cost: 500, income: 5, level: 0, description: 'Ускоряет вычисления' },
-                { name: 'Квантовая матрица', cost: 2000, income: 20, level: 0, description: 'Квантовая мощь' },
-                { name: 'Нейронная сеть', cost: 10000, income: 100, level: 0, description: 'Полная интеграция' },
-                { name: 'AI Оптимизатор', cost: 50000, income: 500, level: 0, description: 'Оптимизация процессов' },
-                { name: 'Квантовый Ускоритель', cost: 100000, income: 1000, level: 0, description: 'Максимальная скорость' }
-            ];
-            let quests = [
-                { id: 1, description: 'Сделай 100 тапов', target: 100, reward: 500, progress: 0, completed: false },
-                { id: 2, description: 'Купи 2 апгрейда', target: 2, reward: 1000, progress: 0, completed: false },
-                { id: 3, description: 'Заработай 5000 AI пассивно', target: 5000, reward: 3000, progress: 0, completed: false }
-            ];
-
-            // Sounds
-            const tapSound = document.getElementById('tap-sound');
-            const upgradeSound = document.getElementById('upgrade-sound');
-            const questSound = document.getElementById('quest-sound');
+            let energy = 100;
+            let maxEnergy = 100;
+            let energyRegenRate = 0.5;
 
             // Load Progress
             function loadProgress() {
                 const data = JSON.parse(localStorage.getItem('aiTapProgress')) || {};
                 ai = data.ai || 0;
-                passiveIncome = data.passiveIncome || 0;
-                upgrades = data.upgrades || upgrades;
                 energy = data.energy || maxEnergy;
-                tapsToday = data.tapsToday || 0;
-                quests = data.quests || quests;
                 updateUI();
-                updateQuests();
-                startPassiveIncome();
                 startEnergyRegen();
             }
             loadProgress();
@@ -166,23 +152,8 @@
             function saveProgress() {
                 localStorage.setItem('aiTapProgress', JSON.stringify({
                     ai,
-                    passiveIncome,
-                    upgrades,
-                    energy,
-                    tapsToday,
-                    quests
+                    energy
                 }));
-            }
-
-            // Passive Income
-            function startPassiveIncome() {
-                setInterval(() => {
-                    ai += passiveIncome / 60;
-                    quests.find(q => q.id === 3).progress += passiveIncome / 60;
-                    checkQuestProgress(3);
-                    updateUI();
-                    saveProgress();
-                }, 1000);
             }
 
             // Energy Regeneration
@@ -198,43 +169,15 @@
 
             // Update UI
             function updateUI() {
-                document.getElementById('score').innerHTML = `<img src="https://via.placeholder.com/24/ffd700/fff?text=AI" alt="AI"> ${Math.floor(ai)}`;
+                document.getElementById('score').innerHTML = `<img src="https://i.imgur.com/8z9z5rX.png" alt="AI"> ${Math.floor(ai)}`;
                 updateEnergyBar();
-                const upgradesDiv = document.getElementById('upgrades');
-                upgradesDiv.innerHTML = '';
-                upgrades.forEach((up, i) => {
-                    const btn = document.createElement('button');
-                    btn.className = 'upgrade-btn';
-                    btn.innerText = `${up.name} Ур.${up.level}\nСтоимость: ${up.cost} AI\nДоход: +${up.income}\n${up.description}`;
-                    btn.disabled = ai < up.cost;
-                    btn.onclick = () => buyUpgrade(i);
-                    upgradesDiv.appendChild(btn);
-                });
             }
 
             // Update Energy Bar
             function updateEnergyBar() {
                 const fill = document.getElementById('energy-fill');
                 fill.style.width = `${(energy / maxEnergy) * 100}%`;
-                document.getElementById('energy-text').innerText = `Энергия: ${Math.floor(energy)}/${maxEnergy}`;
-            }
-
-            // Buy Upgrade
-            function buyUpgrade(index) {
-                const up = upgrades[index];
-                if (ai >= up.cost) {
-                    ai -= up.cost;
-                    up.level++;
-                    passiveIncome += up.income;
-                    up.cost = Math.floor(up.cost * 1.5);
-                    up.income = Math.floor(up.income * 1.2);
-                    createParticles(10, window.innerWidth / 2, window.innerHeight / 2);
-                    upgradeSound.play();
-                    quests.find(q => q.id === 2).progress++;
-                    checkQuestProgress(2);
-                    updateUI();
-                    saveProgress();
-                }
+                document.getElementById('energy-capacity').innerText = `${maxEnergy}`;
             }
 
             // Tap Handling
@@ -243,7 +186,6 @@
                 if (energy >= tapValue) {
                     ai += tapValue;
                     energy -= tapValue;
-                    tapsToday++;
                     const effect = document.createElement('div');
                     effect.className = 'tap-effect';
                     effect.innerText = `+${tapValue}`;
@@ -252,8 +194,7 @@
                     document.body.appendChild(effect);
                     setTimeout(() => effect.remove(), 1200);
                     createParticles(5, e.clientX, e.clientY);
-                    tapSound.play();
-                    checkQuestProgress(1);
+                    document.getElementById('tap-sound').play();
                     updateUI();
                     saveProgress();
                 } else {
@@ -272,48 +213,18 @@
                 }
             }
 
-            // Quests
-            function updateQuests() {
-                const questsDiv = document.getElementById('quests');
-                questsDiv.innerHTML = '';
-                quests.forEach(q => {
-                    const div = document.createElement('div');
-                    div.className = `quest ${q.completed ? 'completed' : ''}`;
-                    div.innerText = `${q.description} (${Math.floor(q.progress)}/${q.target}) Награда: ${q.reward} AI`;
-                    questsDiv.appendChild(div);
-                });
-            }
-
-            function checkQuestProgress(questId) {
-                const q = quests.find(q => q.id === questId);
-                if (q && !q.completed) {
-                    if (questId === 1) q.progress = tapsToday;
-                    if (q.progress >= q.target) {
-                        q.completed = true;
-                        ai += q.reward;
-                        questSound.play();
-                        alert(`Квест выполнен! +${q.reward} AI`);
-                        updateQuests();
-                        updateUI();
-                        saveProgress();
-                    }
-                }
-            }
-
             // Button Actions
             document.getElementById('shop-btn').addEventListener('click', () => {
                 document.getElementById('shop').style.display = 'block';
-                updateUI();
             });
             document.getElementById('quests-btn').addEventListener('click', () => {
                 document.getElementById('quests-panel').style.display = 'block';
-                updateQuests();
             });
             document.getElementById('leaders-btn').addEventListener('click', () => {
-                alert('Лидерборд пока в разработке!');
+                document.getElementById('leaders-panel').style.display = 'block';
             });
             document.getElementById('workshop-btn').addEventListener('click', () => {
-                alert('Мастерская пока в разработке!');
+                document.getElementById('workshop-panel').style.display = 'block';
             });
             document.getElementById('profile').addEventListener('click', () => {
                 alert('Профиль пока в разработке!');
@@ -321,27 +232,6 @@
 
             // Auto-save
             setInterval(saveProgress, 30000);
-
-            /*
-            // Закомментированный код для Firebase и Telegram (для восстановления)
-            const firebaseConfig = {
-                apiKey: "YOUR_API_KEY",
-                authDomain: "YOUR_PROJECT.firebaseapp.com",
-                projectId: "YOUR_PROJECT_ID",
-                storageBucket: "YOUR_PROJECT.appspot.com",
-                messagingSenderId: "YOUR_SENDER_ID",
-                appId: "YOUR_APP_ID",
-                databaseURL: "https://YOUR_PROJECT.firebaseio.com"
-            };
-            // firebase.initializeApp(firebaseConfig);
-            // const db = firebase.firestore();
-            // const realtimeDb = firebase.database();
-            // const auth = firebase.auth();
-            // const tg = window.Telegram.WebApp;
-            // tg.ready();
-            // const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : 'guest_' + Math.random().toString(36).substr(2, 9);
-            // const username = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.username || 'Аноним' : 'Аноним';
-            */
         }
     </script>
 </body>
