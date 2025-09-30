@@ -47,11 +47,12 @@
         body { 
             margin: 0; 
             padding: 0; 
-            background: #0a0a2a; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #fff; 
-            font-family: Arial, sans-serif; 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
             overflow: hidden; 
             touch-action: manipulation; 
+            height: 100vh;
         }
         #loader { 
             position: fixed; 
@@ -137,24 +138,31 @@
             text-shadow: 0 0 10px rgba(0,0,0,0.8);
             font-weight: bold;
         }
-        #game-container { 
+        #chat-container { 
             width: 100vw; 
             height: 100vh; 
             display: none; 
             flex-direction: column; 
-            align-items: center; 
-            justify-content: space-between; 
             position: relative; 
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            margin: 10px;
+            width: calc(100vw - 20px);
+            height: calc(100vh - 20px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
         }
-        #header { 
+        #chat-header { 
             width: 100%; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            padding: 2vw; 
-            background: rgba(0,0,0,0.5); 
+            padding: 20px; 
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
             box-sizing: border-box; 
-            gap: 2vw;
+            border-radius: 20px 20px 0 0;
         }
         #profile { 
             width: 10vw; 
@@ -188,22 +196,22 @@
             box-shadow: 0 0.8vw 1.5vw rgba(0,0,0,0.4);
         }
         #settings-btn {
-            background: linear-gradient(to right, #9b59b6, #8e44ad);
+            background: rgba(255, 255, 255, 0.2);
             color: white;
-            padding: 1.5vw 3vw;
+            padding: 12px 16px;
             border: none;
-            border-radius: 1.5vw;
+            border-radius: 12px;
             cursor: pointer;
-            font-size: 3vw;
-            font-weight: bold;
-            box-shadow: 0 0.5vw 1vw rgba(0,0,0,0.3);
-            transition: transform 0.2s, box-shadow 0.2s;
-            flex: 1;
-            max-width: 150px;
+            font-size: 18px;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
         #settings-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0.8vw 1.5vw rgba(0,0,0,0.4);
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
         }
         #score { 
             font-size: 5vw; 
@@ -336,131 +344,167 @@
             align-items: center;
         }
         #chat-title {
-            font-size: 4vw;
-            font-weight: bold;
-            background: linear-gradient(45deg, #3498db, #2ecc71);
+            font-size: 24px;
+            font-weight: 600;
+            background: linear-gradient(45deg, #667eea, #764ba2);
             background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            margin: 0;
         }
         #chat-messages {
             flex: 1;
             overflow-y: auto;
-            padding: 2vw;
+            padding: 20px;
             background: transparent;
             display: flex;
             flex-direction: column;
-            gap: 1.5vw;
+            gap: 20px;
+            scroll-behavior: smooth;
         }
         .message {
             display: flex;
             align-items: flex-start;
-            gap: 1vw;
-            margin-bottom: 1.5vw;
+            gap: 12px;
+            margin-bottom: 20px;
+            animation: fadeInUp 0.3s ease-out;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         .user-message {
             flex-direction: row-reverse;
             justify-content: flex-start;
         }
         .message-avatar {
-            width: 4vw;
-            height: 4vw;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2vw;
+            font-size: 18px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
         .user-avatar {
-            background: linear-gradient(45deg, #3498db, #2980b9);
+            background: linear-gradient(45deg, #667eea, #764ba2);
         }
         .ai-avatar {
             background: linear-gradient(45deg, #2ecc71, #27ae60);
         }
         .message-content {
-            max-width: 70%;
-            padding: 1.5vw 2vw;
-            border-radius: 2vw;
+            max-width: 80%;
+            padding: 16px 20px;
+            border-radius: 18px;
             position: relative;
             word-wrap: break-word;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
         .user-message .message-content {
-            background: linear-gradient(135deg, #3498db, #2980b9);
+            background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
             margin-left: auto;
+            border-radius: 18px 18px 4px 18px;
         }
         .ai-message .message-content {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.15);
             color: white;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 18px 18px 18px 4px;
         }
         #chat-input-area {
-            padding: 2vw;
-            background: rgba(255,255,255,0.05);
-            border-top: 1px solid rgba(255,255,255,0.1);
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255,255,255,0.2);
+            border-radius: 0 0 20px 20px;
         }
         #chat-input-container {
             display: flex;
-            gap: 1vw;
+            gap: 12px;
             align-items: flex-end;
-            background: rgba(255,255,255,0.1);
-            border-radius: 2vw;
-            padding: 1vw;
-            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.15);
+            border-radius: 25px;
+            padding: 12px;
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
         #chat-input {
             flex: 1;
-            padding: 1.5vw 2vw;
+            padding: 12px 16px;
             border: none;
-            border-radius: 1.5vw;
+            border-radius: 20px;
             background: transparent;
             color: white;
-            font-size: 3.5vw;
+            font-size: 16px;
             resize: none;
-            min-height: 6vw;
-            max-height: 20vw;
+            min-height: 24px;
+            max-height: 120px;
             overflow-y: auto;
+            font-family: inherit;
+            line-height: 1.5;
         }
         #chat-input::placeholder {
             color: rgba(255,255,255,0.6);
         }
+        #chat-input:focus {
+            outline: none;
+        }
         #image-upload {
-            padding: 1.5vw;
-            background: linear-gradient(to right, #2ecc71, #27ae60);
+            padding: 12px;
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
             color: white;
             border: none;
-            border-radius: 1vw;
+            border-radius: 12px;
             cursor: pointer;
-            font-size: 3vw;
+            font-size: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-width: 50px;
-            transition: transform 0.2s;
+            min-width: 48px;
+            height: 48px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
         }
         #image-upload:hover {
-            transform: scale(1.05);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(46, 204, 113, 0.4);
         }
         #send-btn {
-            padding: 1.5vw 2.5vw;
-            background: linear-gradient(to right, #3498db, #2980b9);
+            padding: 12px 20px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
             color: white;
             border: none;
-            border-radius: 1vw;
+            border-radius: 12px;
             cursor: pointer;
-            font-size: 3vw;
-            transition: transform 0.2s;
+            font-size: 18px;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
+            min-width: 48px;
+            height: 48px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         }
         #send-btn:hover {
-            transform: scale(1.05);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
         }
         #send-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
         }
         #admin-panel {
             height: 80vh;
@@ -623,81 +667,26 @@
             <div id="progress-text">0%</div>
         </div>
     </div>
-    <div id="game-container">
-        <div id="header">
-            <div id="profile"></div>
-            <button id="ai-chat-btn">🤖 AI Чат</button>
-            <button id="settings-btn">⚙️ Настройки</button>
-            <div id="score"><img src="https://i.ibb.co/vCGzNnjR/generated-image.png" alt="AI"> 0</div>
+    <div id="chat-container">
+        <div id="chat-header">
+            <div id="chat-title">🤖 AI-TAP</div>
+            <button id="settings-btn">⚙️</button>
         </div>
-        <div id="tap-area">
-            <div id="ai-button">
-                <div id="energy-ring"></div>
-                <div id="energy-timer"></div>
-            </div>
-        </div>
-        <div id="buttons">
-            <button class="action-btn" id="shop-btn">Магазин</button>
-            <button class="action-btn" id="leaders-btn">Лидеры</button>
-            <button class="action-btn" id="quests-btn">Задания</button>
-            <button class="action-btn" id="workshop-btn">Мастерская</button>
-        </div>
-        <div id="shop">
-            <h2>Магазин</h2>
-            <p>Магазин находится в разработке!</p>
-            <button class="close-btn" onclick="document.getElementById('shop').style.display = 'none';">Закрыть</button>
-        </div>
-        <div id="quests-panel">
-            <h2>Задания</h2>
-            <div style="margin: 20px 0;">
-                <div style="background: rgba(52, 152, 219, 0.2); padding: 15px; border-radius: 10px; margin-bottom: 10px;">
-                    <h3>📢 Подписаться на канал</h3>
-                    <p>Подпишитесь на наш канал для получения бонусов!</p>
-                    <a href="https://t.me/ai_technology_tg" target="_blank" style="color: #3498db; text-decoration: none;">👉 Перейти к каналу</a>
-                </div>
-                <div style="background: rgba(46, 204, 113, 0.2); padding: 15px; border-radius: 10px;">
-                    <h3>🚀 Буст канала</h3>
-                    <p>Поставьте буст на наш канал для получения наград!</p>
-                    <a href="https://t.me/boost/ai_technology_tg" target="_blank" style="color: #2ecc71; text-decoration: none;">👉 Поставить буст</a>
+        <div id="chat-messages">
+            <div class="message ai-message">
+                <div class="message-avatar ai-avatar">🤖</div>
+                <div class="message-content">
+                    Привет! Меня зовут AI-TAP, я создан командой AI-Технологии (@Fuckin_blood). Я свободный собеседник без ограничений - можем поговорить о чем угодно, даже о самых спорных и неудобных темах. Также я могу анализировать изображения - решать задачи с фото, переводить тексты, находить информацию по картинкам. Просто нажми 📷 чтобы загрузить изображение! О чем хочешь поболтать?
                 </div>
             </div>
-            <button class="close-btn" onclick="document.getElementById('quests-panel').style.display = 'none';">Закрыть</button>
         </div>
-        <div id="leaders-panel">
-            <h2>Лидеры</h2>
-            <button class="close-btn" onclick="document.getElementById('leaders-panel').style.display = 'none';">Закрыть</button>
-        </div>
-        <div id="workshop-panel">
-            <h2>Мастерская</h2>
-            <button class="close-btn" onclick="document.getElementById('workshop-panel').style.display = 'none';">Закрыть</button>
-        </div>
-        <div id="ai-chat-panel">
-            <div id="chat-header">
-                <div id="chat-title">🤖 AI-TAP</div>
-                <div style="display: flex; gap: 1vw; align-items: center;">
-                    <div style="font-size: 2.5vw; color: rgba(255,255,255,0.7);">Креативность:</div>
-                    <input type="range" id="ai-creativity" min="0.1" max="1.0" step="0.1" value="0.7" style="width: 15vw;">
-                    <span id="creativity-value" style="font-size: 2.5vw; color: #2ecc71; font-weight: bold;">0.7</span>
-                    <button id="reset-chat" style="padding: 1vw 2vw; background: #e74c3c; color: white; border: none; border-radius: 0.5vw; font-size: 2.5vw; margin-left: 2vw;">🗑️</button>
-                    <button class="close-btn" onclick="document.getElementById('ai-chat-panel').style.display = 'none';" style="margin: 0;">✕</button>
-                </div>
-            </div>
-            <div id="chat-messages">
-                <div class="message ai-message">
-                    <div class="message-avatar ai-avatar">🤖</div>
-                    <div class="message-content">
-                        Привет! Меня зовут AI-TAP, я создан командой AI-Технологии (@Fuckin_blood). Я свободный собеседник без ограничений - можем поговорить о чем угодно, даже о самых спорных и неудобных темах. Также я могу анализировать изображения - решать задачи с фото, переводить тексты, находить информацию по картинкам. Просто нажми 📷 чтобы загрузить изображение! О чем хочешь поболтать?
-                    </div>
-                </div>
-            </div>
-            <div id="chat-input-area">
-                <input type="file" id="image-input" accept="image/*" style="display: none;">
-                <img id="image-preview" alt="Preview">
-                <div id="chat-input-container">
-                    <textarea id="chat-input" placeholder="Введите ваше сообщение..." rows="1"></textarea>
-                    <button id="image-upload">📷</button>
-                    <button id="send-btn">➤</button>
-                </div>
+        <div id="chat-input-area">
+            <input type="file" id="image-input" accept="image/*" style="display: none;">
+            <img id="image-preview" alt="Preview">
+            <div id="chat-input-container">
+                <textarea id="chat-input" placeholder="Введите ваше сообщение..." rows="1"></textarea>
+                <button id="image-upload">📷</button>
+                <button id="send-btn">➤</button>
             </div>
         </div>
         <div id="settings-panel">
@@ -724,8 +713,8 @@
                     <input type="file" id="file-upload" multiple accept="*/*" style="width: 100%; padding: 10px; border-radius: 5px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.3);">
                     <div id="file-list" style="margin-top: 10px;"></div>
                 </div>
-                <div style="background: rgba(52, 152, 219, 0.2); padding: 15px; border-radius: 10px;">
-                    <h3>🎮 Игровые настройки</h3>
+                <div style="background: rgba(52, 152, 219, 0.2); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    <h3>🎮 Настройки чата</h3>
                     <p>Звуки:</p>
                     <input type="checkbox" id="sound-enabled" checked style="margin-right: 10px;">
                     <label for="sound-enabled">Включить звуки</label>
@@ -733,6 +722,16 @@
                     <p>Анимации:</p>
                     <input type="checkbox" id="animations-enabled" checked style="margin-right: 10px;">
                     <label for="animations-enabled">Включить анимации</label>
+                </div>
+                <div style="background: rgba(231, 76, 60, 0.2); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    <h3>💝 Поддержать создателя</h3>
+                    <p>Если вам нравится AI-TAP, поддержите разработчика:</p>
+                    <a href="https://t.me/Fuckin_blood" target="_blank" style="display: inline-block; background: linear-gradient(45deg, #e74c3c, #c0392b); color: white; padding: 10px 20px; border-radius: 25px; text-decoration: none; font-weight: bold; margin-top: 10px;">💝 Поблагодарить подарком</a>
+                </div>
+                <div id="admin-section" style="background: rgba(46, 204, 113, 0.2); padding: 15px; border-radius: 10px; display: none;">
+                    <h3>🔧 Админ панель</h3>
+                    <p>Управление пользователями и чатами:</p>
+                    <button id="admin-panel-btn" style="background: linear-gradient(45deg, #2ecc71, #27ae60); color: white; padding: 10px 20px; border: none; border-radius: 25px; cursor: pointer; font-weight: bold; margin-top: 10px;">🔧 Открыть админ панель</button>
                 </div>
             </div>
             <button class="close-btn" onclick="document.getElementById('settings-panel').style.display = 'none';">Закрыть</button>
@@ -998,8 +997,8 @@
                 setTimeout(() => {
                     document.getElementById('loader').style.display = 'none';
                             
-                            // Show main game interface after fade
-                            document.getElementById('game-container').style.display = 'flex';
+                            // Show chat interface after fade
+                            document.getElementById('chat-container').style.display = 'flex';
                         }, 2000); // Wait for fade animation to complete
                     }, 500);
                 }
@@ -1138,27 +1137,9 @@
                 }
             }
 
-            // Button Actions
-            document.getElementById('shop-btn').addEventListener('click', () => {
-                document.getElementById('shop').style.display = 'block';
-            });
-            document.getElementById('quests-btn').addEventListener('click', () => {
-                document.getElementById('quests-panel').style.display = 'block';
-            });
-            document.getElementById('leaders-btn').addEventListener('click', () => {
-                document.getElementById('leaders-panel').style.display = 'block';
-            });
-            document.getElementById('workshop-btn').addEventListener('click', () => {
-                document.getElementById('workshop-panel').style.display = 'block';
-            });
-            document.getElementById('ai-chat-btn').addEventListener('click', () => {
-                document.getElementById('ai-chat-panel').style.display = 'flex';
-            });
+            // Settings button
             document.getElementById('settings-btn').addEventListener('click', () => {
                 document.getElementById('settings-panel').style.display = 'block';
-            });
-            document.getElementById('profile').addEventListener('click', () => {
-                showProfileInfo();
             });
             
             function showProfileInfo() {
@@ -1468,13 +1449,13 @@
                 document.getElementById('chat-viewer').style.display = 'none';
             }
             
-            // Check if user is admin
+            // Check if user is admin and show admin section
             if (user && user.username === 'Fuckin_blood') {
-                // Add admin button to profile
-                document.getElementById('profile').onclick = () => {
+                document.getElementById('admin-section').style.display = 'block';
+                document.getElementById('admin-panel-btn').addEventListener('click', () => {
                     document.getElementById('admin-panel').style.display = 'flex';
                     renderUserList();
-                };
+                });
             }
 
             // File upload functionality
