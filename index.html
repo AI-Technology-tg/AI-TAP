@@ -23,10 +23,9 @@
             background: #0a0a2a; 
             display: flex; 
             justify-content: center; 
-            align-items: flex-end; 
+            align-items: center; 
             z-index: 10; 
             flex-direction: column; 
-            padding-bottom: 25%; 
         }
         #loader h1 { 
             font-size: 10vw; 
@@ -67,7 +66,6 @@
             border-top: 2vw solid #3498db; 
             border-radius: 50%; 
             animation: spin 2s linear infinite; 
-            box-shadow: 0 0 5vw rgba(52, 152, 219, 0.5); 
         }
         @keyframes spin { 
             0% { transform: rotate(0deg); } 
@@ -144,8 +142,20 @@
             background: url('https://i.ibb.co/fdRZrwNf/image.jpg') no-repeat center/cover; 
             border-radius: 50%; 
             cursor: pointer; 
-            transition: transform 0.1s, box-shadow 0.3s; 
-            box-shadow: 0 0 20px #3498db; 
+            transition: transform 0.1s; 
+            position: relative; 
+            box-sizing: border-box; 
+        }
+        #ai-button::before { 
+            content: ''; 
+            position: absolute; 
+            top: -10px; 
+            left: -10px; 
+            right: -10px; 
+            bottom: -10px; 
+            border-radius: 50%; 
+            z-index: -1; 
+            transition: background 0.3s; 
         }
         #ai-button:active { 
             transform: scale(1.05); 
@@ -347,8 +357,9 @@
             // Update Energy Ring
             function updateEnergyRing() {
                 const button = document.getElementById('ai-button');
-                const shadowWidth = (energy / maxEnergy) * 20;
-                button.style.boxShadow = `0 0 ${shadowWidth}px #3498db`;
+                const energyPercent = (energy / maxEnergy) * 100;
+                button.style.border = `10px solid`;
+                button.style.borderImage = `conic-gradient(#3498db ${energyPercent}%, #e74c3c ${energyPercent}%) 1`;
             }
 
             // Tap Handling
@@ -357,7 +368,6 @@
                 if (energy >= tapValue) {
                     ai += tapValue;
                     energy -= tapValue;
-                    // Tap effect (+1)
                     const tapEffect = document.createElement('div');
                     tapEffect.className = 'tap-effect';
                     tapEffect.innerText = `+${tapValue}`;
