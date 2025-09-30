@@ -1,127 +1,504 @@
-<!DOCTYPE html>
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI-Технологии</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>AI-Tap: Построй свою ИИ-империю</title>
     <style>
-        body {
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            background-color: #000;
-            overflow: hidden;
+        body { 
+            margin: 0; 
+            padding: 0; 
+            background: #0a0a2a; 
+            color: #fff; 
+            font-family: Arial, sans-serif; 
+            overflow: hidden; 
+            touch-action: manipulation; 
         }
-        #loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('https://i.ibb.co/Mx1LLNsZ/image.jpg');
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-end;
-            z-index: 1000;
+        #loader { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: url('https://i.ibb.co/Mx1LLNsZ/image.jpg') no-repeat center/cover; 
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-end; 
+            z-index: 10; 
+            flex-direction: column; 
+            padding-bottom: 25%; 
             opacity: 1;
-            transition: opacity 1s ease-out;
+            transition: opacity 2s ease-out;
         }
-        #loading-screen.hidden {
+        #loader.fade-out {
             opacity: 0;
-            pointer-events: none;
         }
-        #progress-bar-container {
+        #progress-container {
             width: 80%;
-            height: 10px;
-            background-color: #333;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            overflow: hidden;
+            max-width: 400px;
+            margin: 4vw auto 0;
+            background: rgba(0,0,0,0.5);
+            border-radius: 10px;
+            padding: 2vw;
+            box-sizing: border-box;
         }
         #progress-bar {
-            width: 0;
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+            overflow: visible;
+            margin-bottom: 1vw;
+            position: relative;
+        }
+        #progress-fill {
             height: 100%;
-            background-color: #00b7ff;
-            transition: width 0.1s linear;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+            position: relative;
+        }
+        #robot {
+            position: absolute;
+            top: -8px;
+            left: 0;
+            width: 24px;
+            height: 24px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23fff"><rect x="3" y="8" width="18" height="10" rx="2" fill="%233498db"/><circle cx="8" cy="5" r="2" fill="%23e74c3c"/><circle cx="16" cy="5" r="2" fill="%23e74c3c"/><rect x="10" y="12" width="4" height="3" fill="%232c3e50"/><circle cx="9" cy="15" r="1" fill="%23fff"/><circle cx="15" cy="15" r="1" fill="%23fff"/></svg>') no-repeat center/cover;
+            transition: left 0.3s ease;
+            filter: drop-shadow(0 0 5px rgba(52, 152, 219, 0.8));
+            animation: robotRun 0.5s infinite alternate;
+        }
+        @keyframes robotRun {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(-2px); }
+        }
+        #title-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 15vw;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(52, 152, 219, 0.8);
+            opacity: 0;
+            z-index: 15;
+            pointer-events: none;
+            letter-spacing: 2vw;
+        }
+        #title-overlay.show {
+            animation: titleAppear 2s ease-in-out forwards;
+        }
+        @keyframes titleAppear {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
         }
         #progress-text {
-            color: white;
-            font-size: 24px;
-            margin-bottom: 10px;
-            text-shadow: 0 0 5px #000;
-        }
-        #main-content {
-            display: none;
             text-align: center;
-            color: white;
-            padding: 20px;
+            font-size: 4vw;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(0,0,0,0.8);
+            font-weight: bold;
         }
-        #coin-counter {
-            font-size: 24px;
-            margin-bottom: 20px;
+        #game-container { 
+            width: 100vw; 
+            height: 100vh; 
+            display: none; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: space-between; 
+            position: relative; 
         }
-        #tap-button {
-            padding: 15px 30px;
-            font-size: 18px;
-            background-color: #00b7ff;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            color: white;
+        #header { 
+            width: 100%; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 2vw; 
+            background: rgba(0,0,0,0.5); 
+            box-sizing: border-box; 
         }
-        #tap-button:hover {
-            background-color: #0099cc;
+        #profile { 
+            width: 10vw; 
+            max-width: 50px; 
+            height: 10vw; 
+            max-height: 50px; 
+            background: url('https://via.placeholder.com/50/3498db/fff?text=Profile') no-repeat center/cover; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            transition: transform 0.2s; 
         }
-        #profile {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            font-size: 18px;
-            color: white;
+        #profile:hover { 
+            transform: scale(1.1); 
+        }
+        #score { 
+            font-size: 5vw; 
+            max-width: 40%; 
+            display: flex; 
+            align-items: center; 
+        }
+        #score img { 
+            width: 5vw; 
+            max-width: 24px; 
+            height: 5vw; 
+            max-height: 24px; 
+            margin-right: 1vw; 
+        }
+        #tap-area { 
+            flex: 1; 
+            width: 100%; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            position: relative; 
+        }
+        #ai-button { 
+            width: 80vw; 
+            max-width: 300px; 
+            min-width: 200px; 
+            height: 80vw; 
+            max-height: 300px; 
+            min-height: 200px; 
+            background: url('https://i.ibb.co/fdRZrwNf/image.jpg') no-repeat center/cover; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            transition: transform 0.1s, box-shadow 0.3s; 
+            box-shadow: 0 0 20px #3498db; 
+        }
+        #ai-button:active { 
+            transform: scale(1.05); 
+        }
+        .tap-effect { 
+            position: absolute; 
+            font-size: 8vw; 
+            max-font-size: 32px; 
+            color: cyan; 
+            pointer-events: none; 
+            animation: floatUp 1.2s ease-out forwards, rotate 1s ease; 
+            font-weight: bold; 
+        }
+        @keyframes floatUp { 
+            0% { opacity: 1; transform: translateY(0); } 
+            100% { opacity: 0; transform: translateY(-20vw); } 
+        }
+        @keyframes rotate { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(5deg); } 
+        }
+        #buttons { 
+            width: 100%; 
+            display: flex; 
+            justify-content: space-around; 
+            padding: 2vw; 
+            background: rgba(0,0,0,0.7); 
+            box-sizing: border-box; 
+        }
+        .action-btn { 
+            background: linear-gradient(to right, #3498db, #2980b9); 
+            color: white; 
+            padding: 2vw 4vw; 
+            border: none; 
+            border-radius: 2vw; 
+            cursor: pointer; 
+            font-size: 3.5vw; 
+            width: 22%; 
+            text-align: center; 
+            box-shadow: 0 1vw 1.5vw rgba(0,0,0,0.3); 
+            transition: transform 0.2s, box-shadow 0.2s; 
+        }
+        .action-btn:hover { 
+            transform: scale(1.05); 
+            box-shadow: 0 1.5vw 2vw rgba(0,0,0,0.4); 
+        }
+        #shop, #quests-panel, #leaders-panel, #workshop-panel { 
+            position: fixed; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            background: rgba(0,0,0,0.9); 
+            padding: 4vw; 
+            border-radius: 2vw; 
+            display: none; 
+            width: 90%; 
+            max-height: 80%; 
+            overflow-y: auto; 
+            z-index: 5; 
+            box-sizing: border-box; 
+        }
+        .close-btn { 
+            background: #e74c3c; 
+            color: white; 
+            padding: 2vw 4vw; 
+            border: none; 
+            border-radius: 1vw; 
+            cursor: pointer; 
+            margin-top: 2vw; 
+            font-size: 3.5vw; 
+        }
+        .particle { 
+            position: absolute; 
+            width: 3vw; 
+            max-width: 15px; 
+            height: 3vw; 
+            max-height: 15px; 
+            background: radial-gradient(circle, cyan, transparent); 
+            border-radius: 50%; 
+            pointer-events: none; 
+            animation: particleBurst 0.8s ease-out forwards; 
+        }
+        @keyframes particleBurst { 
+            0% { opacity: 1; transform: scale(1); } 
+            100% { opacity: 0; transform: scale(0) translate(${Math.random() * 50 - 25}vw, ${Math.random() * 50 - 25}vw); } 
         }
     </style>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-    <div id="loading-screen">
-        <div id="progress-text">0%</div>
-        <div id="progress-bar-container">
-            <div id="progress-bar"></div>
+    <div id="loader">
+        <div id="progress-container">
+            <div id="progress-bar">
+                <div id="progress-fill">
+                    <div id="robot"></div>
+                </div>
+            </div>
+            <div id="progress-text">0%</div>
         </div>
     </div>
-    <div id="main-content">
-        <div id="profile">Профиль</div>
-        <div id="coin-counter">0</div>
-        <button id="tap-button">Тап</button>
+    <div id="title-overlay">AI-TAP</div>
+    <div id="game-container">
+        <div id="header">
+            <div id="profile"></div>
+            <div id="score"><img src="https://i.ibb.co/vCGzNnjR/generated-image.png" alt="AI"> 0</div>
+        </div>
+        <div id="tap-area">
+            <div id="ai-button"></div>
+        </div>
+        <div id="buttons">
+            <button class="action-btn" id="shop-btn">Магазин</button>
+            <button class="action-btn" id="leaders-btn">Лидеры</button>
+            <button class="action-btn" id="quests-btn">Задания</button>
+            <button class="action-btn" id="workshop-btn">Мастерская</button>
+        </div>
+        <div id="shop">
+            <h2>Магазин</h2>
+            <button class="close-btn" onclick="document.getElementById('shop').style.display = 'none';">Закрыть</button>
+        </div>
+        <div id="quests-panel">
+            <h2>Задания</h2>
+            <button class="close-btn" onclick="document.getElementById('quests-panel').style.display = 'none';">Закрыть</button>
+        </div>
+        <div id="leaders-panel">
+            <h2>Лидеры</h2>
+            <button class="close-btn" onclick="document.getElementById('leaders-panel').style.display = 'none';">Закрыть</button>
+        </div>
+        <div id="workshop-panel">
+            <h2>Мастерская</h2>
+            <button class="close-btn" onclick="document.getElementById('workshop-panel').style.display = 'none';">Закрыть</button>
+        </div>
     </div>
-
+    <audio id="tap-sound" src="https://freesound.org/data/previews/571/571811_11955436-lq.mp3" preload="auto"></audio>
     <script>
-        window.onload = function() {
-            const loadingScreen = document.getElementById('loading-screen');
-            const mainContent = document.getElementById('main-content');
-            const progressBar = document.getElementById('progress-bar');
+        // Telegram Integration for Avatar
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        const user = tg.initDataUnsafe.user;
+        const profile = document.getElementById('profile');
+        if (user && user.photo_url) {
+            profile.style.backgroundImage = `url(${user.photo_url})`;
+        }
+
+        // Start progress loading immediately
+        function startProgressLoading() {
+            const progressFill = document.getElementById('progress-fill');
             const progressText = document.getElementById('progress-text');
+            const robot = document.getElementById('robot');
             let progress = 0;
-
-            const loadingInterval = setInterval(() => {
-                progress += 1;
-                progressBar.style.width = `${progress}%`;
-                progressText.textContent = `${progress}%`;
-
+            
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 3 + 1; // Random increment between 1-4
+                if (progress > 100) progress = 100;
+                
+                progressFill.style.width = `${progress}%`;
+                progressText.textContent = `${Math.floor(progress)}%`;
+                
+                // Update robot position
+                const robotPosition = (progress / 100) * (progressFill.offsetWidth - 24);
+                robot.style.left = `${robotPosition}px`;
+                
                 if (progress >= 100) {
-                    clearInterval(loadingInterval);
-                    loadingScreen.classList.add('hidden');
+                    clearInterval(progressInterval);
                     setTimeout(() => {
-                        loadingScreen.style.display = 'none';
-                        mainContent.style.display = 'block';
-                    }, 1000); // Match fade-out duration
+                        // Fade out loader with animation
+                        document.getElementById('loader').classList.add('fade-out');
+                        setTimeout(() => {
+                            document.getElementById('loader').style.display = 'none';
+                            
+                            // Show AI-TAP title animation
+                            const titleOverlay = document.getElementById('title-overlay');
+                            titleOverlay.classList.add('show');
+                            
+                            setTimeout(() => {
+                                // Hide title and show game
+                                titleOverlay.style.display = 'none';
+                                document.getElementById('game-container').style.display = 'flex';
+                                initGame();
+                            }, 2000); // Wait for title animation to complete
+                        }, 2000); // Wait for fade animation to complete
+                    }, 500);
                 }
-            }, 30); // Adjust speed of loading (30ms per increment)
-        };
+            }, 50); // Update every 50ms for smooth progress
+        }
+        
+        // Start loading immediately when page loads
+        startProgressLoading();
+
+        function initGame() {
+            // Game State
+            let ai = 0;
+            let tapValue = 1;
+            let energy = 100;
+            let maxEnergy = 100;
+            let energyRegenRate = 0.1;
+
+            // Load Progress
+            function loadProgress() {
+                const data = JSON.parse(localStorage.getItem('aiTapProgress')) || {};
+                ai = data.ai || 0;
+                energy = data.energy || maxEnergy;
+                updateUI();
+                startEnergyRegen();
+            }
+            loadProgress();
+
+            // Save Progress
+            function saveProgress() {
+                localStorage.setItem('aiTapProgress', JSON.stringify({
+                    ai,
+                    energy
+                }));
+            }
+
+            // Energy Regeneration
+            function startEnergyRegen() {
+                setInterval(() => {
+                    if (energy < maxEnergy) {
+                        energy = Math.min(maxEnergy, energy + energyRegenRate);
+                        updateEnergyRing();
+                        saveProgress();
+                    }
+                }, 1000);
+            }
+
+            // Update UI
+            function updateUI() {
+                document.getElementById('score').innerHTML = `<img src="https://i.ibb.co/vCGzNnjR/generated-image.png" alt="AI"> ${Math.floor(ai)}`;
+                updateEnergyRing();
+            }
+
+            // Update Energy Ring
+            function updateEnergyRing() {
+                const button = document.getElementById('ai-button');
+                const shadowWidth = (energy / maxEnergy) * 20;
+                button.style.boxShadow = `0 0 ${shadowWidth}px #3498db`;
+            }
+
+            // Tap Handling
+            const tapArea = document.getElementById('ai-button');
+            tapArea.addEventListener('click', (e) => {
+                if (energy >= tapValue) {
+                    ai += tapValue;
+                    energy -= tapValue;
+                    // Tap effect (+1)
+                    const tapEffect = document.createElement('div');
+                    tapEffect.className = 'tap-effect';
+                    tapEffect.innerText = `+${tapValue}`;
+                    tapEffect.style.left = `${e.clientX - 20}px`;
+                    tapEffect.style.top = `${e.clientY - 20}px`;
+                    document.body.appendChild(tapEffect);
+                    setTimeout(() => tapEffect.remove(), 1200);
+                    createParticles(5, e.clientX, e.clientY);
+                    document.getElementById('tap-sound').play();
+                    updateUI();
+                    saveProgress();
+                } else {
+                    alert('Недостаточно энергии! Подожди восстановления.');
+                }
+            });
+
+            // Particles
+            function createParticles(count, x, y) {
+                for (let i = 0; i < count; i++) {
+                    const p = document.createElement('div');
+                    p.className = 'particle';
+                    p.style.left = `${x}px`;
+                    p.style.top = `${y}px`;
+                    document.body.appendChild(p);
+                }
+            }
+
+            // Button Actions
+            document.getElementById('shop-btn').addEventListener('click', () => {
+                document.getElementById('shop').style.display = 'block';
+            });
+            document.getElementById('quests-btn').addEventListener('click', () => {
+                document.getElementById('quests-panel').style.display = 'block';
+            });
+            document.getElementById('leaders-btn').addEventListener('click', () => {
+                document.getElementById('leaders-panel').style.display = 'block';
+            });
+            document.getElementById('workshop-btn').addEventListener('click', () => {
+                document.getElementById('workshop-panel').style.display = 'block';
+            });
+            document.getElementById('profile').addEventListener('click', () => {
+                alert('Профиль пока в разработке!');
+            });
+
+            // Auto-save
+            setInterval(saveProgress, 30000);
+        }
     </script>
 </body>
 </html>
