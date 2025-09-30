@@ -2,419 +2,99 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>AI-Tap: Построй свою ИИ-империю</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Технологии</title>
     <style>
-        body { 
-            margin: 0; 
-            padding: 0; 
-            background: #0a0a2a; 
-            color: #fff; 
-            font-family: Arial, sans-serif; 
-            overflow: hidden; 
-            touch-action: manipulation; 
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background-color: #000;
+            overflow: hidden;
         }
-        #loader { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: #0a0a2a; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            z-index: 10; 
-            flex-direction: column; 
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://i.ibb.co/Mx1LLNsZ/image.jpg');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 1000;
         }
-        #loader h1 { 
-            font-size: 10vw; 
-            max-width: 90%; 
-            margin: 0; 
-            letter-spacing: 2vw; 
-            background: linear-gradient(90deg, #3498db, #2ecc71, #e74c3c, #3498db); 
-            background-size: 400% 100%; 
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent; 
-            animation: gradientShift 5s ease-in-out infinite; 
-            text-align: center; 
+        #progress-bar-container {
+            width: 80%;
+            height: 10px;
+            background-color: #333;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
         }
-        #loader p { 
-            font-size: 5vw; 
-            max-width: 90%; 
-            margin: 2vw 0; 
-            opacity: 0; 
-            animation: fadeIn 2s ease-in forwards; 
-            text-align: center; 
+        #progress-bar {
+            width: 0;
+            height: 100%;
+            background-color: #00b7ff;
+            transition: width 0.1s linear;
         }
-        #loader .spinner { 
-            position: relative; 
-            width: 30vw; 
-            max-width: 150px; 
-            height: 30vw; 
-            max-height: 150px; 
-            margin: 0 auto 4vw; 
+        #main-content {
+            display: none;
+            text-align: center;
+            color: white;
+            padding: 20px;
         }
-        #loader .spinner::before { 
-            content: ''; 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            border: 2vw solid transparent; 
-            border-top: 2vw solid #3498db; 
-            border-radius: 50%; 
-            animation: spin 2s linear infinite; 
+        #coin-counter {
+            font-size: 24px;
+            margin-bottom: 20px;
         }
-        @keyframes spin { 
-            0% { transform: rotate(0deg); } 
-            100% { transform: rotate(360deg); } 
+        #tap-button {
+            padding: 15px 30px;
+            font-size: 18px;
+            background-color: #00b7ff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            color: white;
         }
-        @keyframes gradientShift { 
-            0% { background-position: 0% 50%; } 
-            50% { background-position: 100% 50%; } 
-            100% { background-position: 0% 50%; } 
-        }
-        @keyframes fadeIn { 
-            from { opacity: 0; } 
-            to { opacity: 0.8; } 
-        }
-        #game-container { 
-            width: 100vw; 
-            height: 100vh; 
-            display: none; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: space-between; 
-            position: relative; 
-        }
-        #header { 
-            width: 100%; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 2vw; 
-            background: rgba(0,0,0,0.5); 
-            box-sizing: border-box; 
-        }
-        #profile { 
-            width: 10vw; 
-            max-width: 50px; 
-            height: 10vw; 
-            max-height: 50px; 
-            background: url('https://via.placeholder.com/50/3498db/fff?text=Profile') no-repeat center/cover; 
-            border-radius: 50%; 
-            cursor: pointer; 
-            transition: transform 0.2s; 
-        }
-        #profile:hover { 
-            transform: scale(1.1); 
-        }
-        #score { 
-            font-size: 5vw; 
-            max-width: 40%; 
-            display: flex; 
-            align-items: center; 
-        }
-        #score img { 
-            width: 5vw; 
-            max-width: 24px; 
-            height: 5vw; 
-            max-height: 24px; 
-            margin-right: 1vw; 
-        }
-        #tap-area { 
-            flex: 1; 
-            width: 100%; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            position: relative; 
-        }
-        #ai-button { 
-            width: 80vw; 
-            max-width: 300px; 
-            min-width: 200px; 
-            height: 80vw; 
-            max-height: 300px; 
-            min-height: 200px; 
-            background: url('https://i.ibb.co/fdRZrwNf/image.jpg') no-repeat center/cover; 
-            border-radius: 50%; 
-            cursor: pointer; 
-            transition: transform 0.1s; 
-            position: relative; 
-            box-sizing: border-box; 
-            border: 10px solid transparent; 
-        }
-        #ai-button::before { 
-            content: ''; 
-            position: absolute; 
-            top: -10px; 
-            left: -10px; 
-            right: -10px; 
-            bottom: -10px; 
-            border-radius: 50%; 
-            z-index: -1; 
-            transition: background-image 0.3s; 
-        }
-        #ai-button:active { 
-            transform: scale(1.05); 
-        }
-        .tap-effect { 
-            position: absolute; 
-            font-size: 8vw; 
-            max-font-size: 32px; 
-            color: cyan; 
-            pointer-events: none; 
-            animation: floatUp 1.2s ease-out forwards, rotate 1s ease; 
-            font-weight: bold; 
-        }
-        @keyframes floatUp { 
-            0% { opacity: 1; transform: translateY(0); } 
-            100% { opacity: 0; transform: translateY(-20vw); } 
-        }
-        @keyframes rotate { 
-            0% { transform: rotate(0deg); } 
-            100% { transform: rotate(5deg); } 
-        }
-        #buttons { 
-            width: 100%; 
-            display: flex; 
-            justify-content: space-around; 
-            padding: 2vw; 
-            background: rgba(0,0,0,0.7); 
-            box-sizing: border-box; 
-        }
-        .action-btn { 
-            background: linear-gradient(to right, #3498db, #2980b9); 
-            color: white; 
-            padding: 2vw 4vw; 
-            border: none; 
-            border-radius: 2vw; 
-            cursor: pointer; 
-            font-size: 3.5vw; 
-            width: 22%; 
-            text-align: center; 
-            box-shadow: 0 1vw 1.5vw rgba(0,0,0,0.3); 
-            transition: transform 0.2s, box-shadow 0.2s; 
-        }
-        .action-btn:hover { 
-            transform: scale(1.05); 
-            box-shadow: 0 1.5vw 2vw rgba(0,0,0,0.4); 
-        }
-        #shop, #quests-panel, #leaders-panel, #workshop-panel { 
-            position: fixed; 
-            top: 50%; 
-            left: 50%; 
-            transform: translate(-50%, -50%); 
-            background: rgba(0,0,0,0.9); 
-            padding: 4vw; 
-            border-radius: 2vw; 
-            display: none; 
-            width: 90%; 
-            max-height: 80%; 
-            overflow-y: auto; 
-            z-index: 5; 
-            box-sizing: border-box; 
-        }
-        .close-btn { 
-            background: #e74c3c; 
-            color: white; 
-            padding: 2vw 4vw; 
-            border: none; 
-            border-radius: 1vw; 
-            cursor: pointer; 
-            margin-top: 2vw; 
-            font-size: 3.5vw; 
-        }
-        .particle { 
-            position: absolute; 
-            width: 3vw; 
-            max-width: 15px; 
-            height: 3vw; 
-            max-height: 15px; 
-            background: radial-gradient(circle, cyan, transparent); 
-            border-radius: 50%; 
-            pointer-events: none; 
-            animation: particleBurst 0.8s ease-out forwards; 
-        }
-        @keyframes particleBurst { 
-            0% { opacity: 1; transform: scale(1); } 
-            100% { opacity: 0; transform: scale(0) translate(${Math.random() * 50 - 25}vw, ${Math.random() * 50 - 25}vw); } 
+        #tap-button:hover {
+            background-color: #0099cc;
         }
     </style>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-    <div id="loader">
-        <div class="spinner"></div>
-        <h1 id="title"></h1>
-        <p>от AI-Технологии</p>
-    </div>
-    <div id="game-container">
-        <div id="header">
-            <div id="profile"></div>
-            <div id="score"><img src="https://i.ibb.co/vCGzNnjR/generated-image.png" alt="AI"> 0</div>
-        </div>
-        <div id="tap-area">
-            <div id="ai-button"></div>
-        </div>
-        <div id="buttons">
-            <button class="action-btn" id="shop-btn">Магазин</button>
-            <button class="action-btn" id="leaders-btn">Лидеры</button>
-            <button class="action-btn" id="quests-btn">Задания</button>
-            <button class="action-btn" id="workshop-btn">Мастерская</button>
-        </div>
-        <div id="shop">
-            <h2>Магазин</h2>
-            <button class="close-btn" onclick="document.getElementById('shop').style.display = 'none';">Закрыть</button>
-        </div>
-        <div id="quests-panel">
-            <h2>Задания</h2>
-            <button class="close-btn" onclick="document.getElementById('quests-panel').style.display = 'none';">Закрыть</button>
-        </div>
-        <div id="leaders-panel">
-            <h2>Лидеры</h2>
-            <button class="close-btn" onclick="document.getElementById('leaders-panel').style.display = 'none';">Закрыть</button>
-        </div>
-        <div id="workshop-panel">
-            <h2>Мастерская</h2>
-            <button class="close-btn" onclick="document.getElementById('workshop-panel').style.display = 'none';">Закрыть</button>
+    <div id="loading-screen">
+        <div id="progress-bar-container">
+            <div id="progress-bar"></div>
         </div>
     </div>
-    <audio id="tap-sound" src="https://freesound.org/data/previews/571/571811_11955436-lq.mp3" preload="auto"></audio>
+    <div id="main-content">
+        <div id="coin-counter">0</div>
+        <button id="tap-button">Тап</button>
+    </div>
+
     <script>
-        // Telegram Integration for Avatar
-        const tg = window.Telegram.WebApp;
-        tg.ready();
-        const user = tg.initDataUnsafe.user;
-        const profile = document.getElementById('profile');
-        if (user && user.photo_url) {
-            profile.style.backgroundImage = `url(${user.photo_url})`;
-        }
+        window.onload = function() {
+            const loadingScreen = document.getElementById('loading-screen');
+            const mainContent = document.getElementById('main-content');
+            const progressBar = document.getElementById('progress-bar');
+            let progress = 0;
 
-        // Animate Loader
-        const titleText = 'AI-TAP';
-        const titleElement = document.getElementById('title');
-        let index = 0;
-        const typeInterval = setInterval(() => {
-            if (index < titleText.length) {
-                titleElement.innerHTML += titleText[index];
-                index++;
-            } else {
-                clearInterval(typeInterval);
-                setTimeout(() => {
-                    document.getElementById('loader').style.display = 'none';
-                    document.getElementById('game-container').style.display = 'flex';
-                    initGame();
-                }, 1500);
-            }
-        }, 400);
+            const loadingInterval = setInterval(() => {
+                progress += 1;
+                progressBar.style.width = `${progress}%`;
 
-        function initGame() {
-            // Game State
-            let ai = 0;
-            let tapValue = 1;
-            let energy = 100;
-            let maxEnergy = 100;
-            let energyRegenRate = 0.1;
-
-            // Load Progress
-            function loadProgress() {
-                const data = JSON.parse(localStorage.getItem('aiTapProgress')) || {};
-                ai = data.ai || 0;
-                energy = data.energy || maxEnergy;
-                updateUI();
-                startEnergyRegen();
-            }
-            loadProgress();
-
-            // Save Progress
-            function saveProgress() {
-                localStorage.setItem('aiTapProgress', JSON.stringify({
-                    ai,
-                    energy
-                }));
-            }
-
-            // Energy Regeneration
-            function startEnergyRegen() {
-                setInterval(() => {
-                    if (energy < maxEnergy) {
-                        energy = Math.min(maxEnergy, energy + energyRegenRate);
-                        updateEnergyRing();
-                        saveProgress();
-                    }
-                }, 1000);
-            }
-
-            // Update UI
-            function updateUI() {
-                document.getElementById('score').innerHTML = `<img src="https://i.ibb.co/vCGzNnjR/generated-image.png" alt="AI"> ${Math.floor(ai)}`;
-                updateEnergyRing();
-            }
-
-            // Update Energy Ring
-            function updateEnergyRing() {
-                const button = document.getElementById('ai-button');
-                const energyPercent = (energy / maxEnergy) * 360; // Convert to degrees for conic-gradient
-                button.style.borderImage = `conic-gradient(#3498db ${energyPercent}deg, #e74c3c ${energyPercent}deg 360deg) 1`;
-            }
-
-            // Tap Handling
-            const tapArea = document.getElementById('ai-button');
-            tapArea.addEventListener('click', (e) => {
-                if (energy >= tapValue) {
-                    ai += tapValue;
-                    energy -= tapValue;
-                    const tapEffect = document.createElement('div');
-                    tapEffect.className = 'tap-effect';
-                    tapEffect.innerText = `+${tapValue}`;
-                    tapEffect.style.left = `${e.clientX - 20}px`;
-                    tapEffect.style.top = `${e.clientY - 20}px`;
-                    document.body.appendChild(tapEffect);
-                    setTimeout(() => tapEffect.remove(), 1200);
-                    createParticles(5, e.clientX, e.clientY);
-                    document.getElementById('tap-sound').play();
-                    updateUI();
-                    saveProgress();
-                } else {
-                    alert('Недостаточно энергии! Подожди восстановления.');
+                if (progress >= 100) {
+                    clearInterval(loadingInterval);
+                    loadingScreen.style.display = 'none';
+                    mainContent.style.display = 'block';
                 }
-            });
-
-            // Particles
-            function createParticles(count, x, y) {
-                for (let i = 0; i < count; i++) {
-                    const p = document.createElement('div');
-                    p.className = 'particle';
-                    p.style.left = `${x}px`;
-                    p.style.top = `${y}px`;
-                    document.body.appendChild(p);
-                }
-            }
-
-            // Button Actions
-            document.getElementById('shop-btn').addEventListener('click', () => {
-                document.getElementById('shop').style.display = 'block';
-            });
-            document.getElementById('quests-btn').addEventListener('click', () => {
-                document.getElementById('quests-panel').style.display = 'block';
-            });
-            document.getElementById('leaders-btn').addEventListener('click', () => {
-                document.getElementById('leaders-panel').style.display = 'block';
-            });
-            document.getElementById('workshop-btn').addEventListener('click', () => {
-                document.getElementById('workshop-panel').style.display = 'block';
-            });
-            document.getElementById('profile').addEventListener('click', () => {
-                alert('Профиль пока в разработке!');
-            });
-
-            // Auto-save
-            setInterval(saveProgress, 30000);
-        }
+            }, 30); // Adjust speed of loading (30ms per increment)
+        };
     </script>
 </body>
 </html>
