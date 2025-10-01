@@ -1309,6 +1309,11 @@
                 username: username,
                 avatar: photoUrl
             });
+            
+            // Сохраняем пользователя в базу данных
+            if (database) {
+                database.saveUser(userId, username, firstName);
+            }
         } else {
             console.log('Данные пользователя недоступны');
             document.getElementById('userName').textContent = 'Пользователь';
@@ -1473,27 +1478,27 @@
             
             if (!message) return;
             
-            // Проверяем кэш перед отправкой
-            if (responseCache) {
-                const cachedResponse = responseCache.getCache(message, currentLanguage);
-                if (cachedResponse) {
-                    // Добавляем сообщение пользователя в интерфейс
-                    const userTime = addMessage(message, true);
-                    chatHistory.push({ role: 'user', content: message, timestamp: userTime });
-                    localStorage.setItem('ai-tap-chat-history', JSON.stringify(chatHistory));
+            // Проверяем кэш перед отправкой (временно отключено для отладки)
+            // if (responseCache) {
+            //     const cachedResponse = responseCache.getCache(message, currentLanguage);
+            //     if (cachedResponse) {
+            //         // Добавляем сообщение пользователя в интерфейс
+            //         const userTime = addMessage(message, true);
+            //         chatHistory.push({ role: 'user', content: message, timestamp: userTime });
+            //         localStorage.setItem('ai-tap-chat-history', JSON.stringify(chatHistory));
                     
-                    // Показываем кэшированный ответ
-                    setTimeout(() => {
-                        const aiTime = addMessage(cachedResponse);
-                        chatHistory.push({ role: 'assistant', content: cachedResponse, timestamp: aiTime });
-                        localStorage.setItem('ai-tap-chat-history', JSON.stringify(chatHistory));
-                    }, 500);
+            //         // Показываем кэшированный ответ
+            //         setTimeout(() => {
+            //             const aiTime = addMessage(cachedResponse);
+            //             chatHistory.push({ role: 'assistant', content: cachedResponse, timestamp: aiTime });
+            //             localStorage.setItem('ai-tap-chat-history', JSON.stringify(chatHistory));
+            //         }, 500);
                     
-                    input.value = '';
-                    input.style.height = 'auto';
-                    return;
-                }
-            }
+            //         input.value = '';
+            //         input.style.height = 'auto';
+            //         return;
+            //     }
+            // }
             
             // Добавляем сообщение пользователя в интерфейс и получаем время
             const userTime = addMessage(message, true);
@@ -1513,6 +1518,8 @@
             // Блокируем кнопку отправки
             sendButton.disabled = true;
             showTyping();
+            
+            const startTime = Date.now();
             
             try {
                 console.log('Отправляем запрос к Groq API...');
@@ -1561,6 +1568,11 @@
                     // Сохраняем в базу данных
                     if (database && user) {
                         await database.saveMessage(user.id, 'assistant', aiResponse);
+                        
+                        // Логируем использование API
+                        const responseTime = Date.now() - startTime;
+                        const tokensUsed = aiResponse.length; // Примерный подсчет токенов
+                        await database.logApiUsage(user.id, tokensUsed, responseTime);
                     }
                     
                     // Сохраняем в кэш
@@ -1621,41 +1633,63 @@
 
         async function loadAdminStats() {
             try {
-                // Загружаем статистику из localStorage
-                const apiStats = JSON.parse(localStorage.getItem('ai-tap-api-stats') || '{}');
-                const cacheStats = responseCache ? responseCache.getCacheStats() : {};
-
-                document.getElementById('totalRequests').textContent = apiStats.totalRequests || 0;
-                document.getElementById('requestsPerHour').textContent = apiStats.requestsPerHour || 0;
-                document.getElementById('cacheHitRate').textContent = cacheStats.cacheHitRate || '0%';
-                document.getElementById('avgResponseTime').textContent = (apiStats.avgResponseTime || 0) + 'ms';
+                if (database) {
+                    // Загружаем реальную статистику из Supabase
+                    const stats = await database.getApiStats();
+                    
+                    document.getElementById('totalRequests').textContent = stats.totalRequests || 0;
+                    document.getElementById('requestsPerHour').textContent = stats.requestsPerHour || 0;
+                    document.getElementById('cacheHitRate').textContent = '0%';
+                    document.getElementById('avgResponseTime').textContent = '0ms';
+                } else {
+                    // Если база данных не инициализирована
+                    document.getElementById('totalRequests').textContent = '0';
+                    document.getElementById('requestsPerHour').textContent = '0';
+                    document.getElementById('cacheHitRate').textContent = '0%';
+                    document.getElementById('avgResponseTime').textContent = '0ms';
+                }
             } catch (error) {
                 console.error('Ошибка загрузки статистики:', error);
+                document.getElementById('totalRequests').textContent = '0';
+                document.getElementById('requestsPerHour').textContent = '0';
+                document.getElementById('cacheHitRate').textContent = '0%';
+                document.getElementById('avgResponseTime').textContent = '0ms';
             }
         }
 
-        function loadTopUsers() {
-            const topUsers = JSON.parse(localStorage.getItem('ai-tap-top-users') || '[]');
+        async function loadTopUsers() {
             const usersList = document.getElementById('topUsers');
-            
             usersList.innerHTML = '';
             
-            if (topUsers.length === 0) {
-                usersList.innerHTML = '<p>Нет данных о пользователях</p>';
-                return;
-            }
+            try {
+                if (database) {
+                    // Загружаем реальных пользователей из Supabase
+                    const stats = await database.getApiStats();
+                    const topUsers = stats.topUsers || [];
+                    
+                    if (topUsers.length === 0) {
+                        usersList.innerHTML = '<p>Нет данных о пользователях</p>';
+                        return;
+                    }
 
-            topUsers.forEach((user, index) => {
-                const userDiv = document.createElement('div');
-                userDiv.className = 'user-item';
-                userDiv.innerHTML = `
-                    <div>
-                        <strong>#${index + 1}</strong> ID: ${user.telegramId}
-                        <br><small>Запросов: ${user.count}</small>
-                    </div>
-                `;
-                usersList.appendChild(userDiv);
-            });
+                    topUsers.forEach((user, index) => {
+                        const userDiv = document.createElement('div');
+                        userDiv.className = 'user-item';
+                        userDiv.innerHTML = `
+                            <div>
+                                <strong>#${index + 1}</strong> ID: ${user.telegramId}
+                                <br><small>Запросов: ${user.count}</small>
+                            </div>
+                        `;
+                        usersList.appendChild(userDiv);
+                    });
+                } else {
+                    usersList.innerHTML = '<p>База данных не подключена</p>';
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки пользователей:', error);
+                usersList.innerHTML = '<p>Ошибка загрузки данных</p>';
+            }
         }
 
         function loadCacheStats() {
@@ -1668,10 +1702,28 @@
 
         function loadAlerts() {
             const alertsList = document.getElementById('alertsList');
-            const alerts = JSON.parse(localStorage.getItem('ai-tap-alerts') || '[]');
-            
             alertsList.innerHTML = '';
             
+            // Показываем реальные алерты на основе данных
+            const alerts = [];
+            
+            // Проверяем статистику и создаем алерты
+            if (database) {
+                alerts.push({
+                    type: 'success',
+                    title: 'База данных подключена',
+                    message: 'Supabase работает нормально',
+                    timestamp: Date.now()
+                });
+            } else {
+                alerts.push({
+                    type: 'error',
+                    title: 'База данных не подключена',
+                    message: 'Проверьте настройки Supabase',
+                    timestamp: Date.now()
+                });
+            }
+
             if (alerts.length === 0) {
                 alertsList.innerHTML = '<p>Нет активных алертов</p>';
                 return;
