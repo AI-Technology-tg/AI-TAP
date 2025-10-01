@@ -723,7 +723,7 @@
                 <div class="ai-description">Обработка и анализ больших данных</div>
             </div>
 
-            <div class="ai-button" onclick="showNotification(t('creativeAi') + ' - ' + t('inDevelopment'))">
+            <div class="ai-button" onclick="openCreativeAI()">
                 <span class="ai-icon">✨</span>
                 <div class="ai-title">Творческий ИИ</div>
                 <div class="ai-description">Музыка, стихи, рассказы и креатив</div>
@@ -1062,9 +1062,9 @@
             }, 3000);
         }
 
-        // Конфигурация Groq AI API
-        const AI_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
-        const AI_API_KEY = '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';
+        // Конфигурация OpenAI API
+        const AI_API_URL = 'https://api.openai.com/v1/chat/completions';
+        const AI_API_KEY = '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';
 
         // Функции для работы с чатом
         function openChat() {
@@ -1081,6 +1081,24 @@
 
         function closeChat() {
             document.getElementById('chatModal').style.display = 'none';
+        }
+
+        // Функция для Творческого ИИ
+        function openCreativeAI() {
+            document.getElementById('chatModal').style.display = 'block';
+            document.getElementById('chatInput').focus();
+            
+            // Обновляем заголовок для творческого режима
+            document.querySelector('.chat-title').textContent = '🎨 Творческий ИИ';
+            
+            // Обновляем приветственное сообщение
+            const welcomeMessage = document.querySelector('.chat-messages .message.ai .message-content');
+            if (welcomeMessage) {
+                welcomeMessage.textContent = 'Привет! Я ваш творческий AI помощник. Я могу помочь с написанием стихов, рассказов, музыки, идей для творчества и многого другого! Что бы вы хотели создать?';
+            }
+            
+            // Устанавливаем время приветственного сообщения
+            document.getElementById('welcomeTime').textContent = getCurrentTime();
         }
 
         function getCurrentTime() {
@@ -1138,23 +1156,24 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        model: 'llama-3.1-70b-versatile',
+                        model: 'gpt-4o',
                         messages: [
                             {
                                 role: 'system',
-                                content: 'Ты умный и полезный AI ассистент. Отвечай подробно и качественно на русском языке. Будь дружелюбным и профессиональным.'
+                                content: document.querySelector('.chat-title').textContent.includes('Творческий') 
+                                    ? 'Ты креативный AI помощник. Специализируешься на творческих задачах: стихи, рассказы, музыка, идеи, дизайн. Отвечай креативно и вдохновляюще на русском языке.'
+                                    : 'Ты умный и полезный AI ассистент. Отвечай подробно и качественно на русском языке. Будь дружелюбным и профессиональным.'
                             },
                             {
                                 role: 'user',
                                 content: message
                             }
                         ],
-                        max_tokens: 1000,
-                        temperature: 0.8,
-                        top_p: 0.9,
-                        frequency_penalty: 0.1,
-                        presence_penalty: 0.1,
-                        stream: false
+                        max_tokens: 2000,
+                        temperature: 0.7,
+                        top_p: 1,
+                        frequency_penalty: 0,
+                        presence_penalty: 0
                     })
                 });
                 
