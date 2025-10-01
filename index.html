@@ -71,6 +71,7 @@
         .user-info {
             margin-left: 15px;
             color: white;
+            flex: 1;
         }
 
         .user-name {
@@ -82,6 +83,77 @@
         .user-id {
             font-size: 14px;
             opacity: 0.8;
+        }
+
+        .language-selector {
+            margin-left: 15px;
+            position: relative;
+        }
+
+        .language-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            padding: 8px 15px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .language-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .language-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: rgba(0, 0, 0, 0.9);
+            border-radius: 10px;
+            padding: 10px 0;
+            min-width: 150px;
+            display: none;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .language-dropdown.show {
+            display: block;
+            animation: dropdownSlide 0.3s ease-out;
+        }
+
+        @keyframes dropdownSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .language-option {
+            padding: 10px 15px;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .language-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .language-option.active {
+            background: rgba(102, 126, 234, 0.3);
         }
 
         /* Модальное окно с данными пользователя */
@@ -508,6 +580,39 @@
             <div id="userName" class="user-name">Загрузка...</div>
             <div id="userId" class="user-id">ID: ...</div>
         </div>
+        <div class="language-selector">
+            <div class="language-button" onclick="toggleLanguageDropdown()">
+                <span id="currentLanguageFlag">🇷🇺</span>
+                <span id="currentLanguageName">Русский</span>
+                <span>▼</span>
+            </div>
+            <div id="languageDropdown" class="language-dropdown">
+                <div class="language-option active" onclick="changeLanguage('ru')">
+                    <span>🇷🇺</span>
+                    <span>Русский</span>
+                </div>
+                <div class="language-option" onclick="changeLanguage('en')">
+                    <span>🇺🇸</span>
+                    <span>English</span>
+                </div>
+                <div class="language-option" onclick="changeLanguage('es')">
+                    <span>🇪🇸</span>
+                    <span>Español</span>
+                </div>
+                <div class="language-option" onclick="changeLanguage('fr')">
+                    <span>🇫🇷</span>
+                    <span>Français</span>
+                </div>
+                <div class="language-option" onclick="changeLanguage('de')">
+                    <span>🇩🇪</span>
+                    <span>Deutsch</span>
+                </div>
+                <div class="language-option" onclick="changeLanguage('zh')">
+                    <span>🇨🇳</span>
+                    <span>中文</span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Модальное окно с данными пользователя -->
@@ -533,31 +638,31 @@
                 <div class="ai-description">Умный собеседник для любых разговоров</div>
             </div>
 
-            <div class="ai-button" onclick="showNotification('ИИ для генерации изображений - в разработке')">
+            <div class="ai-button" onclick="showNotification(t('imageGen') + ' - ' + t('inDevelopment'))">
                 <span class="ai-icon">🎨</span>
                 <div class="ai-title">Генератор изображений</div>
                 <div class="ai-description">Создание уникальных изображений по описанию</div>
             </div>
 
-            <div class="ai-button" onclick="showNotification('ИИ для учебы - в разработке')">
+            <div class="ai-button" onclick="showNotification(t('studyAi') + ' - ' + t('inDevelopment'))">
                 <span class="ai-icon">📚</span>
                 <div class="ai-title">ИИ для учебы</div>
                 <div class="ai-description">Помощник в обучении и изучении</div>
             </div>
 
-            <div class="ai-button" onclick="showNotification('ИИ для программирования - в разработке')">
+            <div class="ai-button" onclick="showNotification(t('codeAi') + ' - ' + t('inDevelopment'))">
                 <span class="ai-icon">💻</span>
                 <div class="ai-title">ИИ программист</div>
                 <div class="ai-description">Помощь в написании и отладке кода</div>
             </div>
 
-            <div class="ai-button" onclick="showNotification('ИИ для анализа данных - в разработке')">
+            <div class="ai-button" onclick="showNotification(t('dataAi') + ' - ' + t('inDevelopment'))">
                 <span class="ai-icon">📊</span>
                 <div class="ai-title">Анализ данных</div>
                 <div class="ai-description">Обработка и анализ больших данных</div>
             </div>
 
-            <div class="ai-button" onclick="showNotification('ИИ для творчества - в разработке')">
+            <div class="ai-button" onclick="showNotification(t('creativeAi') + ' - ' + t('inDevelopment'))">
                 <span class="ai-icon">✨</span>
                 <div class="ai-title">Творческий ИИ</div>
                 <div class="ai-description">Музыка, стихи, рассказы и креатив</div>
@@ -606,6 +711,232 @@
     <div id="notification" class="notification"></div>
 
     <script>
+        // Система переводов
+        const translations = {
+            ru: {
+                loading: 'Загрузка...',
+                userId: 'ID: ...',
+                welcome: 'Добро пожаловать!',
+                aiPortal: 'AI Portal',
+                selectAi: 'Выберите ИИ для ваших задач',
+                chatAi: 'ИИ для общения',
+                chatDescription: 'Умный собеседник для любых разговоров',
+                imageGen: 'Генератор изображений',
+                imageDescription: 'Создание уникальных изображений по описанию',
+                studyAi: 'ИИ для учебы',
+                studyDescription: 'Помощник в обучении и изучении',
+                codeAi: 'ИИ программист',
+                codeDescription: 'Помощь в написании и отладке кода',
+                dataAi: 'Анализ данных',
+                dataDescription: 'Обработка и анализ больших данных',
+                creativeAi: 'Творческий ИИ',
+                creativeDescription: 'Музыка, стихи, рассказы и креатив',
+                inDevelopment: 'в разработке',
+                chatTitle: 'ИИ Ассистент',
+                chatWelcome: 'Привет! Я ваш ИИ ассистент. Чем могу помочь?',
+                typing: 'ИИ печатает',
+                placeholder: 'Напишите сообщение...',
+                error: 'Извините, произошла ошибка при обработке вашего сообщения. Попробуйте еще раз.',
+                close: 'Закрыть'
+            },
+            en: {
+                loading: 'Loading...',
+                userId: 'ID: ...',
+                welcome: 'Welcome!',
+                aiPortal: 'AI Portal',
+                selectAi: 'Choose AI for your tasks',
+                chatAi: 'Chat AI',
+                chatDescription: 'Smart conversationalist for any discussions',
+                imageGen: 'Image Generator',
+                imageDescription: 'Creating unique images from descriptions',
+                studyAi: 'Study AI',
+                studyDescription: 'Learning and study assistant',
+                codeAi: 'AI Programmer',
+                codeDescription: 'Help with writing and debugging code',
+                dataAi: 'Data Analysis',
+                dataDescription: 'Processing and analyzing big data',
+                creativeAi: 'Creative AI',
+                creativeDescription: 'Music, poetry, stories and creativity',
+                inDevelopment: 'in development',
+                chatTitle: 'AI Assistant',
+                chatWelcome: 'Hello! I am your AI assistant. How can I help?',
+                typing: 'AI is typing',
+                placeholder: 'Write a message...',
+                error: 'Sorry, an error occurred while processing your message. Please try again.',
+                close: 'Close'
+            },
+            es: {
+                loading: 'Cargando...',
+                userId: 'ID: ...',
+                welcome: '¡Bienvenido!',
+                aiPortal: 'Portal IA',
+                selectAi: 'Elige IA para tus tareas',
+                chatAi: 'IA de Chat',
+                chatDescription: 'Conversador inteligente para cualquier discusión',
+                imageGen: 'Generador de Imágenes',
+                imageDescription: 'Creando imágenes únicas desde descripciones',
+                studyAi: 'IA de Estudio',
+                studyDescription: 'Asistente de aprendizaje y estudio',
+                codeAi: 'IA Programador',
+                codeDescription: 'Ayuda con escritura y depuración de código',
+                dataAi: 'Análisis de Datos',
+                dataDescription: 'Procesamiento y análisis de big data',
+                creativeAi: 'IA Creativa',
+                creativeDescription: 'Música, poesía, historias y creatividad',
+                inDevelopment: 'en desarrollo',
+                chatTitle: 'Asistente IA',
+                chatWelcome: '¡Hola! Soy tu asistente IA. ¿Cómo puedo ayudar?',
+                typing: 'IA está escribiendo',
+                placeholder: 'Escribe un mensaje...',
+                error: 'Lo siento, ocurrió un error al procesar tu mensaje. Inténtalo de nuevo.',
+                close: 'Cerrar'
+            },
+            fr: {
+                loading: 'Chargement...',
+                userId: 'ID: ...',
+                welcome: 'Bienvenue!',
+                aiPortal: 'Portail IA',
+                selectAi: 'Choisissez IA pour vos tâches',
+                chatAi: 'IA de Chat',
+                chatDescription: 'Conversationniste intelligent pour toute discussion',
+                imageGen: 'Générateur d\'Images',
+                imageDescription: 'Création d\'images uniques à partir de descriptions',
+                studyAi: 'IA d\'Étude',
+                studyDescription: 'Assistant d\'apprentissage et d\'étude',
+                codeAi: 'IA Programmeur',
+                codeDescription: 'Aide à l\'écriture et au débogage de code',
+                dataAi: 'Analyse de Données',
+                dataDescription: 'Traitement et analyse de big data',
+                creativeAi: 'IA Créative',
+                creativeDescription: 'Musique, poésie, histoires et créativité',
+                inDevelopment: 'en développement',
+                chatTitle: 'Assistant IA',
+                chatWelcome: 'Bonjour! Je suis votre assistant IA. Comment puis-je aider?',
+                typing: 'IA tape',
+                placeholder: 'Écrivez un message...',
+                error: 'Désolé, une erreur s\'est produite lors du traitement de votre message. Réessayez.',
+                close: 'Fermer'
+            },
+            de: {
+                loading: 'Laden...',
+                userId: 'ID: ...',
+                welcome: 'Willkommen!',
+                aiPortal: 'KI Portal',
+                selectAi: 'Wählen Sie KI für Ihre Aufgaben',
+                chatAi: 'Chat KI',
+                chatDescription: 'Intelligenter Gesprächspartner für jede Diskussion',
+                imageGen: 'Bildgenerator',
+                imageDescription: 'Erstellung einzigartiger Bilder aus Beschreibungen',
+                studyAi: 'Lern KI',
+                studyDescription: 'Lern- und Studienassistent',
+                codeAi: 'KI Programmierer',
+                codeDescription: 'Hilfe beim Schreiben und Debuggen von Code',
+                dataAi: 'Datenanalyse',
+                dataDescription: 'Verarbeitung und Analyse von Big Data',
+                creativeAi: 'Kreative KI',
+                creativeDescription: 'Musik, Poesie, Geschichten und Kreativität',
+                inDevelopment: 'in Entwicklung',
+                chatTitle: 'KI Assistent',
+                chatWelcome: 'Hallo! Ich bin Ihr KI-Assistent. Wie kann ich helfen?',
+                typing: 'KI tippt',
+                placeholder: 'Nachricht schreiben...',
+                error: 'Entschuldigung, ein Fehler ist beim Verarbeiten Ihrer Nachricht aufgetreten. Versuchen Sie es erneut.',
+                close: 'Schließen'
+            },
+            zh: {
+                loading: '加载中...',
+                userId: 'ID: ...',
+                welcome: '欢迎！',
+                aiPortal: 'AI 门户',
+                selectAi: '为您的任务选择AI',
+                chatAi: '聊天AI',
+                chatDescription: '智能对话伙伴，适合任何讨论',
+                imageGen: '图像生成器',
+                imageDescription: '根据描述创建独特图像',
+                studyAi: '学习AI',
+                studyDescription: '学习和研究助手',
+                codeAi: 'AI程序员',
+                codeDescription: '帮助编写和调试代码',
+                dataAi: '数据分析',
+                dataDescription: '处理和分析大数据',
+                creativeAi: '创意AI',
+                creativeDescription: '音乐、诗歌、故事和创意',
+                inDevelopment: '开发中',
+                chatTitle: 'AI助手',
+                chatWelcome: '你好！我是你的AI助手。我能如何帮助？',
+                typing: 'AI正在输入',
+                placeholder: '写消息...',
+                error: '抱歉，处理您的消息时发生错误。请重试。',
+                close: '关闭'
+            }
+        };
+
+        // Текущий язык
+        let currentLanguage = 'ru';
+
+        // Функция получения перевода
+        function t(key) {
+            return translations[currentLanguage][key] || translations['ru'][key] || key;
+        }
+
+        // Функция обновления интерфейса
+        function updateInterface() {
+            document.getElementById('userName').textContent = t('loading');
+            document.getElementById('userId').textContent = t('userId');
+            document.querySelector('.title').textContent = t('aiPortal');
+            document.querySelector('.subtitle').textContent = t('selectAi');
+            
+            // Обновляем кнопки AI
+            const buttons = document.querySelectorAll('.ai-button');
+            const titles = [t('chatAi'), t('imageGen'), t('studyAi'), t('codeAi'), t('dataAi'), t('creativeAi')];
+            const descriptions = [t('chatDescription'), t('imageDescription'), t('studyDescription'), t('codeDescription'), t('dataDescription'), t('creativeDescription')];
+            
+            buttons.forEach((button, index) => {
+                button.querySelector('.ai-title').textContent = titles[index];
+                button.querySelector('.ai-description').textContent = descriptions[index];
+            });
+            
+            // Обновляем чат
+            document.querySelector('.chat-title').textContent = t('chatTitle');
+            document.querySelector('.chat-input').placeholder = t('placeholder');
+            document.getElementById('typingIndicator').innerHTML = t('typing') + '<span class="typing-dots"></span>';
+        }
+
+        // Функции для работы с языками
+        function toggleLanguageDropdown() {
+            const dropdown = document.getElementById('languageDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        function changeLanguage(lang) {
+            currentLanguage = lang;
+            updateInterface();
+            
+            // Обновляем селектор языка
+            const flags = {'ru': '🇷🇺', 'en': '🇺🇸', 'es': '🇪🇸', 'fr': '🇫🇷', 'de': '🇩🇪', 'zh': '🇨🇳'};
+            const names = {'ru': 'Русский', 'en': 'English', 'es': 'Español', 'fr': 'Français', 'de': 'Deutsch', 'zh': '中文'};
+            
+            document.getElementById('currentLanguageFlag').textContent = flags[lang];
+            document.getElementById('currentLanguageName').textContent = names[lang];
+            
+            // Обновляем активную опцию
+            document.querySelectorAll('.language-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            event.target.closest('.language-option').classList.add('active');
+            
+            // Закрываем dropdown
+            document.getElementById('languageDropdown').classList.remove('show');
+        }
+
+        // Закрытие dropdown при клике вне его
+        document.addEventListener('click', function(event) {
+            const selector = document.querySelector('.language-selector');
+            if (!selector.contains(event.target)) {
+                document.getElementById('languageDropdown').classList.remove('show');
+            }
+        });
+
         // Инициализация Telegram Web App
         const tg = window.Telegram.WebApp;
         tg.ready();
@@ -685,6 +1016,11 @@
         function openChat() {
             document.getElementById('chatModal').style.display = 'block';
             document.getElementById('chatInput').focus();
+            // Обновляем приветственное сообщение на текущем языке
+            const welcomeMessage = document.querySelector('.chat-messages .message.ai .message-content');
+            if (welcomeMessage) {
+                welcomeMessage.textContent = t('chatWelcome');
+            }
             // Устанавливаем время приветственного сообщения
             document.getElementById('welcomeTime').textContent = getCurrentTime();
         }
@@ -751,28 +1087,59 @@
                             parts: [{
                                 text: message
                             }]
-                        }]
+                        }],
+                        generationConfig: {
+                            temperature: 0.7,
+                            topK: 40,
+                            topP: 0.95,
+                            maxOutputTokens: 1024,
+                        },
+                        safetySettings: [
+                            {
+                                category: "HARM_CATEGORY_HARASSMENT",
+                                threshold: "BLOCK_MEDIUM_AND_ABOVE"
+                            },
+                            {
+                                category: "HARM_CATEGORY_HATE_SPEECH",
+                                threshold: "BLOCK_MEDIUM_AND_ABOVE"
+                            },
+                            {
+                                category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                                threshold: "BLOCK_MEDIUM_AND_ABOVE"
+                            },
+                            {
+                                category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+                                threshold: "BLOCK_MEDIUM_AND_ABOVE"
+                            }
+                        ]
                     })
                 });
                 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    const errorData = await response.json();
+                    console.error('API Error:', errorData);
+                    throw new Error(`API Error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
                 }
                 
                 const data = await response.json();
+                console.log('API Response:', data);
                 
-                if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
                     const aiResponse = data.candidates[0].content.parts[0].text;
                     hideTyping();
                     addMessage(aiResponse);
+                } else if (data.candidates && data.candidates[0] && data.candidates[0].finishReason === 'SAFETY') {
+                    hideTyping();
+                    addMessage('Извините, ваше сообщение было заблокировано системой безопасности. Попробуйте переформулировать вопрос.');
                 } else {
+                    console.error('Unexpected API response format:', data);
                     throw new Error('Неожиданный формат ответа от API');
                 }
                 
             } catch (error) {
                 console.error('Ошибка при отправке сообщения:', error);
                 hideTyping();
-                addMessage('Извините, произошла ошибка при обработке вашего сообщения. Попробуйте еще раз.');
+                addMessage(t('error'));
             } finally {
                 sendButton.disabled = false;
             }
