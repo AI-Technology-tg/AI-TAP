@@ -783,7 +783,7 @@
     <div id="chatModal" class="chat-modal">
         <div class="chat-container">
             <div class="chat-header">
-                <div class="chat-title">🤖 Основной ИИ</div>
+                <div class="chat-title">Основной ИИ</div>
                 <span class="chat-close" onclick="closeChat()">&times;</span>
             </div>
             
@@ -883,6 +883,10 @@
                 inDevelopment: 'en desarrollo',
                 mainAiNotification: 'IA Principal - en desarrollo',
                 imageGenNotification: 'Generador de Imágenes - en desarrollo',
+                chatWelcome: '¡Hola! Soy IA Principal. Desafortunadamente, estoy en desarrollo, pero pronto estaré listo para ayudar!',
+                chatPlaceholder: 'Escribe un mensaje...',
+                chatTyping: 'IA está escribiendo',
+                chatResponse: 'Lo siento, estoy en desarrollo. ¡Pronto estaré listo para ayudarte!',
                 chatTitle: 'Asistente IA',
                 chatWelcome: '¡Hola! Soy tu asistente IA. ¿Cómo puedo ayudar?',
                 typing: 'IA está escribiendo',
@@ -903,6 +907,10 @@
                 inDevelopment: 'en développement',
                 mainAiNotification: 'IA Principal - en développement',
                 imageGenNotification: 'Générateur d\'Images - en développement',
+                chatWelcome: 'Bonjour! Je suis IA Principal. Malheureusement, je suis en développement, mais je serai bientôt prêt à aider!',
+                chatPlaceholder: 'Écrivez un message...',
+                chatTyping: 'IA tape',
+                chatResponse: 'Désolé, je suis en développement. Je serai bientôt prêt à vous aider!',
                 chatTitle: 'Assistant IA',
                 chatWelcome: 'Bonjour! Je suis votre assistant IA. Comment puis-je aider?',
                 typing: 'IA tape',
@@ -923,6 +931,10 @@
                 inDevelopment: 'in Entwicklung',
                 mainAiNotification: 'Haupt-KI - in Entwicklung',
                 imageGenNotification: 'Bildgenerator - in Entwicklung',
+                chatWelcome: 'Hallo! Ich bin Haupt-KI. Leider bin ich noch in Entwicklung, aber ich werde bald bereit sein zu helfen!',
+                chatPlaceholder: 'Nachricht schreiben...',
+                chatTyping: 'KI tippt',
+                chatResponse: 'Entschuldigung, ich bin noch in Entwicklung. Ich werde bald bereit sein, Ihnen zu helfen!',
                 chatTitle: 'KI Assistent',
                 chatWelcome: 'Hallo! Ich bin Ihr KI-Assistent. Wie kann ich helfen?',
                 typing: 'KI tippt',
@@ -943,6 +955,10 @@
                 inDevelopment: '开发中',
                 mainAiNotification: '主要AI - 开发中',
                 imageGenNotification: '图像生成器 - 开发中',
+                chatWelcome: '你好！我是主要AI。很遗憾，我还在开发中，但我很快就会准备好帮助！',
+                chatPlaceholder: '写消息...',
+                chatTyping: 'AI正在输入',
+                chatResponse: '抱歉，我还在开发中。我很快就会准备好帮助您！',
                 chatTitle: 'AI助手',
                 chatWelcome: '你好！我是你的AI助手。我能如何帮助？',
                 typing: 'AI正在输入',
@@ -954,6 +970,13 @@
 
         // Текущий язык
         let currentLanguage = localStorage.getItem('ai-tap-language') || 'ru';
+        
+        // Конфигурация Groq AI API
+        const GROQ_API_KEY = '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';
+        const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+        
+        // Память для чата
+        let chatHistory = JSON.parse(localStorage.getItem('ai-tap-chat-history') || '[]');
 
         // Функция получения перевода
         function t(key) {
@@ -1097,8 +1120,46 @@
             document.getElementById('chatModal').style.display = 'block';
             document.getElementById('chatInput').focus();
             
+            // Восстанавливаем чат из истории
+            restoreChatHistory();
+            
             // Обновляем интерфейс чата на текущем языке
             updateChatInterface();
+        }
+        
+        // Функция восстановления истории чата
+        function restoreChatHistory() {
+            const chatMessages = document.getElementById('chatMessages');
+            
+            if (chatHistory.length === 0) {
+                // Если истории нет, показываем приветствие
+                chatMessages.innerHTML = `
+                    <div class="message ai">
+                        <div class="message-content">
+                            ${t('chatWelcome')}
+                        </div>
+                        <div class="message-time">${getCurrentTime()}</div>
+                    </div>
+                `;
+            } else {
+                // Восстанавливаем всю историю чата
+                chatMessages.innerHTML = '';
+                
+                chatHistory.forEach((msg, index) => {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = `message ${msg.role === 'user' ? 'user' : 'ai'}`;
+                    
+                    messageDiv.innerHTML = `
+                        <div class="message-content">${msg.content}</div>
+                        <div class="message-time">${getCurrentTime()}</div>
+                    `;
+                    
+                    chatMessages.appendChild(messageDiv);
+                });
+                
+                // Прокручиваем к последнему сообщению
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
         }
 
         function closeChat() {
@@ -1107,7 +1168,7 @@
 
         function updateChatInterface() {
             // Обновляем заголовок
-            document.querySelector('.chat-title').textContent = '🤖 ' + t('mainAi');
+            document.querySelector('.chat-title').textContent = t('mainAi');
             
             // Обновляем приветственное сообщение
             const welcomeMessage = document.querySelector('.chat-messages .message.ai .message-content');
@@ -1162,7 +1223,11 @@
             
             if (!message) return;
             
-            // Добавляем сообщение пользователя
+            // Добавляем сообщение пользователя в историю
+            chatHistory.push({ role: 'user', content: message });
+            localStorage.setItem('ai-tap-chat-history', JSON.stringify(chatHistory));
+            
+            // Добавляем сообщение пользователя в интерфейс
             addMessage(message, true);
             input.value = '';
             input.style.height = 'auto';
@@ -1171,12 +1236,61 @@
             sendButton.disabled = true;
             showTyping();
             
-            // Имитируем задержку ответа
-            setTimeout(() => {
+            try {
+                console.log('Отправляем запрос к Groq API...');
+                
+                const response = await fetch(GROQ_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${GROQ_API_KEY}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        model: 'llama-3.1-70b-versatile',
+                        messages: [
+                            {
+                                role: 'system',
+                                content: `Ты полезный AI ассистент. Отвечай на языке: ${currentLanguage === 'ru' ? 'русском' : currentLanguage === 'en' ? 'английском' : currentLanguage === 'es' ? 'испанском' : currentLanguage === 'fr' ? 'французском' : currentLanguage === 'de' ? 'немецком' : currentLanguage === 'zh' ? 'китайском' : 'русском'}. Будь дружелюбным и полезным.`
+                            },
+                            ...chatHistory
+                        ],
+                        max_tokens: 1000,
+                        temperature: 0.7
+                    })
+                });
+                
+                console.log('Статус ответа:', response.status);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Ошибка API:', errorText);
+                    throw new Error(`Ошибка API: ${response.status} - ${errorText}`);
+                }
+                
+                const data = await response.json();
+                console.log('Ответ от Groq:', data);
+                
+                if (data.choices && data.choices.length > 0 && data.choices[0].message && data.choices[0].message.content) {
+                    const aiResponse = data.choices[0].message.content;
+                    
+                    // Добавляем ответ ИИ в историю
+                    chatHistory.push({ role: 'assistant', content: aiResponse });
+                    localStorage.setItem('ai-tap-chat-history', JSON.stringify(chatHistory));
+                    
+                    hideTyping();
+                    addMessage(aiResponse);
+                } else {
+                    console.error('Неожиданный формат ответа:', data);
+                    throw new Error('ИИ не смог сформировать ответ');
+                }
+                
+            } catch (error) {
+                console.error('Ошибка при отправке сообщения:', error);
                 hideTyping();
-                addMessage(t('chatResponse'));
+                addMessage(`Ошибка: ${error.message}. Попробуйте еще раз.`);
+            } finally {
                 sendButton.disabled = false;
-            }, 1500);
+            }
         }
 
 
