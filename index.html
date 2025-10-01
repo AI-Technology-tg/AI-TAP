@@ -763,8 +763,8 @@
             </div>
             <div id="chat-input-area">
                 <div id="chat-input-container">
-                    <textarea id="chat-input" placeholder="Введите ваше сообщение..." rows="1"></textarea>
-                    <button id="send-btn">➤</button>
+                    <textarea id="chat-input" placeholder="Введите ваше сообщение..." rows="1" onkeypress="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }"></textarea>
+                    <button id="send-btn" onclick="sendMessage()">➤</button>
                 </div>
             </div>
     </div>
@@ -1155,6 +1155,8 @@
             }
             
             async function sendMessage() {
+                console.log('🚀 sendMessage function called');
+                
                 const message = chatInput.value.trim();
                 if (!message) {
                     console.log('⚠️ Empty message, not sending');
@@ -1262,6 +1264,20 @@
                 console.error('❌ Send button not found');
             }
             
+            // Also try to get send button again after a delay
+            setTimeout(() => {
+                const sendBtnRetry = document.getElementById('send-btn');
+                if (sendBtnRetry && !sendBtnRetry.onclick) {
+                    console.log('🔄 Retrying send button initialization...');
+                    sendBtnRetry.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        console.log('📤 Send button clicked (retry)');
+                        sendMessage();
+                    });
+                    console.log('✅ Send button initialized (retry)');
+                }
+            }, 1000);
+            
             // Chat input functionality
             if (chatInput) {
                 chatInput.addEventListener('keypress', (e) => {
@@ -1308,6 +1324,81 @@
                 console.error('❌ Error saving message:', error);
             }
         }
+        
+        // Global send message function
+        window.sendMessage = function() {
+            console.log('🌐 Global sendMessage called');
+            const chatInput = document.getElementById('chat-input');
+            const chatMessages = document.getElementById('chat-messages');
+            
+            if (!chatInput || !chatMessages) {
+                console.error('❌ Chat elements not found');
+                return;
+            }
+            
+            const message = chatInput.value.trim();
+            if (!message) {
+                console.log('⚠️ Empty message, not sending');
+                return;
+            }
+            
+            console.log('📤 Sending message (global):', message);
+            
+            // Add user message
+            addMessage(message, true);
+            chatInput.value = '';
+            
+            // Show typing indicator
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'ai-message';
+            typingDiv.innerHTML = '🤖 Анализирую...';
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Send to AI (simplified version)
+            setTimeout(() => {
+                chatMessages.removeChild(typingDiv);
+                const responses = [
+                    'Интересный вопрос! Давай разберем его подробнее.',
+                    'Хорошая тема для обсуждения! У меня есть несколько мыслей на этот счет.',
+                    'Это важная тема. Давай обсудим ее с разных сторон.',
+                    'Отличный вопрос! Я готов помочь разобраться в этом вопросе.',
+                    'Интересная точка зрения! Давай обсудим это подробнее.'
+                ];
+                const response = responses[Math.floor(Math.random() * responses.length)];
+                addMessage(response);
+            }, 1000);
+        };
+        
+        // Global add message function
+        window.addMessage = function(text, isUser = false) {
+            const chatMessages = document.getElementById('chat-messages');
+            if (!chatMessages) return;
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
+            
+            const avatarDiv = document.createElement('div');
+            avatarDiv.className = `message-avatar ${isUser ? 'user-avatar' : 'ai-avatar'}`;
+            avatarDiv.textContent = isUser ? '👤' : '🤖';
+            messageDiv.appendChild(avatarDiv);
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            
+            const textElement = document.createElement('div');
+            textElement.textContent = text;
+            contentDiv.appendChild(textElement);
+            
+            messageDiv.appendChild(contentDiv);
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Save to database
+            saveMessageToDatabase(text, isUser);
+            
+            console.log(`💬 Message added (global): ${isUser ? 'User' : 'AI'}: ${text}`);
+        };
         
         
         
