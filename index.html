@@ -1281,12 +1281,23 @@
         }, 100);
 
         function initGame() {
+            console.log('🎮 Initializing AI-TAP game...');
+            
             // Initialize chat functionality
-
-            // Settings button
-            document.getElementById('settings-btn').addEventListener('click', () => {
-                document.getElementById('settings-panel').style.display = 'block';
-            });
+            try {
+                // Settings button
+                const settingsBtn = document.getElementById('settings-btn');
+                if (settingsBtn) {
+                    settingsBtn.addEventListener('click', () => {
+                        console.log('⚙️ Settings button clicked');
+                        document.getElementById('settings-panel').style.display = 'block';
+                    });
+                } else {
+                    console.error('❌ Settings button not found');
+                }
+            } catch (error) {
+                console.error('❌ Error initializing settings:', error);
+            }
             
             function showProfileInfo() {
                 const user = tg.initDataUnsafe.user;
@@ -1455,30 +1466,50 @@
                 }
             }
             
-            sendBtn.addEventListener('click', sendMessage);
-            chatInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    sendMessage();
-                }
-            });
+            // Send button functionality
+            if (sendBtn) {
+                sendBtn.addEventListener('click', sendMessage);
+                console.log('✅ Send button initialized');
+            } else {
+                console.error('❌ Send button not found');
+            }
+            
+            // Chat input functionality
+            if (chatInput) {
+                chatInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        sendMessage();
+                    }
+                });
+                console.log('✅ Chat input initialized');
+            } else {
+                console.error('❌ Chat input not found');
+            }
             
             // Image upload functionality
-            imageUploadBtn.addEventListener('click', () => {
-                imageInput.click();
-            });
-            
-            imageInput.addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        currentImage = e.target.result;
-                        imagePreview.src = currentImage;
-                        imagePreview.style.display = 'block';
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
+            if (imageUploadBtn && imageInput) {
+                imageUploadBtn.addEventListener('click', () => {
+                    console.log('📷 Image upload clicked');
+                    imageInput.click();
+                });
+                
+                imageInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        console.log('📷 Image selected:', file.name);
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            currentImage = e.target.result;
+                            imagePreview.src = currentImage;
+                            imagePreview.style.display = 'block';
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+                console.log('✅ Image upload initialized');
+            } else {
+                console.error('❌ Image upload elements not found');
+            }
             
             // AI Settings
             const creativitySlider = document.getElementById('ai-creativity');
@@ -1745,7 +1776,9 @@
             }
             
             // Check if user is admin and show admin section
+            // STRICT ADMIN ACCESS: Only for @Fuckin_blood (ID: 1485058648)
             if (user && user.id === 1485058648) {
+                console.log('🔧 Admin access granted for @Fuckin_blood');
                 document.getElementById('admin-section').style.display = 'block';
                 document.getElementById('admin-panel-btn').addEventListener('click', () => {
                     document.getElementById('admin-panel').style.display = 'flex';
@@ -1753,6 +1786,10 @@
                     updateAdminStats();
                     startAdminAutoRefresh();
                 });
+            } else {
+                console.log('🚫 Admin access denied - user is not @Fuckin_blood');
+                // Ensure admin section is hidden for non-admin users
+                document.getElementById('admin-section').style.display = 'none';
             }
             
             // Auto-refresh admin data every 30 seconds
@@ -1769,46 +1806,58 @@
             const fileUpload = document.getElementById('file-upload');
             const fileList = document.getElementById('file-list');
             
-            fileUpload.addEventListener('change', (e) => {
-                const files = Array.from(e.target.files);
-                fileList.innerHTML = '';
-                
-                files.forEach((file, index) => {
-                    const fileItem = document.createElement('div');
-                    fileItem.style.cssText = `
-                        background: rgba(255,255,255,0.1);
-                        padding: 10px;
-                        margin: 5px 0;
-                        border-radius: 5px;
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                    `;
+            if (fileUpload && fileList) {
+                fileUpload.addEventListener('change', (e) => {
+                    const files = Array.from(e.target.files);
+                    console.log('📁 Files selected:', files.length);
+                    fileList.innerHTML = '';
                     
-                    fileItem.innerHTML = `
-                        <div>
-                            <strong>${file.name}</strong><br>
-                            <small>${(file.size / 1024).toFixed(1)} KB</small>
-                        </div>
-                        <button onclick="removeFile(${index})" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">✕</button>
-                    `;
-                    
-                    fileList.appendChild(fileItem);
+                    files.forEach((file, index) => {
+                        const fileItem = document.createElement('div');
+                        fileItem.style.cssText = `
+                            background: rgba(255,255,255,0.1);
+                            padding: 10px;
+                            margin: 5px 0;
+                            border-radius: 5px;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                        `;
+                        
+                        fileItem.innerHTML = `
+                            <div>
+                                <strong>${file.name}</strong><br>
+                                <small>${(file.size / 1024).toFixed(1)} KB</small>
+                            </div>
+                            <button onclick="removeFile(${index})" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">✕</button>
+                        `;
+                        
+                        fileList.appendChild(fileItem);
+                    });
                 });
-            });
+                console.log('✅ File upload initialized');
+            } else {
+                console.error('❌ File upload elements not found');
+            }
             
             // Language change functionality
             const languageSelect = document.getElementById('language-select');
-            languageSelect.addEventListener('change', (e) => {
-                const selectedLang = e.target.value;
-                if (selectedLang === 'auto') {
-                    currentLanguage = detectDeviceLanguage();
-                } else {
-                    currentLanguage = selectedLang;
-                }
-                localStorage.setItem('appLanguage', currentLanguage);
-                applyLanguage();
-            });
+            if (languageSelect) {
+                languageSelect.addEventListener('change', (e) => {
+                    const selectedLang = e.target.value;
+                    console.log('🌍 Language changed to:', selectedLang);
+                    if (selectedLang === 'auto') {
+                        currentLanguage = detectDeviceLanguage();
+                    } else {
+                        currentLanguage = selectedLang;
+                    }
+                    localStorage.setItem('appLanguage', currentLanguage);
+                    applyLanguage();
+                });
+                console.log('✅ Language selector initialized');
+            } else {
+                console.error('❌ Language selector not found');
+            }
             
             // Initialize language on page load
             initLanguage();
@@ -1824,21 +1873,45 @@
                 GITHUB_CONFIG.token = savedGitHubSettings.token;
             }
 
+            // Auto-save function
+            function saveProgress() {
+                try {
+                    const progress = {
+                        timestamp: new Date().toISOString(),
+                        user: user ? {
+                            id: user.id,
+                            username: user.username,
+                            firstName: user.first_name
+                        } : null
+                    };
+                    localStorage.setItem('aiTapProgress', JSON.stringify(progress));
+                    console.log('💾 Progress saved');
+                } catch (error) {
+                    console.error('❌ Error saving progress:', error);
+                }
+            }
+            
             // Auto-save
             setInterval(saveProgress, 30000);
         }
         
         // Global function for file removal
         function removeFile(index) {
+            console.log('🗑️ Removing file at index:', index);
             const fileInput = document.getElementById('file-upload');
-            const dt = new DataTransfer();
-            const files = Array.from(fileInput.files);
-            files.splice(index, 1);
-            files.forEach(file => dt.items.add(file));
-            fileInput.files = dt.files;
-            
-            // Re-trigger change event
-            fileInput.dispatchEvent(new Event('change'));
+            if (fileInput) {
+                const dt = new DataTransfer();
+                const files = Array.from(fileInput.files);
+                files.splice(index, 1);
+                files.forEach(file => dt.items.add(file));
+                fileInput.files = dt.files;
+                
+                // Re-trigger change event
+                fileInput.dispatchEvent(new Event('change'));
+                console.log('✅ File removed successfully');
+            } else {
+                console.error('❌ File input not found');
+            }
         }
         
         // GitHub API Integration
@@ -2059,6 +2132,13 @@
         
         // Admin Panel Functions
         function showAdminTab(tabName) {
+            // SECURITY CHECK: Only allow admin access
+            if (!user || user.id !== 1485058648) {
+                console.log('🚫 Unauthorized admin access attempt blocked');
+                alert('Доступ запрещен! Только @Fuckin_blood может использовать админ панель.');
+                return;
+            }
+            
             // Hide all tabs
             document.querySelectorAll('.admin-tab-content').forEach(tab => {
                 tab.classList.remove('active');
@@ -2136,6 +2216,13 @@
         }
         
         function saveSystemSettings() {
+            // SECURITY CHECK: Only allow admin access
+            if (!user || user.id !== 1485058648) {
+                console.log('🚫 Unauthorized admin function access blocked');
+                alert('Доступ запрещен! Только @Fuckin_blood может изменять настройки системы.');
+                return;
+            }
+            
             const settings = {
                 maxMessageLength: document.getElementById('max-message-length').value,
                 responseDelay: document.getElementById('response-delay').value,
@@ -2148,6 +2235,13 @@
         }
         
         function saveGitHubSettings() {
+            // SECURITY CHECK: Only allow admin access
+            if (!user || user.id !== 1485058648) {
+                console.log('🚫 Unauthorized GitHub settings access blocked');
+                alert('Доступ запрещен! Только @Fuckin_blood может изменять GitHub настройки.');
+                return;
+            }
+            
             const githubSettings = {
                 owner: document.getElementById('github-owner').value,
                 repo: document.getElementById('github-repo').value,
@@ -2226,6 +2320,13 @@
         }
         
         function exportUserData() {
+            // SECURITY CHECK: Only allow admin access
+            if (!user || user.id !== 1485058648) {
+                console.log('🚫 Unauthorized data export access blocked');
+                alert('Доступ запрещен! Только @Fuckin_blood может экспортировать данные.');
+                return;
+            }
+            
             const adminData = JSON.parse(localStorage.getItem('adminData')) || {};
             const dataStr = JSON.stringify(adminData, null, 2);
             const dataBlob = new Blob([dataStr], {type: 'application/json'});
@@ -2238,6 +2339,13 @@
         }
         
         function clearAllData() {
+            // SECURITY CHECK: Only allow admin access
+            if (!user || user.id !== 1485058648) {
+                console.log('🚫 Unauthorized data clearing access blocked');
+                alert('Доступ запрещен! Только @Fuckin_blood может очищать данные.');
+                return;
+            }
+            
             if (confirm('Вы уверены? Это удалит ВСЕ данные пользователей!')) {
                 localStorage.removeItem('adminData');
                 localStorage.removeItem('aiTapProgress');
@@ -2247,6 +2355,13 @@
         }
         
         function sendTestMessage() {
+            // SECURITY CHECK: Only allow admin access
+            if (!user || user.id !== 1485058648) {
+                console.log('🚫 Unauthorized test message access blocked');
+                alert('Доступ запрещен! Только @Fuckin_blood может отправлять тестовые сообщения.');
+                return;
+            }
+            
             const output = document.getElementById('tools-output');
             output.innerHTML = '<div>📨 Тестовое сообщение отправлено!</div>';
             
@@ -2257,6 +2372,13 @@
         }
         
         function checkSystemHealth() {
+            // SECURITY CHECK: Only allow admin access
+            if (!user || user.id !== 1485058648) {
+                console.log('🚫 Unauthorized system health access blocked');
+                alert('Доступ запрещен! Только @Fuckin_blood может проверять систему.');
+                return;
+            }
+            
             const output = document.getElementById('tools-output');
             output.innerHTML = '<div>🏥 Проверка системы...</div>';
             
@@ -2275,6 +2397,13 @@
         }
         
         function generateReport() {
+            // SECURITY CHECK: Only allow admin access
+            if (!user || user.id !== 1485058648) {
+                console.log('🚫 Unauthorized report generation access blocked');
+                alert('Доступ запрещен! Только @Fuckin_blood может генерировать отчеты.');
+                return;
+            }
+            
             const adminData = JSON.parse(localStorage.getItem('adminData')) || {};
             const users = adminData.users || {};
             
@@ -2300,6 +2429,13 @@
         }
         
         function backupData() {
+            // SECURITY CHECK: Only allow admin access
+            if (!user || user.id !== 1485058648) {
+                console.log('🚫 Unauthorized backup access blocked');
+                alert('Доступ запрещен! Только @Fuckin_blood может создавать резервные копии.');
+                return;
+            }
+            
             const allData = {
                 adminData: JSON.parse(localStorage.getItem('adminData')) || {},
                 globalUserData: JSON.parse(localStorage.getItem('globalUserData')) || {},
@@ -2323,6 +2459,13 @@
         
         // Force collect all user data
         function collectAllUserData() {
+            // SECURITY CHECK: Only allow admin access
+            if (!user || user.id !== 1485058648) {
+                console.log('🚫 Unauthorized data collection access blocked');
+                alert('Доступ запрещен! Только @Fuckin_blood может собирать данные пользователей.');
+                return;
+            }
+            
             const output = document.getElementById('tools-output');
             output.innerHTML = '<div>🔄 Сбор данных от всех пользователей...</div>';
             
