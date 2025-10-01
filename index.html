@@ -692,6 +692,147 @@
             color: rgba(0, 255, 255, 0.7);
         }
 
+        /* Админ панель стили */
+        .admin-panel {
+            margin-top: 10px;
+        }
+
+        .admin-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .admin-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .admin-content {
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .admin-tabs {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px 10px 0 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: rgba(102, 126, 234, 0.8);
+            color: white;
+        }
+
+        .admin-tab {
+            display: none;
+        }
+
+        .admin-tab.active {
+            display: block;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00ffff;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .users-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .user-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-action-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+        }
+
+        .admin-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .alerts-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .alert-item {
+            background: rgba(255, 193, 7, 0.1);
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+
+        .alert-item.error {
+            background: rgba(220, 53, 69, 0.1);
+            border-left-color: #dc3545;
+        }
+
+        .alert-item.success {
+            background: rgba(40, 167, 69, 0.1);
+            border-left-color: #28a745;
+        }
+
         /* Адаптивность */
         @media (max-width: 768px) {
             .ai-panel {
@@ -715,6 +856,9 @@
         <div class="user-info">
             <div id="userName" class="user-name">Загрузка...</div>
             <div id="userId" class="user-id">ID: ...</div>
+            <div id="adminPanel" class="admin-panel" style="display: none;">
+                <button class="admin-btn" onclick="openAdminPanel()">🔧 Админ панель</button>
+            </div>
         </div>
     </div>
 
@@ -816,9 +960,69 @@
         </div>
     </div>
 
+    <!-- Админ панель -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content admin-content">
+            <span class="close" onclick="closeAdminPanel()">&times;</span>
+            <h2>🔧 Админ панель</h2>
+            
+            <div class="admin-tabs">
+                <button class="tab-btn active" onclick="showAdminTab('stats')">📊 Статистика</button>
+                <button class="tab-btn" onclick="showAdminTab('users')">👥 Пользователи</button>
+                <button class="tab-btn" onclick="showAdminTab('cache')">💾 Кэш</button>
+                <button class="tab-btn" onclick="showAdminTab('alerts')">⚠️ Алерты</button>
+            </div>
+            
+            <div id="statsTab" class="admin-tab active">
+                <h3>📈 Статистика API</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalRequests">0</div>
+                        <div class="stat-label">Всего запросов</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="requestsPerHour">0</div>
+                        <div class="stat-label">Запросов/час</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="cacheHitRate">0%</div>
+                        <div class="stat-label">Попаданий в кэш</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="avgResponseTime">0ms</div>
+                        <div class="stat-label">Среднее время ответа</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="usersTab" class="admin-tab">
+                <h3>👥 Топ пользователи</h3>
+                <div id="topUsers" class="users-list"></div>
+            </div>
+            
+            <div id="cacheTab" class="admin-tab">
+                <h3>💾 Управление кэшем</h3>
+                <div class="cache-stats">
+                    <p>Записей в кэше: <span id="cacheEntries">0</span></p>
+                    <p>Популярные запросы: <span id="popularQueries">0</span></p>
+                </div>
+                <button class="admin-action-btn" onclick="clearCache()">🗑️ Очистить кэш</button>
+            </div>
+            
+            <div id="alertsTab" class="admin-tab">
+                <h3>⚠️ Алерты и мониторинг</h3>
+                <div id="alertsList" class="alerts-list"></div>
+                <button class="admin-action-btn" onclick="checkApiLimits()">🔍 Проверить лимиты</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Уведомления -->
     <div id="notification" class="notification"></div>
 
+    <!-- Подключение модулей -->
+    <script src="database.js"></script>
+    <script src="cache.js"></script>
     <script>
         // Система переводов
         const translations = {
@@ -970,6 +1174,45 @@
 
         // Текущий язык
         let currentLanguage = localStorage.getItem('ai-tap-language') || 'ru';
+        
+        // Админ пользователь
+        const ADMIN_USER = {
+            telegramId: 1485058648,
+            username: 'Fuckin_blood',
+            firstName: 'Андрей'
+        };
+        
+        // Инициализация базы данных и кэша
+        let database = null;
+        let responseCache = null;
+        
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            // Проверяем, является ли пользователь админом
+            checkAdminUser();
+            
+            // Инициализируем кэш
+            if (typeof ResponseCache !== 'undefined') {
+                responseCache = new ResponseCache();
+                responseCache.loadFromLocalStorage();
+            }
+            
+            // Инициализируем базу данных
+            if (typeof Database !== 'undefined') {
+                database = new Database();
+            }
+        });
+        
+        // Проверка админ пользователя
+        function checkAdminUser() {
+            const tg = window.Telegram?.WebApp;
+            if (tg && tg.initDataUnsafe?.user) {
+                const user = tg.initDataUnsafe.user;
+                if (user.id === ADMIN_USER.telegramId) {
+                    document.getElementById('adminPanel').style.display = 'block';
+                }
+            }
+        }
         
         // Конфигурация Groq AI API
         const GROQ_API_KEY = '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';
@@ -1149,9 +1392,12 @@
                     const messageDiv = document.createElement('div');
                     messageDiv.className = `message ${msg.role === 'user' ? 'user' : 'ai'}`;
                     
+                    // Используем сохраненное время или текущее
+                    const messageTime = msg.timestamp || getCurrentTime();
+                    
                     messageDiv.innerHTML = `
                         <div class="message-content">${msg.content}</div>
-                        <div class="message-time">${getCurrentTime()}</div>
+                        <div class="message-time">${messageTime}</div>
                     `;
                     
                     chatMessages.appendChild(messageDiv);
@@ -1199,13 +1445,17 @@
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${isUser ? 'user' : 'ai'}`;
             
+            const currentTime = getCurrentTime();
+            
             messageDiv.innerHTML = `
                 <div class="message-content">${content}</div>
-                <div class="message-time">${getCurrentTime()}</div>
+                <div class="message-time">${currentTime}</div>
             `;
             
             messagesContainer.appendChild(messageDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            return currentTime;
         }
 
         function showTyping() {
@@ -1223,12 +1473,40 @@
             
             if (!message) return;
             
-            // Добавляем сообщение пользователя в историю
-            chatHistory.push({ role: 'user', content: message });
+            // Проверяем кэш перед отправкой
+            if (responseCache) {
+                const cachedResponse = responseCache.getCache(message, currentLanguage);
+                if (cachedResponse) {
+                    // Добавляем сообщение пользователя в интерфейс
+                    const userTime = addMessage(message, true);
+                    chatHistory.push({ role: 'user', content: message, timestamp: userTime });
+                    localStorage.setItem('ai-tap-chat-history', JSON.stringify(chatHistory));
+                    
+                    // Показываем кэшированный ответ
+                    setTimeout(() => {
+                        const aiTime = addMessage(cachedResponse);
+                        chatHistory.push({ role: 'assistant', content: cachedResponse, timestamp: aiTime });
+                        localStorage.setItem('ai-tap-chat-history', JSON.stringify(chatHistory));
+                    }, 500);
+                    
+                    input.value = '';
+                    input.style.height = 'auto';
+                    return;
+                }
+            }
+            
+            // Добавляем сообщение пользователя в интерфейс и получаем время
+            const userTime = addMessage(message, true);
+            
+            // Добавляем сообщение пользователя в историю с временем
+            chatHistory.push({ role: 'user', content: message, timestamp: userTime });
             localStorage.setItem('ai-tap-chat-history', JSON.stringify(chatHistory));
             
-            // Добавляем сообщение пользователя в интерфейс
-            addMessage(message, true);
+            // Сохраняем в базу данных
+            if (database && user) {
+                await database.saveMessage(user.id, 'user', message);
+            }
+            
             input.value = '';
             input.style.height = 'auto';
             
@@ -1273,12 +1551,25 @@
                 if (data.choices && data.choices.length > 0 && data.choices[0].message && data.choices[0].message.content) {
                     const aiResponse = data.choices[0].message.content;
                     
-                    // Добавляем ответ ИИ в историю
-                    chatHistory.push({ role: 'assistant', content: aiResponse });
+                    // Добавляем ответ ИИ в интерфейс и получаем время
+                    const aiTime = addMessage(aiResponse);
+                    
+                    // Добавляем ответ ИИ в историю с временем
+                    chatHistory.push({ role: 'assistant', content: aiResponse, timestamp: aiTime });
                     localStorage.setItem('ai-tap-chat-history', JSON.stringify(chatHistory));
                     
+                    // Сохраняем в базу данных
+                    if (database && user) {
+                        await database.saveMessage(user.id, 'assistant', aiResponse);
+                    }
+                    
+                    // Сохраняем в кэш
+                    if (responseCache) {
+                        responseCache.setCache(message, currentLanguage, aiResponse);
+                        responseCache.saveToLocalStorage();
+                    }
+                    
                     hideTyping();
-                    addMessage(aiResponse);
                 } else {
                     console.error('Неожиданный формат ответа:', data);
                     throw new Error('ИИ не смог сформировать ответ');
@@ -1291,6 +1582,140 @@
             } finally {
                 sendButton.disabled = false;
             }
+        }
+
+        // Админ панель функции
+        function openAdminPanel() {
+            document.getElementById('adminModal').style.display = 'block';
+            loadAdminStats();
+        }
+
+        function closeAdminPanel() {
+            document.getElementById('adminModal').style.display = 'none';
+        }
+
+        function showAdminTab(tabName) {
+            // Скрываем все табы
+            document.querySelectorAll('.admin-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Показываем выбранный таб
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            event.target.classList.add('active');
+
+            // Загружаем данные для таба
+            if (tabName === 'stats') {
+                loadAdminStats();
+            } else if (tabName === 'users') {
+                loadTopUsers();
+            } else if (tabName === 'cache') {
+                loadCacheStats();
+            } else if (tabName === 'alerts') {
+                loadAlerts();
+            }
+        }
+
+        async function loadAdminStats() {
+            try {
+                // Загружаем статистику из localStorage
+                const apiStats = JSON.parse(localStorage.getItem('ai-tap-api-stats') || '{}');
+                const cacheStats = responseCache ? responseCache.getCacheStats() : {};
+
+                document.getElementById('totalRequests').textContent = apiStats.totalRequests || 0;
+                document.getElementById('requestsPerHour').textContent = apiStats.requestsPerHour || 0;
+                document.getElementById('cacheHitRate').textContent = cacheStats.cacheHitRate || '0%';
+                document.getElementById('avgResponseTime').textContent = (apiStats.avgResponseTime || 0) + 'ms';
+            } catch (error) {
+                console.error('Ошибка загрузки статистики:', error);
+            }
+        }
+
+        function loadTopUsers() {
+            const topUsers = JSON.parse(localStorage.getItem('ai-tap-top-users') || '[]');
+            const usersList = document.getElementById('topUsers');
+            
+            usersList.innerHTML = '';
+            
+            if (topUsers.length === 0) {
+                usersList.innerHTML = '<p>Нет данных о пользователях</p>';
+                return;
+            }
+
+            topUsers.forEach((user, index) => {
+                const userDiv = document.createElement('div');
+                userDiv.className = 'user-item';
+                userDiv.innerHTML = `
+                    <div>
+                        <strong>#${index + 1}</strong> ID: ${user.telegramId}
+                        <br><small>Запросов: ${user.count}</small>
+                    </div>
+                `;
+                usersList.appendChild(userDiv);
+            });
+        }
+
+        function loadCacheStats() {
+            if (!responseCache) return;
+            
+            const stats = responseCache.getCacheStats();
+            document.getElementById('cacheEntries').textContent = stats.totalEntries;
+            document.getElementById('popularQueries').textContent = stats.popularQueries.length;
+        }
+
+        function loadAlerts() {
+            const alertsList = document.getElementById('alertsList');
+            const alerts = JSON.parse(localStorage.getItem('ai-tap-alerts') || '[]');
+            
+            alertsList.innerHTML = '';
+            
+            if (alerts.length === 0) {
+                alertsList.innerHTML = '<p>Нет активных алертов</p>';
+                return;
+            }
+
+            alerts.forEach(alert => {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert-item ${alert.type}`;
+                alertDiv.innerHTML = `
+                    <strong>${alert.title}</strong><br>
+                    <small>${alert.message}</small><br>
+                    <small>${new Date(alert.timestamp).toLocaleString()}</small>
+                `;
+                alertsList.appendChild(alertDiv);
+            });
+        }
+
+        function clearCache() {
+            if (responseCache) {
+                responseCache.clearCache();
+                responseCache.saveToLocalStorage();
+                loadCacheStats();
+                showNotification('Кэш очищен');
+            }
+        }
+
+        function checkApiLimits() {
+            // Проверяем лимиты API
+            const apiStats = JSON.parse(localStorage.getItem('ai-tap-api-stats') || '{}');
+            const alerts = JSON.parse(localStorage.getItem('ai-tap-alerts') || '[]');
+            
+            // Добавляем новые алерты если нужно
+            if (apiStats.requestsPerHour > 100) {
+                alerts.push({
+                    type: 'error',
+                    title: 'Высокая нагрузка API',
+                    message: `Запросов в час: ${apiStats.requestsPerHour}`,
+                    timestamp: Date.now()
+                });
+            }
+            
+            localStorage.setItem('ai-tap-alerts', JSON.stringify(alerts));
+            loadAlerts();
+            showNotification('Проверка лимитов завершена');
         }
 
 
