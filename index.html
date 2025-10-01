@@ -1185,13 +1185,13 @@
             }
         };
         
-        // Multiple AI System
+        // Multiple AI System with Hugging Face API
         const aiSystem = {
             text: {
-                name: '📝 Текстовый AI',
-                apiKey: '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',
-                model: 'llama-3.1-8b-instant',
-                endpoint: 'https://api.groq.com/openai/v1/chat/completions',
+                name: '📝 Текстовый AI (DeepSeek-V3.2)',
+                apiKey: 'hf_your_token_here', // Замените на ваш HF_TOKEN
+                model: 'deepseek-ai/DeepSeek-V3.2-Exp:novita',
+                endpoint: 'https://router.huggingface.co/v1/chat/completions',
                 systemPrompt: 'Ты Grok - продвинутый AI-ассистент для текстовых задач. Ты помогаешь с написанием текстов, редактированием, анализом, переводом, созданием контента. Отвечай качественно, структурированно и полезно.'
             },
             image: {
@@ -1202,14 +1202,46 @@
                 systemPrompt: 'Ты Grok - AI для генерации изображений. Ты создаешь качественные, красивые и релевантные изображения по описанию пользователя.'
             },
             profile: {
-                name: '👤 AI для профиля',
+                name: '👤 AI для профиля (DeepSeek-V3.2)',
+                apiKey: 'hf_your_token_here', // Замените на ваш HF_TOKEN
+                model: 'deepseek-ai/DeepSeek-V3.2-Exp:novita',
+                endpoint: 'https://router.huggingface.co/v1/chat/completions',
+                systemPrompt: 'Ты Grok - AI-ассистент для работы с профилем пользователя. Ты помогаешь анализировать данные пользователя, создавать персонализированные рекомендации, анализировать историю чатов.'
+            },
+            code: {
+                name: '💻 AI для программирования (DeepSeek-V3.2)',
+                apiKey: 'hf_your_token_here', // Замените на ваш HF_TOKEN
+                model: 'deepseek-ai/DeepSeek-V3.2-Exp:novita',
+                endpoint: 'https://router.huggingface.co/v1/chat/completions',
+                systemPrompt: 'Ты Grok - AI-ассистент для программирования. Ты помогаешь с написанием кода, отладкой, оптимизацией, объяснением алгоритмов. Отвечай с примерами кода и подробными объяснениями.'
+            },
+            advanced: {
+                name: '🚀 Продвинутый AI (DeepSeek-V3.2)',
+                apiKey: 'hf_your_token_here', // Замените на ваш HF_TOKEN
+                model: 'deepseek-ai/DeepSeek-V3.2-Exp:novita',
+                endpoint: 'https://router.huggingface.co/v1/chat/completions',
+                systemPrompt: 'Ты Grok - продвинутый AI-ассистент с глубокими знаниями. Ты можешь решать сложные задачи, анализировать данные, давать экспертные советы. Отвечай максимально точно и полезно.'
+            }
+        };
+        
+        // Fallback AI System (Groq)
+        const fallbackAISystem = {
+            text: {
+                name: '📝 Текстовый AI (Groq)',
+                apiKey: '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',
+                model: 'llama-3.1-8b-instant',
+                endpoint: 'https://api.groq.com/openai/v1/chat/completions',
+                systemPrompt: 'Ты Grok - продвинутый AI-ассистент для текстовых задач. Ты помогаешь с написанием текстов, редактированием, анализом, переводом, созданием контента. Отвечай качественно, структурированно и полезно.'
+            },
+            profile: {
+                name: '👤 AI для профиля (Groq)',
                 apiKey: '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',
                 model: 'llama-3.1-8b-instant',
                 endpoint: 'https://api.groq.com/openai/v1/chat/completions',
                 systemPrompt: 'Ты Grok - AI-ассистент для работы с профилем пользователя. Ты помогаешь анализировать данные пользователя, создавать персонализированные рекомендации, анализировать историю чатов.'
             },
             code: {
-                name: '💻 AI для программирования',
+                name: '💻 AI для программирования (Groq)',
                 apiKey: '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',
                 model: 'llama-3.1-8b-instant',
                 endpoint: 'https://api.groq.com/openai/v1/chat/completions',
@@ -1227,6 +1259,16 @@
                 lowerMessage.includes('draw') || lowerMessage.includes('image') || 
                 lowerMessage.includes('picture') || lowerMessage.includes('фото')) {
                 return 'image';
+            }
+            
+            // Advanced AI keywords (complex tasks)
+            if (lowerMessage.includes('сложно') || lowerMessage.includes('эксперт') || 
+                lowerMessage.includes('анализ') || lowerMessage.includes('исследование') ||
+                lowerMessage.includes('научн') || lowerMessage.includes('математик') ||
+                lowerMessage.includes('философ') || lowerMessage.includes('психолог') ||
+                lowerMessage.includes('complex') || lowerMessage.includes('expert') ||
+                lowerMessage.includes('research') || lowerMessage.includes('scientific')) {
+                return 'advanced';
             }
             
             // Code keywords
@@ -1289,18 +1331,17 @@
             chatMessages.scrollTop = chatMessages.scrollHeight;
             
             try {
-                // Use selected AI
-                const ai = aiSystem[selectedAI];
-                const response = await processWithAI(ai, message);
+                // Use selected AI with fallback system
+                const response = await processWithFallback(selectedAI, message);
                 
                 chatMessages.removeChild(typingDiv);
                 addMessage(response);
                 
             } catch (error) {
-                console.log('AI API failed, using fallback:', error.message);
+                console.log('All AI systems failed, using final fallback:', error.message);
                 chatMessages.removeChild(typingDiv);
                 
-                // Fallback to personality responses
+                // Final fallback to personality responses
                 const responses = getPersonalityResponses(currentAIMode, message);
                 const response = responses[Math.floor(Math.random() * responses.length)];
                 addMessage(response);
@@ -1314,6 +1355,33 @@
             } else {
                 return await generateText(ai, message);
             }
+        }
+        
+        // Try primary AI, fallback to secondary
+        async function processWithFallback(selectedAI, message) {
+            try {
+                // Try primary AI (Hugging Face)
+                const ai = aiSystem[selectedAI];
+                if (ai && ai.apiKey !== 'hf_your_token_here') {
+                    return await processWithAI(ai, message);
+                }
+            } catch (error) {
+                console.log('Primary AI failed, trying fallback:', error.message);
+            }
+            
+            try {
+                // Try fallback AI (Groq)
+                const fallbackAI = fallbackAISystem[selectedAI];
+                if (fallbackAI) {
+                    return await processWithAI(fallbackAI, message);
+                }
+            } catch (error) {
+                console.log('Fallback AI failed:', error.message);
+            }
+            
+            // Final fallback to personality responses
+            const responses = getPersonalityResponses(currentAIMode, message);
+            return responses[Math.floor(Math.random() * responses.length)];
         }
         
         // Generate text response
@@ -1359,6 +1427,47 @@
             // For now, return a placeholder message
             // In real implementation, you would call DALL-E API
             return `🎨 Я бы создал изображение по запросу: "${message}". Для генерации изображений нужен API ключ DALL-E. Пока что я могу помочь с описанием того, как должно выглядеть изображение!`;
+        }
+        
+        // API Configuration
+        function configureAPIKeys() {
+            // Check for environment variables or localStorage
+            const hfToken = localStorage.getItem('HF_TOKEN') || 'hf_your_token_here';
+            const openaiKey = localStorage.getItem('OPENAI_KEY') || 'sk-proj-1234567890abcdef';
+            
+            // Update AI system with real keys
+            Object.keys(aiSystem).forEach(key => {
+                if (aiSystem[key].endpoint.includes('huggingface.co')) {
+                    aiSystem[key].apiKey = hfToken;
+                } else if (aiSystem[key].endpoint.includes('openai.com')) {
+                    aiSystem[key].apiKey = openaiKey;
+                }
+            });
+            
+            console.log('🔑 API keys configured');
+        }
+        
+        // Set API key function
+        function setAPIKey(service, key) {
+            if (service === 'huggingface') {
+                localStorage.setItem('HF_TOKEN', key);
+                // Update all Hugging Face endpoints
+                Object.keys(aiSystem).forEach(aiKey => {
+                    if (aiSystem[aiKey].endpoint.includes('huggingface.co')) {
+                        aiSystem[aiKey].apiKey = key;
+                    }
+                });
+                console.log('🔑 Hugging Face API key set');
+            } else if (service === 'openai') {
+                localStorage.setItem('OPENAI_KEY', key);
+                // Update all OpenAI endpoints
+                Object.keys(aiSystem).forEach(aiKey => {
+                    if (aiSystem[aiKey].endpoint.includes('openai.com')) {
+                        aiSystem[aiKey].apiKey = key;
+                    }
+                });
+                console.log('🔑 OpenAI API key set');
+            }
         }
         
         // Profile AI functions
@@ -1610,6 +1719,9 @@
                     <div class="ai-analysis-item">
                         <button onclick="showAIRecommendations()" class="ai-analysis-btn">🎯 Рекомендации</button>
                     </div>
+                    <div class="ai-analysis-item">
+                        <button onclick="showAPISettings()" class="ai-analysis-btn">🔑 Настройки API</button>
+                    </div>
                 </div>
             `;
             
@@ -1625,6 +1737,37 @@
         function showAIRecommendations() {
             const recommendations = generatePersonalizedRecommendations();
             addMessage(recommendations, false);
+            closeProfile();
+        }
+        
+        function showAPISettings() {
+            const hfToken = localStorage.getItem('HF_TOKEN') || '';
+            const openaiKey = localStorage.getItem('OPENAI_KEY') || '';
+            
+            const settingsMessage = `🔑 Настройки API ключей:
+
+🤗 Hugging Face Token: ${hfToken ? '✅ Настроен' : '❌ Не настроен'}
+${hfToken ? `Токен: ${hfToken.substring(0, 10)}...` : ''}
+
+🔑 OpenAI Key: ${openaiKey ? '✅ Настроен' : '❌ Не настроен'}
+${openaiKey ? `Ключ: ${openaiKey.substring(0, 10)}...` : ''}
+
+💡 Для настройки API ключей используйте:
+• setAPIKey('huggingface', 'ваш_токен')
+• setAPIKey('openai', 'ваш_ключ')
+
+🚀 Доступные AI модели:
+• DeepSeek-V3.2 (Hugging Face) - для сложных задач
+• Llama-3.1 (Groq) - быстрые ответы
+• DALL-E 3 (OpenAI) - генерация изображений
+
+📊 Статус AI системы:
+• Текстовый AI: ${aiSystem.text.apiKey !== 'hf_your_token_here' ? '✅ Активен' : '❌ Не настроен'}
+• AI для профиля: ${aiSystem.profile.apiKey !== 'hf_your_token_here' ? '✅ Активен' : '❌ Не настроен'}
+• AI для кода: ${aiSystem.code.apiKey !== 'hf_your_token_here' ? '✅ Активен' : '❌ Не настроен'}
+• Продвинутый AI: ${aiSystem.advanced.apiKey !== 'hf_your_token_here' ? '✅ Активен' : '❌ Не настроен'}`;
+            
+            addMessage(settingsMessage, false);
             closeProfile();
         }
         
@@ -1843,6 +1986,9 @@
             isInitialized = true;
             
             console.log('🔧 Initializing application...');
+            
+            // Configure API keys
+            configureAPIKeys();
             
             // Load chat history
             loadChatHistoryFromStorage();
