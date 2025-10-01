@@ -460,6 +460,12 @@
             min-width: 48px;
             height: 48px;
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
         #send-btn:hover {
             transform: translateY(-2px);
@@ -763,8 +769,8 @@
             </div>
             <div id="chat-input-area">
                 <div id="chat-input-container">
-                    <textarea id="chat-input" placeholder="Введите ваше сообщение..." rows="1" onkeypress="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }"></textarea>
-                    <button id="send-btn" onclick="sendMessage()">➤</button>
+                    <textarea id="chat-input" placeholder="Введите ваше сообщение..." rows="1"></textarea>
+                    <button id="send-btn">➤</button>
                 </div>
             </div>
     </div>
@@ -772,6 +778,78 @@
     <script>
         // IMMEDIATE START - Force loading to start
         console.log('🚀 AI-TAP: Immediate start...');
+        
+        // Simple send message function - defined early
+        function sendMessage() {
+            console.log('🚀 sendMessage called');
+            const chatInput = document.getElementById('chat-input');
+            const chatMessages = document.getElementById('chat-messages');
+            
+            if (!chatInput || !chatMessages) {
+                console.error('❌ Chat elements not found');
+                return;
+            }
+            
+            const message = chatInput.value.trim();
+            if (!message) {
+                console.log('⚠️ Empty message, not sending');
+                return;
+            }
+            
+            console.log('📤 Sending message:', message);
+            
+            // Add user message
+            addMessage(message, true);
+            chatInput.value = '';
+            
+            // Show typing indicator
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'ai-message';
+            typingDiv.innerHTML = '🤖 Анализирую...';
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Send to AI (simplified version)
+            setTimeout(() => {
+                chatMessages.removeChild(typingDiv);
+                const responses = [
+                    'Интересный вопрос! Давай разберем его подробнее.',
+                    'Хорошая тема для обсуждения! У меня есть несколько мыслей на этот счет.',
+                    'Это важная тема. Давай обсудим ее с разных сторон.',
+                    'Отличный вопрос! Я готов помочь разобраться в этом вопросе.',
+                    'Интересная точка зрения! Давай обсудим это подробнее.'
+                ];
+                const response = responses[Math.floor(Math.random() * responses.length)];
+                addMessage(response);
+            }, 1000);
+        }
+        
+        // Simple add message function - defined early
+        function addMessage(text, isUser = false) {
+            const chatMessages = document.getElementById('chat-messages');
+            if (!chatMessages) return;
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
+            
+            const avatarDiv = document.createElement('div');
+            avatarDiv.className = `message-avatar ${isUser ? 'user-avatar' : 'ai-avatar'}`;
+            avatarDiv.textContent = isUser ? '👤' : '🤖';
+            messageDiv.appendChild(avatarDiv);
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            
+            const textElement = document.createElement('div');
+            textElement.textContent = text;
+            contentDiv.appendChild(textElement);
+            
+            messageDiv.appendChild(contentDiv);
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            console.log(`💬 Message added: ${isUser ? 'User' : 'AI'}: ${text}`);
+        }
         
         // Start loading immediately
         function forceStartLoading() {
@@ -806,6 +884,32 @@
                                 document.getElementById('loader').style.display = 'none';
                                 document.getElementById('chat-container').style.display = 'flex';
                                 console.log('✅ Chat container displayed');
+                                
+                                // Initialize send button after chat is shown
+                                setTimeout(() => {
+                                    const sendBtn = document.getElementById('send-btn');
+                                    const chatInput = document.getElementById('chat-input');
+                                    
+                                    if (sendBtn) {
+                                        sendBtn.addEventListener('click', function(e) {
+                                            e.preventDefault();
+                                            console.log('📤 Send button clicked (after load)');
+                                            sendMessage();
+                                        });
+                                        console.log('✅ Send button initialized (after load)');
+                                    }
+                                    
+                                    if (chatInput) {
+                                        chatInput.addEventListener('keypress', function(e) {
+                                            if (e.key === 'Enter' && !e.shiftKey) {
+                                                e.preventDefault();
+                                                console.log('📤 Enter pressed (after load)');
+                                                sendMessage();
+                                            }
+                                        });
+                                        console.log('✅ Chat input initialized (after load)');
+                                    }
+                                }, 100);
                         }, 2000);
                     }, 500);
                 }
@@ -814,6 +918,37 @@
         
         // Start immediately
         forceStartLoading();
+        
+        // Initialize send button immediately
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔧 Initializing send button...');
+            const sendBtn = document.getElementById('send-btn');
+            const chatInput = document.getElementById('chat-input');
+            
+            if (sendBtn) {
+                sendBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('📤 Send button clicked');
+                    sendMessage();
+                });
+                console.log('✅ Send button initialized');
+            } else {
+                console.error('❌ Send button not found');
+            }
+            
+            if (chatInput) {
+                chatInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        console.log('📤 Enter pressed');
+                        sendMessage();
+                    }
+                });
+                console.log('✅ Chat input initialized');
+            } else {
+                console.error('❌ Chat input not found');
+            }
+        });
         
         // Multilingual support
         const translations = {
