@@ -21,7 +21,7 @@
             left: 0; 
             width: 100%; 
             height: 100%; 
-            background: url('https://i.ibb.co/Mx1LLNsZ/image.jpg') no-repeat center/cover; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
             display: flex; 
             justify-content: center; 
             align-items: flex-end; 
@@ -134,7 +134,12 @@
             max-width: 50px; 
             height: 10vw; 
             max-height: 50px; 
-            background: url('https://via.placeholder.com/50/3498db/fff?text=Profile') no-repeat center/cover; 
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px; 
             border-radius: 50%; 
             cursor: pointer; 
             transition: transform 0.2s; 
@@ -184,12 +189,18 @@
             display: flex; 
             align-items: center; 
         }
-        #score img { 
+        #score .icon { 
             width: 5vw; 
             max-width: 24px; 
             height: 5vw; 
             max-height: 24px; 
-            margin-right: 1vw; 
+            margin-right: 1vw;
+            display: inline-block;
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 5vw;
+            font-size: 3vw;
         }
         #tap-area { 
             flex: 1; 
@@ -206,7 +217,13 @@
             height: 80vw; 
             max-height: 300px; 
             min-height: 200px; 
-            background: url('https://i.ibb.co/fdRZrwNf/image.jpg') no-repeat center/cover; 
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4vw;
+            color: white;
+            font-weight: bold; 
             border-radius: 50%; 
             cursor: pointer; 
             transition: transform 0.1s, box-shadow 0.3s; 
@@ -862,35 +879,62 @@
     <div id="loader">
         <div id="progress-container">
             <div id="progress-bar">
-                <div id="progress-fill"></div>
+                <div id="progress-fill">
+                    <div id="robot"></div>
+                </div>
             </div>
             <div id="progress-text">0%</div>
         </div>
     </div>
     <div id="chat-container">
             <div id="chat-header">
-                <div id="chat-title">🤖 AI-TAP</div>
-                <select id="ai-selector">
-                    <option value="smart">🧠 Умный (для учебы)</option>
-                    <option value="funny">😄 Веселый (для шуток)</option>
-                    <option value="psychologist">💚 Психолог (для советов)</option>
-                    <option value="all" selected>🌟 Все вместе</option>
-                </select>
+                <div id="profile">👤</div>
+                <div id="score">
+                    <span class="icon">🤖</span>
+                    <span id="ai-count">1000</span>
+                </div>
+                <button id="settings-btn">⚙️</button>
             </div>
-            <div id="chat-messages">
-                <div class="message ai-message">
-                    <div class="message-avatar ai-avatar">🤖</div>
-                    <div class="message-content">
-                        Привет! Меня зовут AI-TAP, я создан командой AI-Технологии (@Fuckin_blood). Я умный, веселый и интересный собеседник - могу помочь с учебой, развеселить шутками, дать психологический совет или просто поболтать на любые темы. Выбери мой режим работы в меню выше! О чем хочешь поговорить?
-                    </div>
+            <div id="tap-area">
+                <div id="ai-button">
+                    <div id="energy-ring"></div>
+                    <div id="energy-timer"></div>
                 </div>
             </div>
-            <div id="chat-input-area">
-                <div id="chat-input-container">
-                    <textarea id="chat-input" placeholder="Введите ваше сообщение..." rows="1"></textarea>
-                    <button id="send-btn">➤</button>
+            <div id="buttons">
+                <button class="action-btn" id="shop-btn">🏪 Магазин</button>
+                <button class="action-btn" id="ai-chat-btn">🤖 AI Чат</button>
+                <button class="action-btn" id="quests-btn">🎯 Задания</button>
+                <button class="action-btn" id="leaders-btn">🏆 Лидеры</button>
+            </div>
+    </div>
+    
+    <!-- AI Chat Panel -->
+    <div id="ai-chat-panel">
+        <div id="chat-header">
+            <div id="chat-title">🤖 AI-TAP</div>
+            <select id="ai-selector">
+                <option value="smart">🧠 Умный (для учебы)</option>
+                <option value="funny">😄 Веселый (для шуток)</option>
+                <option value="psychologist">💚 Психолог (для советов)</option>
+                <option value="all" selected>🌟 Все вместе</option>
+            </select>
+            <button class="close-btn" onclick="closeAIChat()">✖</button>
+        </div>
+        <div id="chat-messages">
+            <div class="message ai-message">
+                <div class="message-avatar ai-avatar">🤖</div>
+                <div class="message-content">
+                    Привет! Меня зовут AI-TAP, я создан командой AI-Технологии. Я умный, веселый и интересный собеседник - могу помочь с учебой, развеселить шутками, дать психологический совет или просто поболтать на любые темы. Выбери мой режим работы в меню выше! О чем хочешь поговорить?
                 </div>
             </div>
+        </div>
+        <div id="chat-input-area">
+            <div id="chat-input-container">
+                <textarea id="chat-input" placeholder="Введите ваше сообщение..." rows="1"></textarea>
+                <button id="send-btn">➤</button>
+            </div>
+        </div>
     </div>
     
     <!-- Profile Panel -->
@@ -928,6 +972,10 @@
     <script>
         // IMMEDIATE START - Force loading to start
         console.log('🚀 AI-TAP: Immediate start...');
+        
+        // Game variables
+        let ai = 1000; // Starting AI balance
+        let energy = 100; // Starting energy
         
         // Current AI mode
         let currentAIMode = 'all';
@@ -1185,9 +1233,9 @@
             console.log(`💬 Message added: ${isUser ? 'User' : 'AI'}: ${text}`);
         }
         
-        // Start loading immediately
-        function forceStartLoading() {
-            console.log('🔄 Force starting loading...');
+        // Optimized loading function
+        function startProgressLoading() {
+            console.log('🔄 Starting loading...');
             const progressFill = document.getElementById('progress-fill');
             const progressText = document.getElementById('progress-text');
             const robot = document.getElementById('robot');
@@ -1195,7 +1243,7 @@
             
             if (!progressFill || !progressText) {
                 console.log('⚠️ Elements not ready, retrying...');
-                setTimeout(forceStartLoading, 100);
+                setTimeout(startProgressLoading, 100);
                 return;
             }
             
@@ -1212,105 +1260,21 @@
                 
                 if (progress >= 100) {
                     clearInterval(progressInterval);
+                    setTimeout(() => {
+                        document.getElementById('loader').classList.add('fade-out');
                         setTimeout(() => {
-                            document.getElementById('loader').classList.add('fade-out');
-                            setTimeout(() => {
-                                document.getElementById('loader').style.display = 'none';
-                                document.getElementById('chat-container').style.display = 'flex';
-                                console.log('✅ Chat container displayed');
-                                
-                                // Initialize send button after chat is shown
-                                setTimeout(() => {
-                                    const sendBtn = document.getElementById('send-btn');
-                                    const chatInput = document.getElementById('chat-input');
-                                    const aiSelector = document.getElementById('ai-selector');
-                                    
-                                    if (sendBtn) {
-                                        sendBtn.addEventListener('click', function(e) {
-                                            e.preventDefault();
-                                            console.log('📤 Send button clicked (after load)');
-                                            sendMessage();
-                                        });
-                                        console.log('✅ Send button initialized (after load)');
-                                    }
-                                    
-                                    if (chatInput) {
-                                        chatInput.addEventListener('keypress', function(e) {
-                                            if (e.key === 'Enter' && !e.shiftKey) {
-                                                e.preventDefault();
-                                                console.log('📤 Enter pressed (after load)');
-                                                sendMessage();
-                                            }
-                                        });
-                                        console.log('✅ Chat input initialized (after load)');
-                                    }
-                                    
-                                    if (aiSelector) {
-                                        aiSelector.addEventListener('change', function(e) {
-                                            currentAIMode = e.target.value;
-                                            console.log('🤖 AI mode changed to (after load):', currentAIMode);
-                                            
-                                            // Show AI mode change message
-                                            const personality = aiPersonalities[currentAIMode];
-                                            addMessage(`Режим изменен на: ${personality.name}. Теперь я буду отвечать в этом стиле!`);
-                                        });
-                                        console.log('✅ AI selector initialized (after load)');
-                                    }
-                                }, 100);
+                            document.getElementById('loader').style.display = 'none';
+                            document.getElementById('chat-container').style.display = 'flex';
+                            console.log('✅ Chat container displayed');
+                            initGame(); // Initialize game after loading
                         }, 2000);
                     }, 500);
                 }
             }, 50);
         }
         
-        // Start immediately
-        forceStartLoading();
-        
-        // Initialize send button immediately
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🔧 Initializing send button...');
-            const sendBtn = document.getElementById('send-btn');
-            const chatInput = document.getElementById('chat-input');
-            const aiSelector = document.getElementById('ai-selector');
-            
-            if (sendBtn) {
-                sendBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    console.log('📤 Send button clicked');
-                    sendMessage();
-                });
-                console.log('✅ Send button initialized');
-            } else {
-                console.error('❌ Send button not found');
-            }
-            
-            if (chatInput) {
-                chatInput.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        console.log('📤 Enter pressed');
-                        sendMessage();
-                    }
-                });
-                console.log('✅ Chat input initialized');
-            } else {
-                console.error('❌ Chat input not found');
-            }
-            
-            if (aiSelector) {
-                aiSelector.addEventListener('change', function(e) {
-                    currentAIMode = e.target.value;
-                    console.log('🤖 AI mode changed to:', currentAIMode);
-                    
-                    // Show AI mode change message
-                    const personality = aiPersonalities[currentAIMode];
-                    addMessage(`Режим изменен на: ${personality.name}. Теперь я буду отвечать в этом стиле!`);
-                });
-                console.log('✅ AI selector initialized');
-            } else {
-                console.error('❌ AI selector not found');
-            }
-        });
+        // Start loading immediately
+        startProgressLoading();
         
         // Multilingual support
         const translations = {
@@ -1497,13 +1461,22 @@
         function applyLanguage() {
             const t = translations[currentLanguage];
             
-            // Update interface elements
-            document.getElementById('ai-chat-btn').textContent = t.aiChat;
-            document.getElementById('settings-btn').textContent = t.settings;
-            document.getElementById('shop-btn').textContent = t.shop;
-            document.getElementById('leaders-btn').textContent = t.leaders;
-            document.getElementById('quests-btn').textContent = t.quests;
-            document.getElementById('workshop-btn').textContent = t.workshop;
+            // Update interface elements (if they exist)
+            const elements = {
+                'ai-chat-btn': t.aiChat,
+                'settings-btn': t.settings,
+                'shop-btn': t.shop,
+                'leaders-btn': t.leaders,
+                'quests-btn': t.quests,
+                'workshop-btn': t.workshop
+            };
+            
+            Object.keys(elements).forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = elements[id];
+                }
+            });
             
             // Update settings panel
             const settingsPanel = document.getElementById('settings-panel');
@@ -1516,134 +1489,188 @@
         }
 
         // Telegram Integration for Avatar and Bot Communication
-        const tg = window.Telegram.WebApp;
-        tg.ready();
-        const user = tg.initDataUnsafe.user;
+        let tg, user;
+        try {
+            tg = window.Telegram?.WebApp;
+            if (tg) {
+                tg.ready();
+                user = tg.initDataUnsafe?.user;
+            }
+        } catch (error) {
+            console.warn('Telegram WebApp not available:', error);
+            tg = null;
+            user = null;
+        }
         
-        // Enable closing confirmation
-        tg.enableClosingConfirmation();
+        // Enable Telegram WebApp features if available
+        if (tg) {
+            try {
+                tg.enableClosingConfirmation();
+                
+                // Set main button for bot communication
+                tg.MainButton.setText("💬 Отправить в бот");
+                tg.MainButton.show();
+                
+                // Handle main button click
+                tg.MainButton.onClick(() => {
+                    const chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || [];
+                    const lastMessages = chatHistory.slice(-5); // Last 5 messages
+                    
+                    let messageToBot = "🤖 AI-TAP Диалог:\n\n";
+                    lastMessages.forEach(msg => {
+                        const sender = msg.isUser ? "👤 Пользователь" : "🤖 AI";
+                        messageToBot += `${sender}: ${msg.text}\n\n`;
+                    });
+                    
+                    // Send to bot
+                    tg.sendData(JSON.stringify({
+                        type: "chat_history",
+                        data: messageToBot,
+                        user_id: user ? user.id : 'anonymous'
+                    }));
+                    
+                    tg.showAlert("Диалог отправлен в бот! 📤");
+                });
+                
+                // Handle back button
+                tg.BackButton.onClick(() => {
+                    tg.close();
+                });
+            } catch (error) {
+                console.warn('Telegram WebApp features not available:', error);
+            }
+        }
         
-        // Set main button for bot communication
-        tg.MainButton.setText("💬 Отправить в бот");
-        tg.MainButton.show();
-        
-        // Handle main button click
-        tg.MainButton.onClick(() => {
-            const chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || [];
-            const lastMessages = chatHistory.slice(-5); // Last 5 messages
-            
-            let messageToBot = "🤖 AI-TAP Диалог:\n\n";
-            lastMessages.forEach(msg => {
-                const sender = msg.isUser ? "👤 Пользователь" : "🤖 AI";
-                messageToBot += `${sender}: ${msg.text}\n\n`;
-            });
-            
-            // Send to bot
-            tg.sendData(JSON.stringify({
-                type: "chat_history",
-                data: messageToBot,
-                user_id: user ? user.id : 'anonymous'
-            }));
-            
-            tg.showAlert("Диалог отправлен в бот! 📤");
-        });
-        
-        // Handle back button
-        tg.BackButton.onClick(() => {
-            tg.close();
-        });
-        
-        const profile = document.getElementById('profile');
-        if (user && user.photo_url) {
-            profile.style.backgroundImage = `url(${user.photo_url})`;
+        // Set profile image if available
+        try {
+            const profile = document.getElementById('profile');
+            if (profile && user && user.photo_url) {
+                profile.style.backgroundImage = `url(${user.photo_url})`;
+            }
+        } catch (error) {
+            console.warn('Profile setup failed:', error);
         }
 
-        // Start progress loading immediately
-        function startProgressLoading() {
-            const progressFill = document.getElementById('progress-fill');
-            const progressText = document.getElementById('progress-text');
-            const robot = document.getElementById('robot');
-            let progress = 0;
-            
-            const progressInterval = setInterval(() => {
-                progress += Math.random() * 3 + 1; // Random increment between 1-4
-                if (progress > 100) progress = 100;
-                
-                progressFill.style.width = `${progress}%`;
-                progressText.textContent = `${Math.floor(progress)}%`;
-                
-                // Move robot along progress bar
-                if (robot) {
-                    robot.style.left = `${progress}%`;
-                }
-                
-                if (progress >= 100) {
-                    clearInterval(progressInterval);
-                    setTimeout(() => {
-                        // Fade out loader with animation
-                        document.getElementById('loader').classList.add('fade-out');
-                setTimeout(() => {
-                    document.getElementById('loader').style.display = 'none';
-                            
-                            // Show chat interface after fade
-                            document.getElementById('chat-container').style.display = 'flex';
-                        }, 2000); // Wait for fade animation to complete
-                    }, 500);
-                }
-            }, 50); // Update every 50ms for smooth progress
-            }
+        // Removed duplicate startProgressLoading function
         
-        // Start loading immediately when page loads
+        // Simplified app initialization
         function startApp() {
             console.log('🚀 Starting AI-TAP application...');
             startProgressLoading();
-            initGame();
         }
         
-        // Make startApp globally available
-        window.startApp = startApp;
-        
-        // Force start immediately
-        console.log('🔄 Force starting AI-TAP...');
-        startApp();
-        
-        // Multiple ways to start the app
+        // Start the app
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', function() {
-                console.log('📱 DOM loaded, starting app...');
-                startApp();
-            });
+            document.addEventListener('DOMContentLoaded', startApp);
         } else {
-            console.log('📱 DOM already loaded, starting app...');
             startApp();
         }
-        
-        // Fallback - start after a short delay
-        setTimeout(() => {
-            if (document.getElementById('loader') && document.getElementById('loader').style.display !== 'none') {
-                console.log('🔄 Fallback start...');
-                startApp();
-            }
-        }, 100);
 
+        // UI Functions
+        function showAIChat() {
+            document.getElementById('ai-chat-panel').style.display = 'flex';
+            console.log('🤖 AI Chat panel opened');
+        }
+        
+        function closeAIChat() {
+            document.getElementById('ai-chat-panel').style.display = 'none';
+            console.log('🤖 AI Chat panel closed');
+        }
+        
+        function tapAI() {
+            if (energy <= 0) {
+                console.log('⚡ No energy left!');
+                return;
+            }
+            
+            // Increase AI count
+            ai += 1;
+            energy -= 1;
+            
+            // Update display
+            document.getElementById('ai-count').textContent = ai;
+            
+            // Create tap effect
+            createTapEffect();
+            
+            // Play sound if available
+            try {
+                const tapSound = document.getElementById('tap-sound');
+                if (tapSound) {
+                    tapSound.currentTime = 0;
+                    tapSound.play().catch(e => console.log('Sound play failed:', e));
+                }
+            } catch (e) {
+                console.log('Sound not available:', e);
+            }
+            
+            console.log(`💰 AI: ${ai}, Energy: ${energy}`);
+        }
+        
+        function createTapEffect() {
+            const tapArea = document.getElementById('tap-area');
+            if (!tapArea) return;
+            
+            const effect = document.createElement('div');
+            effect.className = 'tap-effect';
+            effect.textContent = '+1';
+            effect.style.left = Math.random() * 200 + 'px';
+            effect.style.top = Math.random() * 200 + 'px';
+            
+            tapArea.appendChild(effect);
+            
+            setTimeout(() => {
+                if (effect.parentNode) {
+                    effect.parentNode.removeChild(effect);
+                }
+            }, 1200);
+        }
+        
         function initGame() {
             console.log('🎮 Initializing AI-TAP chat...');
+            
+            // Initialize UI event listeners
+            try {
+                // AI Chat button
+                const aiChatBtn = document.getElementById('ai-chat-btn');
+                if (aiChatBtn) {
+                    aiChatBtn.addEventListener('click', showAIChat);
+                    console.log('✅ AI Chat button initialized');
+                }
+                
+                // AI Button (tap)
+                const aiButton = document.getElementById('ai-button');
+                if (aiButton) {
+                    aiButton.addEventListener('click', tapAI);
+                    console.log('✅ AI Button initialized');
+                }
+                
+                // Profile button
+                const profileBtn = document.getElementById('profile');
+                if (profileBtn) {
+                    profileBtn.addEventListener('click', showProfile);
+                    console.log('✅ Profile button initialized');
+                }
+                
+            } catch (error) {
+                console.error('❌ Error initializing UI:', error);
+            }
             
             // Initialize chat functionality
             try {
             
             function showProfileInfo() {
-                const user = tg.initDataUnsafe.user;
+                const currentUser = tg?.initDataUnsafe?.user || user;
                 const profileInfo = `
                     👤 Профиль
-                    ${user ? `
-                    Имя: ${user.first_name} ${user.last_name || ''}
-                    Username: @${user.username || 'не указан'}
-                    ID: ${user.id}
+                    ${currentUser ? `
+                    Имя: ${currentUser.first_name} ${currentUser.last_name || ''}
+                    Username: @${currentUser.username || 'не указан'}
+                    ID: ${currentUser.id}
                     ` : 'Данные пользователя недоступны'}
                     
                     📊 Статистика
-                    Баланс: ${formatBalance(ai)} AI
+                    Баланс: ${ai} AI
                     Энергия: ${Math.floor(energy)}/100
                     Тапов: ${ai - 1000}
                     
@@ -1712,7 +1739,7 @@
                     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                         method: 'POST',
                         headers: {
-                            'Authorization': 'Bearer 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',
+                            'Authorization': 'Bearer YOUR_API_KEY_HERE',
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
@@ -1795,19 +1822,21 @@
                 console.error('❌ Send button not found');
             }
             
-            // Also try to get send button again after a delay
-            setTimeout(() => {
-                const sendBtnRetry = document.getElementById('send-btn');
-                if (sendBtnRetry && !sendBtnRetry.onclick) {
-                    console.log('🔄 Retrying send button initialization...');
-                    sendBtnRetry.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        console.log('📤 Send button clicked (retry)');
-                        sendMessage();
+                // Initialize AI selector
+                const aiSelector = document.getElementById('ai-selector');
+                if (aiSelector) {
+                    aiSelector.addEventListener('change', function(e) {
+                        currentAIMode = e.target.value;
+                        console.log('🤖 AI mode changed to:', currentAIMode);
+                        
+                        // Show AI mode change message
+                        const personality = aiPersonalities[currentAIMode];
+                        if (personality) {
+                            addMessage(`Режим изменен на: ${personality.name}. Теперь я буду отвечать в этом стиле!`);
+                        }
                     });
-                    console.log('✅ Send button initialized (retry)');
+                    console.log('✅ AI selector initialized');
                 }
-            }, 1000);
             
             // Chat input functionality
             if (chatInput) {
@@ -1856,80 +1885,12 @@
             }
         }
         
-        // Global send message function
-        window.sendMessage = function() {
-            console.log('🌐 Global sendMessage called');
-            const chatInput = document.getElementById('chat-input');
-            const chatMessages = document.getElementById('chat-messages');
-            
-            if (!chatInput || !chatMessages) {
-                console.error('❌ Chat elements not found');
-                return;
-            }
-            
-            const message = chatInput.value.trim();
-            if (!message) {
-                console.log('⚠️ Empty message, not sending');
-                return;
-            }
-            
-            console.log('📤 Sending message (global):', message);
-            
-            // Add user message
-            addMessage(message, true);
-            chatInput.value = '';
-            
-            // Show typing indicator
-            const typingDiv = document.createElement('div');
-            typingDiv.className = 'ai-message';
-            typingDiv.innerHTML = '🤖 Анализирую...';
-            chatMessages.appendChild(typingDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-            
-            // Send to AI (simplified version)
-            setTimeout(() => {
-                chatMessages.removeChild(typingDiv);
-                const responses = [
-                    'Интересный вопрос! Давай разберем его подробнее.',
-                    'Хорошая тема для обсуждения! У меня есть несколько мыслей на этот счет.',
-                    'Это важная тема. Давай обсудим ее с разных сторон.',
-                    'Отличный вопрос! Я готов помочь разобраться в этом вопросе.',
-                    'Интересная точка зрения! Давай обсудим это подробнее.'
-                ];
-                const response = responses[Math.floor(Math.random() * responses.length)];
-                addMessage(response);
-            }, 1000);
-        };
-        
-        // Global add message function
-        window.addMessage = function(text, isUser = false) {
-            const chatMessages = document.getElementById('chat-messages');
-            if (!chatMessages) return;
-            
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
-            
-            const avatarDiv = document.createElement('div');
-            avatarDiv.className = `message-avatar ${isUser ? 'user-avatar' : 'ai-avatar'}`;
-            avatarDiv.textContent = isUser ? '👤' : '🤖';
-            messageDiv.appendChild(avatarDiv);
-            
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'message-content';
-            
-            const textElement = document.createElement('div');
-            textElement.textContent = text;
-            contentDiv.appendChild(textElement);
-            
-            messageDiv.appendChild(contentDiv);
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-            
-            // Save to database
-            saveMessageToDatabase(text, isUser);
-            
-            console.log(`💬 Message added (global): ${isUser ? 'User' : 'AI'}: ${text}`);
-        };
+        // Make functions globally available
+        window.showAIChat = showAIChat;
+        window.closeAIChat = closeAIChat;
+        window.showProfile = showProfile;
+        window.closeProfile = closeProfile;
+        window.tapAI = tapAI;
         
         
         
@@ -1960,13 +1921,6 @@
             }
         });
         
-        // Emergency start after 3 seconds
-        setTimeout(() => {
-            if (document.getElementById('loader') && document.getElementById('loader').style.display !== 'none') {
-                console.log('🚨 Emergency start - loading not started automatically');
-                startApp();
-            }
-        }, 3000);
         
         // Final emergency start after 5 seconds
         setTimeout(() => {
