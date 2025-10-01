@@ -1515,10 +1515,44 @@
             }
         }
 
-        // Telegram Integration for Avatar
+        // Telegram Integration for Avatar and Bot Communication
         const tg = window.Telegram.WebApp;
         tg.ready();
         const user = tg.initDataUnsafe.user;
+        
+        // Enable closing confirmation
+        tg.enableClosingConfirmation();
+        
+        // Set main button for bot communication
+        tg.MainButton.setText("💬 Отправить в бот");
+        tg.MainButton.show();
+        
+        // Handle main button click
+        tg.MainButton.onClick(() => {
+            const chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || [];
+            const lastMessages = chatHistory.slice(-5); // Last 5 messages
+            
+            let messageToBot = "🤖 AI-TAP Диалог:\n\n";
+            lastMessages.forEach(msg => {
+                const sender = msg.isUser ? "👤 Пользователь" : "🤖 AI";
+                messageToBot += `${sender}: ${msg.text}\n\n`;
+            });
+            
+            // Send to bot
+            tg.sendData(JSON.stringify({
+                type: "chat_history",
+                data: messageToBot,
+                user_id: user ? user.id : 'anonymous'
+            }));
+            
+            tg.showAlert("Диалог отправлен в бот! 📤");
+        });
+        
+        // Handle back button
+        tg.BackButton.onClick(() => {
+            tg.close();
+        });
+        
         const profile = document.getElementById('profile');
         if (user && user.photo_url) {
             profile.style.backgroundImage = `url(${user.photo_url})`;
