@@ -252,6 +252,238 @@
             transform: translateX(0);
         }
 
+        /* Чат интерфейс */
+        .chat-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .chat-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 2% auto;
+            border-radius: 20px;
+            width: 95%;
+            height: 90%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            animation: chatSlideIn 0.3s ease-out;
+        }
+
+        @keyframes chatSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .chat-header {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .chat-title {
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .chat-title::before {
+            content: '🤖';
+            margin-right: 10px;
+            font-size: 28px;
+        }
+
+        .chat-close {
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+
+        .chat-close:hover {
+            opacity: 1;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 15px 20px;
+            border-radius: 20px;
+            animation: messageSlideIn 0.3s ease-out;
+        }
+
+        @keyframes messageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message.ai {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .message-content {
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .message-time {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-style: italic;
+        }
+
+        .typing-dots {
+            display: inline-block;
+            margin-left: 5px;
+        }
+
+        .typing-dots::after {
+            content: '...';
+            animation: typingDots 1.5s infinite;
+        }
+
+        @keyframes typingDots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 0 0 20px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            padding: 15px 20px;
+            color: white;
+            font-size: 16px;
+            resize: none;
+            min-height: 50px;
+            max-height: 120px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input:focus {
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .chat-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .send-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 20px;
+        }
+
+        .send-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: scale(1.05);
+        }
+
+        .send-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Скроллбар для чата */
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
         /* Адаптивность */
         @media (max-width: 768px) {
             .ai-panel {
@@ -295,7 +527,7 @@
         <p class="subtitle">Выберите ИИ для ваших задач</p>
         
         <div class="ai-panel">
-            <div class="ai-button" onclick="showNotification('ИИ для общения - в разработке')">
+            <div class="ai-button" onclick="openChat()">
                 <span class="ai-icon">💬</span>
                 <div class="ai-title">ИИ для общения</div>
                 <div class="ai-description">Умный собеседник для любых разговоров</div>
@@ -329,6 +561,43 @@
                 <span class="ai-icon">✨</span>
                 <div class="ai-title">Творческий ИИ</div>
                 <div class="ai-description">Музыка, стихи, рассказы и креатив</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Чат с ИИ -->
+    <div id="chatModal" class="chat-modal">
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="chat-title">ИИ Ассистент</div>
+                <span class="chat-close" onclick="closeChat()">&times;</span>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="message ai">
+                    <div class="message-content">
+                        Привет! Я ваш ИИ ассистент. Чем могу помочь?
+                    </div>
+                    <div class="message-time" id="welcomeTime"></div>
+                </div>
+            </div>
+            
+            <div class="typing-indicator" id="typingIndicator">
+                ИИ печатает<span class="typing-dots"></span>
+            </div>
+            
+            <div class="chat-input-container">
+                <div class="chat-input-wrapper">
+                    <textarea 
+                        id="chatInput" 
+                        class="chat-input" 
+                        placeholder="Напишите сообщение..."
+                        rows="1"
+                    ></textarea>
+                    <button id="sendButton" class="send-button" onclick="sendMessage()">
+                        ➤
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -384,11 +653,16 @@
             document.getElementById('userModal').style.display = 'none';
         }
 
-        // Закрытие модального окна при клике вне его
+        // Закрытие модальных окон при клике вне их
         window.onclick = function(event) {
-            const modal = document.getElementById('userModal');
-            if (event.target === modal) {
-                modal.style.display = 'none';
+            const userModal = document.getElementById('userModal');
+            const chatModal = document.getElementById('chatModal');
+            
+            if (event.target === userModal) {
+                userModal.style.display = 'none';
+            }
+            if (event.target === chatModal) {
+                chatModal.style.display = 'none';
             }
         }
 
@@ -402,6 +676,127 @@
                 notification.classList.remove('show');
             }, 3000);
         }
+
+        // Конфигурация Google AI API
+        const GOOGLE_AI_API_KEY = 'AIzaSyBQskMJsn52upW1O6eUITiA4xWj10gwumo';
+        const GOOGLE_AI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+
+        // Функции для работы с чатом
+        function openChat() {
+            document.getElementById('chatModal').style.display = 'block';
+            document.getElementById('chatInput').focus();
+            // Устанавливаем время приветственного сообщения
+            document.getElementById('welcomeTime').textContent = getCurrentTime();
+        }
+
+        function closeChat() {
+            document.getElementById('chatModal').style.display = 'none';
+        }
+
+        function getCurrentTime() {
+            const now = new Date();
+            return now.toLocaleTimeString('ru-RU', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+        }
+
+        function addMessage(content, isUser = false) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'ai'}`;
+            
+            messageDiv.innerHTML = `
+                <div class="message-content">${content}</div>
+                <div class="message-time">${getCurrentTime()}</div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function showTyping() {
+            document.getElementById('typingIndicator').style.display = 'flex';
+        }
+
+        function hideTyping() {
+            document.getElementById('typingIndicator').style.display = 'none';
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const sendButton = document.getElementById('sendButton');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Добавляем сообщение пользователя
+            addMessage(message, true);
+            input.value = '';
+            input.style.height = 'auto';
+            
+            // Блокируем кнопку отправки
+            sendButton.disabled = true;
+            showTyping();
+            
+            try {
+                // Отправляем запрос к Google AI API
+                const response = await fetch(`${GOOGLE_AI_API_URL}?key=${GOOGLE_AI_API_KEY}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: message
+                            }]
+                        }]
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                    const aiResponse = data.candidates[0].content.parts[0].text;
+                    hideTyping();
+                    addMessage(aiResponse);
+                } else {
+                    throw new Error('Неожиданный формат ответа от API');
+                }
+                
+            } catch (error) {
+                console.error('Ошибка при отправке сообщения:', error);
+                hideTyping();
+                addMessage('Извините, произошла ошибка при обработке вашего сообщения. Попробуйте еще раз.');
+            } finally {
+                sendButton.disabled = false;
+            }
+        }
+
+        // Обработка нажатия Enter в поле ввода
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatInput = document.getElementById('chatInput');
+            
+            if (chatInput) {
+                chatInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        sendMessage();
+                    }
+                });
+                
+                // Автоматическое изменение высоты textarea
+                chatInput.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+                });
+            }
+        });
 
         // Анимация появления кнопок
         document.addEventListener('DOMContentLoaded', function() {
