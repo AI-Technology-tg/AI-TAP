@@ -818,7 +818,7 @@
             </div>
             <button class="close-btn" onclick="document.getElementById('settings-panel').style.display = 'none';">Закрыть</button>
         </div>
-        <div id="admin-panel">
+        <div id="admin-panel" style="display: none;">
             <div class="admin-header">
                 <div class="admin-title">🔧 Панель разработчика</div>
                 <button class="close-btn" onclick="document.getElementById('admin-panel').style.display = 'none';" style="margin: 0;">✕</button>
@@ -881,7 +881,7 @@
                         <h4 style="color: white; margin: 0 0 15px 0;">🔗 GitHub Integration</h4>
                         <div class="setting-item">
                             <label>GitHub Username:</label>
-                            <input type="text" id="github-owner" value="Fuckin_blood" style="width: 200px; padding: 5px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: white;">
+                            <input type="text" id="github-owner" value="AI-Technology-tg" style="width: 200px; padding: 5px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: white;">
                         </div>
                         <div class="setting-item">
                             <label>Repository Name:</label>
@@ -1283,7 +1283,8 @@
             // Settings button
             const settingsBtn = document.getElementById('settings-btn');
             if (settingsBtn) {
-                settingsBtn.addEventListener('click', () => {
+                settingsBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
                     console.log('⚙️ Settings button clicked');
                     const settingsPanel = document.getElementById('settings-panel');
                     if (settingsPanel) {
@@ -1471,7 +1472,11 @@
             
             // Send button functionality
             if (sendBtn) {
-                sendBtn.addEventListener('click', sendMessage);
+                sendBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    console.log('📤 Send button clicked');
+                    sendMessage();
+                });
                 console.log('✅ Send button initialized');
             } else {
                 console.error('❌ Send button not found');
@@ -1480,10 +1485,17 @@
             // Chat input functionality
             if (chatInput) {
                 chatInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
                         sendMessage();
                     }
                 });
+                
+                // Also add click event for better responsiveness
+                chatInput.addEventListener('input', () => {
+                    console.log('📝 Chat input changed');
+                });
+                
                 console.log('✅ Chat input initialized');
             } else {
                 console.error('❌ Chat input not found');
@@ -1491,7 +1503,8 @@
             
             // Image upload functionality
             if (imageUploadBtn && imageInput) {
-                imageUploadBtn.addEventListener('click', () => {
+                imageUploadBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
                     console.log('📷 Image upload clicked');
                     imageInput.click();
                 });
@@ -1503,8 +1516,10 @@
                         const reader = new FileReader();
                         reader.onload = (e) => {
                             currentImage = e.target.result;
-                            imagePreview.src = currentImage;
-                            imagePreview.style.display = 'block';
+                            if (imagePreview) {
+                                imagePreview.src = currentImage;
+                                imagePreview.style.display = 'block';
+                            }
                         };
                         reader.readAsDataURL(file);
                     }
@@ -1927,9 +1942,9 @@
         
         // GitHub API Integration
         const GITHUB_CONFIG = {
-            owner: 'Fuckin_blood', // Замените на ваш GitHub username
-            repo: 'ai-tap-data', // Замените на название репозитория для данных
-            token: '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' // Ваш GitHub Personal Access Token
+            owner: 'AI-Technology-tg', // Ваш GitHub username
+            repo: 'AI-TAP', // Название репозитория для данных
+            token: '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' // Ваш GitHub Personal Access Token
         };
         
         // Create repository if it doesn't exist
@@ -2169,61 +2184,98 @@
         }
         
         function updateAdminStats() {
-            const adminData = JSON.parse(localStorage.getItem('adminData')) || {};
-            const users = adminData.users || {};
-            
-            // Update stats
-            document.getElementById('total-users').textContent = Object.keys(users).length;
-            
-            const today = new Date().toDateString();
-            const activeToday = Object.values(users).filter(user => 
-                new Date(user.lastActivity).toDateString() === today
-            ).length;
-            document.getElementById('active-today').textContent = activeToday;
-            
-            const totalMessages = Object.values(users).reduce((sum, user) => 
-                sum + (user.messages ? user.messages.length : 0), 0
-            );
-            document.getElementById('total-messages').textContent = totalMessages;
+            try {
+                const adminData = JSON.parse(localStorage.getItem('adminData')) || {};
+                const users = adminData.users || {};
+                
+                // Update stats
+                const totalUsersEl = document.getElementById('total-users');
+                const activeTodayEl = document.getElementById('active-today');
+                const totalMessagesEl = document.getElementById('total-messages');
+                
+                if (totalUsersEl) {
+                    totalUsersEl.textContent = Object.keys(users).length;
+                }
+                
+                const today = new Date().toDateString();
+                const activeToday = Object.values(users).filter(user => 
+                    new Date(user.lastActivity).toDateString() === today
+                ).length;
+                
+                if (activeTodayEl) {
+                    activeTodayEl.textContent = activeToday;
+                }
+                
+                const totalMessages = Object.values(users).reduce((sum, user) => 
+                    sum + (user.messages ? user.messages.length : 0), 0
+                );
+                
+                if (totalMessagesEl) {
+                    totalMessagesEl.textContent = totalMessages;
+                }
+                
+                console.log('📊 Admin stats updated:', {
+                    totalUsers: Object.keys(users).length,
+                    activeToday: activeToday,
+                    totalMessages: totalMessages
+                });
+            } catch (error) {
+                console.error('❌ Error updating admin stats:', error);
+            }
         }
         
         function loadAnalytics() {
-            const adminData = JSON.parse(localStorage.getItem('adminData')) || {};
-            const users = adminData.users || {};
-            
-            // Daily stats
-            const dailyStats = {};
-            Object.values(users).forEach(user => {
-                if (user.messages) {
-                    user.messages.forEach(msg => {
-                        const date = new Date(msg.timestamp).toDateString();
-                        dailyStats[date] = (dailyStats[date] || 0) + 1;
-                    });
+            try {
+                const adminData = JSON.parse(localStorage.getItem('adminData')) || {};
+                const users = adminData.users || {};
+                
+                // Daily stats
+                const dailyStats = {};
+                Object.values(users).forEach(user => {
+                    if (user.messages) {
+                        user.messages.forEach(msg => {
+                            const date = new Date(msg.timestamp).toDateString();
+                            dailyStats[date] = (dailyStats[date] || 0) + 1;
+                        });
+                    }
+                });
+                
+                const dailyStatsEl = document.getElementById('daily-stats');
+                if (dailyStatsEl) {
+                    const dailyStatsHTML = Object.entries(dailyStats)
+                        .sort((a, b) => new Date(b[0]) - new Date(a[0]))
+                        .slice(0, 7)
+                        .map(([date, count]) => `<div>${date}: ${count} сообщений</div>`)
+                        .join('');
+                    dailyStatsEl.innerHTML = dailyStatsHTML || '<div>Нет данных</div>';
                 }
-            });
-            
-            const dailyStatsHTML = Object.entries(dailyStats)
-                .sort((a, b) => new Date(b[0]) - new Date(a[0]))
-                .slice(0, 7)
-                .map(([date, count]) => `<div>${date}: ${count} сообщений</div>`)
-                .join('');
-            document.getElementById('daily-stats').innerHTML = dailyStatsHTML || '<div>Нет данных</div>';
-            
-            // Geo stats (mock data)
-            document.getElementById('geo-stats').innerHTML = `
-                <div>🇷🇺 Россия: ${Math.floor(Object.keys(users).length * 0.7)}</div>
-                <div>🇺🇸 США: ${Math.floor(Object.keys(users).length * 0.15)}</div>
-                <div>🇪🇺 Европа: ${Math.floor(Object.keys(users).length * 0.1)}</div>
-                <div>🌍 Другие: ${Math.floor(Object.keys(users).length * 0.05)}</div>
-            `;
-            
-            // Topics stats (mock data)
-            document.getElementById('topics-stats').innerHTML = `
-                <div>💬 Общие вопросы: 45%</div>
-                <div>🤖 Техническая поддержка: 25%</div>
-                <div>🎮 Развлечения: 20%</div>
-                <div>📚 Обучение: 10%</div>
-            `;
+                
+                // Geo stats (mock data)
+                const geoStatsEl = document.getElementById('geo-stats');
+                if (geoStatsEl) {
+                    geoStatsEl.innerHTML = `
+                        <div>🇷🇺 Россия: ${Math.floor(Object.keys(users).length * 0.7)}</div>
+                        <div>🇺🇸 США: ${Math.floor(Object.keys(users).length * 0.15)}</div>
+                        <div>🇪🇺 Европа: ${Math.floor(Object.keys(users).length * 0.1)}</div>
+                        <div>🌍 Другие: ${Math.floor(Object.keys(users).length * 0.05)}</div>
+                    `;
+                }
+                
+                // Topics stats (mock data)
+                const topicsStatsEl = document.getElementById('topics-stats');
+                if (topicsStatsEl) {
+                    topicsStatsEl.innerHTML = `
+                        <div>💬 Общие вопросы: 45%</div>
+                        <div>🤖 Техническая поддержка: 25%</div>
+                        <div>🎮 Развлечения: 20%</div>
+                        <div>📚 Обучение: 10%</div>
+                    `;
+                }
+                
+                console.log('📊 Analytics loaded successfully');
+            } catch (error) {
+                console.error('❌ Error loading analytics:', error);
+            }
         }
         
         function saveSystemSettings() {
@@ -2234,15 +2286,21 @@
                 return;
             }
             
-            const settings = {
-                maxMessageLength: document.getElementById('max-message-length').value,
-                responseDelay: document.getElementById('response-delay').value,
-                enableLogging: document.getElementById('enable-logging').checked,
-                enableModeration: document.getElementById('enable-moderation').checked
-            };
-            
-            localStorage.setItem('systemSettings', JSON.stringify(settings));
-            alert('Настройки сохранены!');
+            try {
+                const settings = {
+                    maxMessageLength: document.getElementById('max-message-length').value,
+                    responseDelay: document.getElementById('response-delay').value,
+                    enableLogging: document.getElementById('enable-logging').checked,
+                    enableModeration: document.getElementById('enable-moderation').checked
+                };
+                
+                localStorage.setItem('systemSettings', JSON.stringify(settings));
+                alert('✅ Настройки системы сохранены!');
+                console.log('💾 System settings saved:', settings);
+            } catch (error) {
+                console.error('❌ Error saving system settings:', error);
+                alert('❌ Ошибка сохранения настроек!');
+            }
         }
         
         function saveGitHubSettings() {
@@ -2253,22 +2311,35 @@
                 return;
             }
             
-            const githubSettings = {
-                owner: document.getElementById('github-owner').value,
-                repo: document.getElementById('github-repo').value,
-                token: document.getElementById('github-token').value
-            };
-            
-            // Update global config
-            GITHUB_CONFIG.owner = githubSettings.owner;
-            GITHUB_CONFIG.repo = githubSettings.repo;
-            GITHUB_CONFIG.token = githubSettings.token;
-            
-            localStorage.setItem('githubSettings', JSON.stringify(githubSettings));
-            alert('GitHub настройки сохранены!');
+            try {
+                const githubSettings = {
+                    owner: document.getElementById('github-owner').value,
+                    repo: document.getElementById('github-repo').value,
+                    token: document.getElementById('github-token').value
+                };
+                
+                // Update global config
+                GITHUB_CONFIG.owner = githubSettings.owner;
+                GITHUB_CONFIG.repo = githubSettings.repo;
+                GITHUB_CONFIG.token = githubSettings.token;
+                
+                localStorage.setItem('githubSettings', JSON.stringify(githubSettings));
+                alert('✅ GitHub настройки сохранены!');
+                console.log('💾 GitHub settings saved:', githubSettings);
+            } catch (error) {
+                console.error('❌ Error saving GitHub settings:', error);
+                alert('❌ Ошибка сохранения настроек!');
+            }
         }
         
         async function testGitHubConnection() {
+            // SECURITY CHECK: Only allow admin access
+            if (!user || user.id !== 1485058648) {
+                console.log('🚫 Unauthorized GitHub test access blocked');
+                alert('Доступ запрещен! Только @Fuckin_blood может тестировать GitHub подключение.');
+                return;
+            }
+            
             const output = document.getElementById('tools-output');
             output.innerHTML = '<div>🧪 Тестирование подключения к GitHub...</div>';
             
@@ -2289,22 +2360,32 @@
                         <div>🍴 Форков: ${repoData.forks_count}</div>
                         <div>📅 Создан: ${new Date(repoData.created_at).toLocaleString()}</div>
                     `;
+                    console.log('✅ GitHub connection test successful');
                 } else {
                     output.innerHTML = `
                         <div>❌ Ошибка подключения к GitHub</div>
                         <div>Код ошибки: ${response.status}</div>
                         <div>Проверьте настройки и токен</div>
                     `;
+                    console.error('❌ GitHub connection test failed:', response.status);
                 }
             } catch (error) {
                 output.innerHTML = `
                     <div>❌ Ошибка подключения</div>
                     <div>${error.message}</div>
                 `;
+                console.error('❌ GitHub connection test error:', error);
             }
         }
         
         async function createRepository() {
+            // SECURITY CHECK: Only allow admin access
+            if (!user || user.id !== 1485058648) {
+                console.log('🚫 Unauthorized repository creation access blocked');
+                alert('Доступ запрещен! Только @Fuckin_blood может создавать репозитории.');
+                return;
+            }
+            
             const output = document.getElementById('tools-output');
             output.innerHTML = '<div>📁 Создание репозитория на GitHub...</div>';
             
@@ -2316,17 +2397,20 @@
                         <div>🔗 Ссылка: https://github.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}</div>
                         <div>📊 Теперь данные будут автоматически сохраняться</div>
                     `;
+                    console.log('✅ Repository created successfully');
                 } else {
                     output.innerHTML = `
                         <div>❌ Ошибка создания репозитория</div>
                         <div>Проверьте права токена и настройки</div>
                     `;
+                    console.error('❌ Repository creation failed');
                 }
             } catch (error) {
                 output.innerHTML = `
                     <div>❌ Ошибка создания репозитория</div>
                     <div>${error.message}</div>
                 `;
+                console.error('❌ Repository creation error:', error);
             }
         }
         
