@@ -1062,9 +1062,9 @@
             }, 3000);
         }
 
-        // Конфигурация бесплатного AI API
-        const AI_API_URL = 'https://api.openai-proxy.com/v1/chat/completions';
-        const AI_API_KEY = 'sk-free'; // Бесплатный ключ
+        // Конфигурация Groq AI API
+        const AI_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+        const AI_API_KEY = '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';
 
         // Функции для работы с чатом
         function openChat() {
@@ -1138,19 +1138,20 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        model: 'gpt-3.5-turbo',
+                        model: 'llama-3.1-70b-versatile',
                         messages: [
                             {
                                 role: 'system',
-                                content: 'Ты полезный AI ассистент. Отвечай кратко и по делу.'
+                                content: 'Ты полезный AI ассистент. Отвечай кратко и по делу на русском языке.'
                             },
                             {
                                 role: 'user',
                                 content: message
                             }
                         ],
-                        max_tokens: 150,
-                        temperature: 0.7
+                        max_tokens: 200,
+                        temperature: 0.7,
+                        stream: false
                     })
                 });
                 
