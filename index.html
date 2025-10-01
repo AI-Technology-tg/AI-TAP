@@ -598,6 +598,45 @@
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
         }
+        
+        /* AI Analysis Styles */
+        .ai-analysis {
+            margin: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .ai-analysis h3 {
+            color: white;
+            margin: 0 0 15px 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .ai-analysis-item {
+            margin-bottom: 10px;
+        }
+        .ai-analysis-item:last-child {
+            margin-bottom: 0;
+        }
+        .ai-analysis-btn {
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+        }
+        .ai-analysis-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(46, 204, 113, 0.4);
+        }
         #chat-messages {
             flex: 1;
             overflow-y: auto;
@@ -1146,6 +1185,70 @@
             }
         };
         
+        // Multiple AI System
+        const aiSystem = {
+            text: {
+                name: '📝 Текстовый AI',
+                apiKey: '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',
+                model: 'llama-3.1-8b-instant',
+                endpoint: 'https://api.groq.com/openai/v1/chat/completions',
+                systemPrompt: 'Ты Grok - продвинутый AI-ассистент для текстовых задач. Ты помогаешь с написанием текстов, редактированием, анализом, переводом, созданием контента. Отвечай качественно, структурированно и полезно.'
+            },
+            image: {
+                name: '🎨 AI для изображений',
+                apiKey: 'sk-proj-1234567890abcdef', // Замените на реальный ключ
+                model: 'dall-e-3',
+                endpoint: 'https://api.openai.com/v1/images/generations',
+                systemPrompt: 'Ты Grok - AI для генерации изображений. Ты создаешь качественные, красивые и релевантные изображения по описанию пользователя.'
+            },
+            profile: {
+                name: '👤 AI для профиля',
+                apiKey: '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',
+                model: 'llama-3.1-8b-instant',
+                endpoint: 'https://api.groq.com/openai/v1/chat/completions',
+                systemPrompt: 'Ты Grok - AI-ассистент для работы с профилем пользователя. Ты помогаешь анализировать данные пользователя, создавать персонализированные рекомендации, анализировать историю чатов.'
+            },
+            code: {
+                name: '💻 AI для программирования',
+                apiKey: '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',
+                model: 'llama-3.1-8b-instant',
+                endpoint: 'https://api.groq.com/openai/v1/chat/completions',
+                systemPrompt: 'Ты Grok - AI-ассистент для программирования. Ты помогаешь с написанием кода, отладкой, оптимизацией, объяснением алгоритмов. Отвечай с примерами кода и подробными объяснениями.'
+            }
+        };
+        
+        // AI Selection Logic
+        function selectAI(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            // Image generation keywords
+            if (lowerMessage.includes('нарисуй') || lowerMessage.includes('создай картинку') || 
+                lowerMessage.includes('изображение') || lowerMessage.includes('картинка') ||
+                lowerMessage.includes('draw') || lowerMessage.includes('image') || 
+                lowerMessage.includes('picture') || lowerMessage.includes('фото')) {
+                return 'image';
+            }
+            
+            // Code keywords
+            if (lowerMessage.includes('код') || lowerMessage.includes('программирование') || 
+                lowerMessage.includes('функция') || lowerMessage.includes('алгоритм') ||
+                lowerMessage.includes('code') || lowerMessage.includes('programming') ||
+                lowerMessage.includes('function') || lowerMessage.includes('algorithm')) {
+                return 'code';
+            }
+            
+            // Profile keywords
+            if (lowerMessage.includes('профиль') || lowerMessage.includes('история') || 
+                lowerMessage.includes('статистика') || lowerMessage.includes('анализ') ||
+                lowerMessage.includes('profile') || lowerMessage.includes('history') ||
+                lowerMessage.includes('stats') || lowerMessage.includes('analysis')) {
+                return 'profile';
+            }
+            
+            // Default to text AI
+            return 'text';
+        }
+        
         // Global variables
         let isInitialized = false;
         let currentChatId = 'default';
@@ -1174,50 +1277,24 @@
             addMessage(message, true);
             chatInput.value = '';
             
-            // Show typing indicator
+            // Select appropriate AI
+            const selectedAI = selectAI(message);
+            console.log('🤖 Selected AI:', selectedAI);
+            
+            // Show typing indicator with AI name
             const typingDiv = document.createElement('div');
             typingDiv.className = 'ai-message';
-            typingDiv.innerHTML = '🤖 Анализирую...';
+            typingDiv.innerHTML = `🤖 ${aiSystem[selectedAI].name} анализирует...`;
             chatMessages.appendChild(typingDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
             
             try {
-                // Try real AI API first
-                const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': 'Bearer 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',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        model: 'llama-3.1-8b-instant',
-                        messages: [
-                            { 
-                                role: 'system', 
-                                content: aiPersonalities[currentAIMode].systemPrompt
-                            },
-                            { 
-                                role: 'user', 
-                                content: message
-                            }
-                        ],
-                        max_tokens: 2000,
-                        temperature: 0.7
-                    })
-                });
+                // Use selected AI
+                const ai = aiSystem[selectedAI];
+                const response = await processWithAI(ai, message);
                 
-                if (!response.ok) {
-                    throw new Error(`API Error: ${response.status}`);
-                }
-                
-                const data = await response.json();
                 chatMessages.removeChild(typingDiv);
-                
-                if (data.choices && data.choices[0] && data.choices[0].message) {
-                    addMessage(data.choices[0].message.content);
-                } else {
-                    throw new Error('Invalid API response');
-                }
+                addMessage(response);
                 
             } catch (error) {
                 console.log('AI API failed, using fallback:', error.message);
@@ -1228,6 +1305,149 @@
                 const response = responses[Math.floor(Math.random() * responses.length)];
                 addMessage(response);
             }
+        }
+        
+        // Process message with selected AI
+        async function processWithAI(ai, message) {
+            if (ai.name.includes('изображений')) {
+                return await generateImage(ai, message);
+            } else {
+                return await generateText(ai, message);
+            }
+        }
+        
+        // Generate text response
+        async function generateText(ai, message) {
+            const response = await fetch(ai.endpoint, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${ai.apiKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    model: ai.model,
+                    messages: [
+                        { 
+                            role: 'system', 
+                            content: ai.systemPrompt
+                        },
+                        { 
+                            role: 'user', 
+                            content: message
+                        }
+                    ],
+                    max_tokens: 2000,
+                    temperature: 0.7
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.choices && data.choices[0] && data.choices[0].message) {
+                return data.choices[0].message.content;
+            } else {
+                throw new Error('Invalid API response');
+            }
+        }
+        
+        // Generate image
+        async function generateImage(ai, message) {
+            // For now, return a placeholder message
+            // In real implementation, you would call DALL-E API
+            return `🎨 Я бы создал изображение по запросу: "${message}". Для генерации изображений нужен API ключ DALL-E. Пока что я могу помочь с описанием того, как должно выглядеть изображение!`;
+        }
+        
+        // Profile AI functions
+        function analyzeUserProfile() {
+            const user = window.tg?.initDataUnsafe?.user;
+            const chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || [];
+            
+            let analysis = '📊 Анализ профиля пользователя:\n\n';
+            
+            if (user) {
+                analysis += `👤 Имя: ${user.first_name} ${user.last_name || ''}\n`;
+                analysis += `🆔 ID: ${user.id}\n`;
+                analysis += `📱 Username: @${user.username || 'не указан'}\n`;
+                analysis += `🌍 Язык: ${user.language_code || 'не указан'}\n\n`;
+            }
+            
+            analysis += `💬 Статистика чатов:\n`;
+            analysis += `📈 Всего чатов: ${chatHistory.length}\n`;
+            
+            if (chatHistory.length > 0) {
+                const totalMessages = chatHistory.reduce((sum, chat) => sum + chat.messages.length, 0);
+                analysis += `📝 Всего сообщений: ${totalMessages}\n`;
+                
+                const lastChat = chatHistory[0];
+                analysis += `🕒 Последний чат: ${new Date(lastChat.createdAt).toLocaleDateString()}\n`;
+                
+                // Analyze message patterns
+                const userMessages = chatHistory.reduce((sum, chat) => 
+                    sum + chat.messages.filter(msg => msg.isUser).length, 0);
+                const aiMessages = chatHistory.reduce((sum, chat) => 
+                    sum + chat.messages.filter(msg => !msg.isUser).length, 0);
+                
+                analysis += `👤 Сообщений пользователя: ${userMessages}\n`;
+                analysis += `🤖 Ответов AI: ${aiMessages}\n`;
+                
+                if (userMessages > 0) {
+                    analysis += `📊 Активность: ${Math.round((userMessages / totalMessages) * 100)}% пользователь, ${Math.round((aiMessages / totalMessages) * 100)}% AI\n`;
+                }
+            }
+            
+            return analysis;
+        }
+        
+        function generatePersonalizedRecommendations() {
+            const chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || [];
+            
+            let recommendations = '🎯 Персонализированные рекомендации:\n\n';
+            
+            if (chatHistory.length === 0) {
+                recommendations += '🌟 Начните новый чат для получения рекомендаций!\n';
+                recommendations += '💡 Попробуйте задать вопросы о программировании, текстах или изображениях.\n';
+                return recommendations;
+            }
+            
+            // Analyze chat topics
+            const topics = [];
+            chatHistory.forEach(chat => {
+                chat.messages.forEach(msg => {
+                    if (msg.isUser) {
+                        const text = msg.text.toLowerCase();
+                        if (text.includes('код') || text.includes('программирование')) {
+                            topics.push('💻 Программирование');
+                        }
+                        if (text.includes('нарисуй') || text.includes('изображение')) {
+                            topics.push('🎨 Искусство');
+                        }
+                        if (text.includes('текст') || text.includes('писать')) {
+                            topics.push('📝 Тексты');
+                        }
+                    }
+                });
+            });
+            
+            const uniqueTopics = [...new Set(topics)];
+            
+            if (uniqueTopics.length > 0) {
+                recommendations += '📈 Ваши интересы:\n';
+                uniqueTopics.forEach(topic => {
+                    recommendations += `• ${topic}\n`;
+                });
+                recommendations += '\n';
+            }
+            
+            recommendations += '💡 Рекомендации:\n';
+            recommendations += '• Попробуйте создать новый чат для новой темы\n';
+            recommendations += '• Используйте ключевые слова для автоматического выбора AI\n';
+            recommendations += '• Задавайте вопросы о программировании, текстах или изображениях\n';
+            
+            return recommendations;
         }
         
         // Get personality responses
@@ -1367,8 +1587,45 @@
             // Load chat history
             loadChatHistory();
             
+            // Add AI analysis to profile
+            addProfileAIAnalysis();
+            
             profilePanel.style.display = 'block';
             console.log('👤 Profile panel opened');
+        }
+        
+        function addProfileAIAnalysis() {
+            const chatHistoryDiv = document.querySelector('.chat-history');
+            if (!chatHistoryDiv) return;
+            
+            // Add AI analysis section
+            const aiAnalysisDiv = document.createElement('div');
+            aiAnalysisDiv.className = 'ai-analysis';
+            aiAnalysisDiv.innerHTML = `
+                <h3>🤖 AI Анализ профиля</h3>
+                <div id="ai-analysis-content">
+                    <div class="ai-analysis-item">
+                        <button onclick="showAIAnalysis()" class="ai-analysis-btn">📊 Анализ профиля</button>
+                    </div>
+                    <div class="ai-analysis-item">
+                        <button onclick="showAIRecommendations()" class="ai-analysis-btn">🎯 Рекомендации</button>
+                    </div>
+                </div>
+            `;
+            
+            chatHistoryDiv.appendChild(aiAnalysisDiv);
+        }
+        
+        function showAIAnalysis() {
+            const analysis = analyzeUserProfile();
+            addMessage(analysis, false);
+            closeProfile();
+        }
+        
+        function showAIRecommendations() {
+            const recommendations = generatePersonalizedRecommendations();
+            addMessage(recommendations, false);
+            closeProfile();
         }
         
         function closeProfile() {
