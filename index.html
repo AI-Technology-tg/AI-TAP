@@ -736,7 +736,10 @@
         <div class="chat-container">
             <div class="chat-header">
                 <div class="chat-title">ИИ Ассистент</div>
-                <span class="chat-close" onclick="closeChat()">&times;</span>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button onclick="testAPI()" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px;">Тест API</button>
+                    <span class="chat-close" onclick="closeChat()">&times;</span>
+                </div>
             </div>
             
             <div class="chat-messages" id="chatMessages">
@@ -1080,7 +1083,7 @@
             }, 3000);
         }
 
-        // Конфигурация OpenAI API
+        // Конфигурация API - используем простой и надежный подход
         const AI_API_URL = 'https://api.openai.com/v1/chat/completions';
         const AI_API_KEY = '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';
 
@@ -1153,6 +1156,41 @@
             
             showNotification('История чата очищена');
         }
+        
+        // Тестовая функция для проверки API
+        async function testAPI() {
+            console.log('=== ТЕСТ API ===');
+            console.log('API URL:', AI_API_URL);
+            console.log('API Key:', AI_API_KEY.substring(0, 20) + '...');
+            
+            try {
+                const response = await fetch(AI_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${AI_API_KEY}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-3.5-turbo',
+                        messages: [{ role: 'user', content: 'Привет!' }],
+                        max_tokens: 50
+                    })
+                });
+                
+                console.log('Тест статус:', response.status);
+                const data = await response.json();
+                console.log('Тест ответ:', data);
+                
+                if (response.ok) {
+                    showNotification('✅ API работает!');
+                } else {
+                    showNotification('❌ API не работает: ' + response.status);
+                }
+            } catch (error) {
+                console.error('Тест ошибка:', error);
+                showNotification('❌ Ошибка API: ' + error.message);
+            }
+        }
 
         // Функция для Творческого ИИ
         function openCreativeAI() {
@@ -1203,6 +1241,8 @@
             
             if (!message) return;
             
+            console.log('Отправляем сообщение:', message);
+            
             // Добавляем сообщение пользователя в историю
             chatHistory.push({ role: 'user', content: message });
             localStorage.setItem('ai-tap-chat-history', JSON.stringify(chatHistory));
@@ -1217,45 +1257,47 @@
             showTyping();
             
             try {
-                // Запрос к бесплатному AI API
+                console.log('Отправляем запрос к API...');
+                
+                const requestBody = {
+                    model: 'gpt-3.5-turbo',
+                    messages: [
+                        {
+                            role: 'system',
+                            content: 'Ты полезный AI ассистент. Отвечай на русском языке кратко и по делу.'
+                        },
+                        ...chatHistory
+                    ],
+                    max_tokens: 500,
+                    temperature: 0.7
+                };
+                
+                console.log('Тело запроса:', requestBody);
+                
                 const response = await fetch(AI_API_URL, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${AI_API_KEY}`,
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        model: 'gpt-4o',
-                        messages: [
-                            {
-                                role: 'system',
-                                content: document.querySelector('.chat-title').textContent.includes('Творческий') 
-                                    ? 'Ты креативный AI помощник. Специализируешься на творческих задачах: стихи, рассказы, музыка, идеи, дизайн. Отвечай креативно и вдохновляюще на русском языке. Помни контекст разговора и отвечай в соответствии с ним.'
-                                    : 'Ты умный и полезный AI ассистент. Отвечай подробно и качественно на русском языке. Будь дружелюбным и профессиональным. Помни контекст разговора и отвечай в соответствии с ним.'
-                            },
-                            ...chatHistory
-                        ],
-                        max_tokens: 2000,
-                        temperature: 0.7,
-                        top_p: 1,
-                        frequency_penalty: 0,
-                        presence_penalty: 0
-                    })
+                    body: JSON.stringify(requestBody)
                 });
                 
-                console.log('Response status:', response.status);
+                console.log('Статус ответа:', response.status);
+                console.log('Заголовки ответа:', response.headers);
                 
                 if (!response.ok) {
                     const errorText = await response.text();
-                    console.error('API Error Response:', errorText);
-                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                    console.error('Ошибка API:', errorText);
+                    throw new Error(`Ошибка API: ${response.status} - ${errorText}`);
                 }
                 
                 const data = await response.json();
-                console.log('API Response:', data);
+                console.log('Полный ответ API:', data);
                 
-                if (data.choices && data.choices.length > 0 && data.choices[0].message) {
+                if (data.choices && data.choices.length > 0 && data.choices[0].message && data.choices[0].message.content) {
                     const aiResponse = data.choices[0].message.content;
+                    console.log('Ответ ИИ:', aiResponse);
                     
                     // Добавляем ответ ИИ в историю
                     chatHistory.push({ role: 'assistant', content: aiResponse });
@@ -1264,24 +1306,16 @@
                     hideTyping();
                     addMessage(aiResponse);
                 } else {
-                    console.error('Unexpected response format:', data);
-                    throw new Error('Неожиданный формат ответа от API');
+                    console.error('Неожиданный формат ответа:', data);
+                    throw new Error('ИИ не смог сформировать ответ');
                 }
                 
             } catch (error) {
-                console.error('Ошибка при отправке сообщения:', error);
+                console.error('КРИТИЧЕСКАЯ ОШИБКА:', error);
                 hideTyping();
                 
-                // Показываем более дружелюбное сообщение
-                const fallbackMessages = [
-                    'Привет! Я AI ассистент. Сейчас у меня временные технические проблемы, но я все равно попробую помочь!',
-                    'Здравствуйте! Я ваш AI помощник. Давайте попробуем решить ваш вопрос вместе!',
-                    'Привет! Я здесь, чтобы помочь. Расскажите, что вас интересует?',
-                    'Добро пожаловать! Я AI ассистент, готовый ответить на ваши вопросы!'
-                ];
-                
-                const randomMessage = fallbackMessages[Math.floor(Math.random() * fallbackMessages.length)];
-                addMessage(randomMessage);
+                // Показываем детальную ошибку для отладки
+                addMessage(`Ошибка: ${error.message}. Проверьте консоль браузера (F12) для подробностей.`);
             } finally {
                 sendButton.disabled = false;
             }
