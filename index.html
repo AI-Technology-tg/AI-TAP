@@ -1374,29 +1374,31 @@
         /* Панель онлайн пользователей */
         .online-panel {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
             background: rgba(0, 255, 255, 0.1);
-            border: 2px solid rgba(0, 255, 255, 0.3);
-            border-radius: 15px;
-            padding: 6px 12px;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 3px 10px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             backdrop-filter: blur(10px);
-            box-shadow: 0 4px 15px rgba(0, 255, 255, 0.2);
+            box-shadow: 0 2px 10px rgba(0, 255, 255, 0.2);
             z-index: 1000;
             animation: onlinePanelSlide 0.5s ease-out;
-            font-size: 12px;
+            font-size: 10px;
         }
 
         @keyframes onlinePanelSlide {
             from {
                 opacity: 0;
-                transform: translateY(50px);
+                transform: translateX(-50%) translateY(50px);
             }
             to {
                 opacity: 1;
+                transform: translateX(-50%) translateY(0);
                 transform: translateY(0);
             }
         }
@@ -1404,11 +1406,11 @@
         .online-status {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 4px;
         }
 
         .online-indicator {
-            font-size: 12px;
+            font-size: 8px;
             animation: onlinePulse 2s infinite;
         }
 
@@ -1419,39 +1421,39 @@
 
         .online-text {
             color: #00ffff;
-            font-size: 14px;
+            font-size: 10px;
             font-weight: 600;
         }
 
         .online-count {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 3px;
         }
 
         #onlineUsersCount {
             color: #00ffff;
-            font-size: 16px;
+            font-size: 12px;
             font-weight: bold;
         }
 
         .online-label {
             color: rgba(255, 255, 255, 0.7);
-            font-size: 12px;
+            font-size: 10px;
         }
 
         .notifications-btn {
             background: rgba(255, 165, 0, 0.2);
-            border: 2px solid rgba(255, 165, 0, 0.4);
+            border: 1px solid rgba(255, 165, 0, 0.4);
             color: #ffa500;
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            display: flex;
+            width: 20px;
+            height: 20px;
+            display: none;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 10px;
             transition: all 0.3s ease;
         }
 
@@ -1500,6 +1502,10 @@
         <div class="user-info">
             <div id="userName" class="user-name">Загрузка...</div>
             <div id="userId" class="user-id">ID: ...</div>
+            <button id="userNotificationsBtn" onclick="showUserNotifications()" style="display: none; background: rgba(255, 165, 0, 0.2); border: 2px solid rgba(255, 165, 0, 0.4); color: #ffa500; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; font-size: 18px; margin-top: 5px; position: relative;">
+                🔔
+                <span id="notificationBadge" style="display: none; position: absolute; top: -5px; right: -5px; background: #ff4444; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold;">0</span>
+            </button>
             <div id="adminPanel" class="admin-panel" style="display: none;">
                 <button class="admin-btn" onclick="openAdminPanel()">🔧 Админ панель</button>
             </div>
@@ -1514,6 +1520,21 @@
             <h2 id="modalName">Имя пользователя</h2>
             <p id="modalId">ID: ...</p>
             <p id="modalUsername">@username</p>
+            
+            <!-- Статус пользователя -->
+            <div id="userStatusSection" style="margin: 20px 0; padding: 15px; background: rgba(0, 255, 255, 0.1); border-radius: 10px; border: 1px solid rgba(0, 255, 255, 0.3);">
+                <h3 style="color: #00ffff; margin: 0 0 10px 0; font-size: 16px;">📊 Статус</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <span style="color: white;">Статус:</span>
+                    <span id="userStatusText" style="color: #00ff00; font-weight: bold;">Хорошо</span>
+                </div>
+                <div id="blockTimer" style="display: none; margin-top: 10px; padding: 10px; background: rgba(255, 0, 0, 0.1); border-radius: 8px; border: 1px solid rgba(255, 0, 0, 0.3);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: #ff4444; font-weight: bold;">⏰ Блокировка до:</span>
+                        <span id="blockTimeRemaining" style="color: #ff4444; font-weight: bold;">--:--:--</span>
+                    </div>
+                </div>
+            </div>
             
             <div class="language-section">
                 <h3>Выбор языка / Language Selection</h3>
@@ -2926,10 +2947,72 @@
         // Функции для работы с модальным окном
         function showUserInfo() {
             document.getElementById('userModal').style.display = 'block';
+            
+            // Обновляем статус пользователя в профиле
+            updateUserProfileStatus();
         }
 
         function closeUserInfo() {
             document.getElementById('userModal').style.display = 'none';
+        }
+        
+        // Функция обновления статуса пользователя в профиле
+        function updateUserProfileStatus() {
+            if (!user) return;
+            
+            const userWarnings = getUserWarnings(user.id);
+            const userStatus = getUserStatus(user.id);
+            const statusText = getStatusText(userStatus);
+            const statusColor = getStatusColor(userStatus);
+            
+            // Обновляем текст статуса
+            const statusTextElement = document.getElementById('userStatusText');
+            if (statusTextElement) {
+                statusTextElement.textContent = statusText;
+                statusTextElement.style.color = statusColor;
+            }
+            
+            // Проверяем и обновляем таймер блокировки
+            const blockTimer = document.getElementById('blockTimer');
+            if (userWarnings.blockedUntil && userWarnings.blockedUntil > Date.now()) {
+                blockTimer.style.display = 'block';
+                
+                // Запускаем таймер
+                updateBlockTimer();
+                if (window.blockTimerInterval) {
+                    clearInterval(window.blockTimerInterval);
+                }
+                window.blockTimerInterval = setInterval(updateBlockTimer, 1000);
+            } else {
+                blockTimer.style.display = 'none';
+                if (window.blockTimerInterval) {
+                    clearInterval(window.blockTimerInterval);
+                }
+            }
+        }
+        
+        // Функция обновления таймера блокировки
+        function updateBlockTimer() {
+            if (!user) return;
+            
+            const userWarnings = getUserWarnings(user.id);
+            if (!userWarnings.blockedUntil || userWarnings.blockedUntil <= Date.now()) {
+                document.getElementById('blockTimer').style.display = 'none';
+                if (window.blockTimerInterval) {
+                    clearInterval(window.blockTimerInterval);
+                }
+                return;
+            }
+            
+            const timeRemaining = userWarnings.blockedUntil - Date.now();
+            const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
+            const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+            
+            const blockTimeRemaining = document.getElementById('blockTimeRemaining');
+            if (blockTimeRemaining) {
+                blockTimeRemaining.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
         }
 
         // Закрытие модальных окон при клике вне их
@@ -3604,7 +3687,18 @@
         }
 
         function getUserInfo(telegramId) {
-            // Пытаемся получить информацию из localStorage или создаем тестовую
+            // Сначала проверяем данные из Telegram WebApp
+            const tg = window.Telegram?.WebApp;
+            if (tg && tg.initDataUnsafe?.user && tg.initDataUnsafe.user.id === telegramId) {
+                const tgUser = tg.initDataUnsafe.user;
+                return {
+                    name: `${tgUser.first_name || ''} ${tgUser.last_name || ''}`.trim() || 'Пользователь',
+                    username: tgUser.username || 'unknown',
+                    avatar: tgUser.photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(tgUser.first_name || 'User')}&background=00ffff&color=ffffff&size=40`
+                };
+            }
+            
+            // Затем проверяем сохраненные данные пользователей
             const storedUsers = JSON.parse(localStorage.getItem('ai-tap-users') || '{}');
             const user = storedUsers[telegramId];
             
@@ -3616,7 +3710,16 @@
                 };
             }
             
-            // Создаем более реалистичные тестовые данные
+            // Если это текущий пользователь, используем его данные
+            if (user && user.id === telegramId) {
+                return {
+                    name: `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Пользователь',
+                    username: user.username || 'unknown',
+                    avatar: user.photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.first_name || 'User')}&background=00ffff&color=ffffff&size=40`
+                };
+            }
+            
+            // В крайнем случае используем случайные данные
             const names = ['Алексей', 'Мария', 'Дмитрий', 'Анна', 'Сергей', 'Елена', 'Иван', 'Ольга', 'Михаил', 'Татьяна'];
             const randomName = names[telegramId % names.length];
             
@@ -3975,16 +4078,15 @@
 
         // Система предупреждений и блокировок
         function getUserWarnings(telegramId) {
-            const warnings = JSON.parse(localStorage.getItem('ai-tap-warnings') || '{}');
-            return warnings[telegramId] || { count: 0, warnings: [] };
+            const warningsData = JSON.parse(localStorage.getItem('userWarnings') || '{}');
+            const userKey = telegramId.toString();
+            return warningsData[userKey] || { count: 0, warnings: [], unread: 0, blockedUntil: null };
         }
         
         function getUserStatus(telegramId) {
             const warnings = getUserWarnings(telegramId);
-            const blocks = JSON.parse(localStorage.getItem('ai-tap-blocks') || '{}');
-            const userBlock = blocks[telegramId];
             
-            if (userBlock && new Date() < new Date(userBlock.until)) {
+            if (warnings.blockedUntil && warnings.blockedUntil > Date.now()) {
                 return 'blocked';
             }
             
@@ -4002,10 +4104,10 @@
         function getStatusText(status) {
             switch(status) {
                 case 'blocked': return 'Заблокирован';
-                case 'warning_3': return '3 предупреждения';
-                case 'warning_2': return '2 предупреждения';
-                case 'warning_1': return '1 предупреждение';
-                default: return 'Активен';
+                case 'warning_3': return 'Нарушитель';
+                case 'warning_2': return 'Плохо';
+                case 'warning_1': return 'Не плохо';
+                default: return 'Хорошо';
             }
         }
         
@@ -4026,37 +4128,36 @@
                 return;
             }
             
-            const warnings = JSON.parse(localStorage.getItem('ai-tap-warnings') || '{}');
-            const userWarnings = warnings[telegramId] || { count: 0, warnings: [] };
+            const warningsData = JSON.parse(localStorage.getItem('userWarnings') || '{}');
+            const userKey = telegramId.toString();
+            const userWarnings = warningsData[userKey] || { count: 0, warnings: [], unread: 0, blockedUntil: null };
             
             // Добавляем новое предупреждение
             userWarnings.warnings.push({
                 reason: reason,
-                date: new Date().toISOString(),
+                date: Date.now(),
                 admin: 'Администратор'
             });
             userWarnings.count++;
+            userWarnings.unread = (userWarnings.unread || 0) + 1;
             
-            warnings[telegramId] = userWarnings;
-            localStorage.setItem('ai-tap-warnings', JSON.stringify(warnings));
-            
-            // Если 3 предупреждения - блокируем пользователя
-            if (userWarnings.count >= 3) {
-                const blockDuration = userWarnings.count * 60 * 60 * 1000; // часы в миллисекундах
-                const blockUntil = new Date(Date.now() + blockDuration);
+            // Если 3 или более предупреждений - блокируем пользователя
+            if (userWarnings.count % 3 === 0) {
+                // Вычисляем длительность блокировки: 3 часа + по 1 часу за каждые следующие 3 предупреждения
+                const blockSets = Math.floor(userWarnings.count / 3);
+                const blockHours = 3 + (blockSets - 1);
+                const blockDuration = blockHours * 60 * 60 * 1000; // часы в миллисекундах
+                const blockUntil = Date.now() + blockDuration;
                 
-                const blocks = JSON.parse(localStorage.getItem('ai-tap-blocks') || '{}');
-                blocks[telegramId] = {
-                    until: blockUntil.toISOString(),
-                    reason: '3 предупреждения',
-                    warnings: userWarnings.count
-                };
-                localStorage.setItem('ai-tap-blocks', JSON.stringify(blocks));
+                userWarnings.blockedUntil = blockUntil;
                 
-                showNotification(`Пользователь заблокирован на ${userWarnings.count} часов`);
+                showNotification(`Пользователь заблокирован на ${blockHours} часов`);
             } else {
                 showNotification(`Предупреждение выдано (${userWarnings.count}/3)`);
             }
+            
+            warningsData[userKey] = userWarnings;
+            localStorage.setItem('userWarnings', JSON.stringify(warningsData));
             
             // Закрываем модальное окно
             document.querySelector('[style*="position: fixed"]').remove();
@@ -4609,13 +4710,33 @@
                 // Получаем реальное количество онлайн пользователей
                 let realOnlineCount = 0;
                 
-                if (database) {
-                    // Здесь можно добавить запрос к базе данных для получения реального количества онлайн пользователей
-                    // Пока используем симуляцию
-                    realOnlineCount = Math.floor(Math.random() * 50) + 10;
+                // Отмечаем текущего пользователя как онлайн
+                if (user) {
+                    const onlineUsers = JSON.parse(localStorage.getItem('onlineUsers') || '{}');
+                    onlineUsers[user.id] = Date.now();
+                    localStorage.setItem('onlineUsers', JSON.stringify(onlineUsers));
+                    
+                    // Подсчитываем пользователей, которые были активны в последние 5 минут
+                    const now = Date.now();
+                    const fiveMinutesAgo = now - (5 * 60 * 1000);
+                    
+                    Object.values(onlineUsers).forEach(lastSeen => {
+                        if (lastSeen > fiveMinutesAgo) {
+                            realOnlineCount++;
+                        }
+                    });
+                    
+                    // Очищаем старые записи (старше 5 минут)
+                    const cleanedOnlineUsers = {};
+                    Object.entries(onlineUsers).forEach(([userId, lastSeen]) => {
+                        if (lastSeen > fiveMinutesAgo) {
+                            cleanedOnlineUsers[userId] = lastSeen;
+                        }
+                    });
+                    localStorage.setItem('onlineUsers', JSON.stringify(cleanedOnlineUsers));
                 } else {
-                    // Тестовые данные
-                    realOnlineCount = Math.floor(Math.random() * 20) + 5;
+                    // Если нет пользователя, показываем минимальное количество
+                    realOnlineCount = 1;
                 }
                 
                 onlineCount.textContent = realOnlineCount;
@@ -4632,7 +4753,7 @@
             }
         }
         
-        // Функция показа уведомлений пользователя
+        // Функция показа уведомлений пользователя (для админов)
         function showNotifications() {
             const userWarnings = getUserWarnings(user?.id || 0);
             
@@ -4681,6 +4802,147 @@
                 </div>
             `;
             document.body.appendChild(modal);
+        }
+        
+        // Функция показа уведомлений пользователя на главной странице (с возможностью удаления)
+        function showUserNotifications() {
+            if (!user) return;
+            
+            const userWarnings = getUserWarnings(user.id);
+            
+            if (userWarnings.warnings.length === 0) {
+                showNotification('У вас нет уведомлений');
+                return;
+            }
+            
+            let notificationsHtml = '';
+            notificationsHtml = userWarnings.warnings.map((warning, index) => `
+                <div id="notification_${index}" style="margin-bottom: 15px; padding: 15px; background: rgba(255, 165, 0, 0.1); border-radius: 10px; border: 1px solid rgba(255, 165, 0, 0.3);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span style="color: #ffa500; font-weight: bold;">⚠️ Предупреждение #${index + 1}</span>
+                        <button onclick="deleteNotification(${index})" 
+                                style="background: rgba(255, 0, 0, 0.2); border: 1px solid rgba(255, 0, 0, 0.4); 
+                                       color: #ff4444; border-radius: 5px; cursor: pointer; padding: 5px 10px; font-size: 12px;">
+                            🗑️ Удалить
+                        </button>
+                    </div>
+                    <div style="color: rgba(255, 255, 255, 0.7); font-size: 12px; margin-bottom: 10px;">
+                        ${new Date(warning.date).toLocaleString('ru-RU')}
+                    </div>
+                    <div style="color: white; margin-bottom: 5px;">
+                        <strong>Причина:</strong> ${warning.reason}
+                    </div>
+                    <div style="color: rgba(255, 255, 255, 0.7); font-size: 12px;">
+                        Выдано: ${warning.admin}
+                    </div>
+                </div>
+            `).join('');
+            
+            const modal = document.createElement('div');
+            modal.id = 'userNotificationsModal';
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                background: rgba(0, 0, 0, 0.8); z-index: 10000; 
+                display: flex; align-items: center; justify-content: center;
+            `;
+            modal.innerHTML = `
+                <div style="background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%); 
+                           border: 2px solid rgba(0, 255, 255, 0.3); border-radius: 20px; 
+                           padding: 30px; max-width: 600px; max-height: 80vh; overflow-y: auto;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="color: #00ffff; margin: 0;">🔔 Ваши уведомления</h2>
+                        <button onclick="closeUserNotificationsModal()" 
+                                style="background: rgba(255, 0, 0, 0.2); border: 2px solid rgba(255, 0, 0, 0.4); 
+                                       color: #ff4444; width: 30px; height: 30px; border-radius: 50%; cursor: pointer;">✕</button>
+                    </div>
+                    <div id="notificationsContainer" style="max-height: 400px; overflow-y: auto;">
+                        ${notificationsHtml}
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            // Помечаем уведомления как прочитанные
+            markNotificationsAsRead();
+        }
+        
+        // Функция удаления уведомления
+        function deleteNotification(index) {
+            if (!user) return;
+            
+            const warningsData = JSON.parse(localStorage.getItem('userWarnings') || '{}');
+            const userKey = user.id.toString();
+            
+            if (warningsData[userKey] && warningsData[userKey].warnings) {
+                warningsData[userKey].warnings.splice(index, 1);
+                warningsData[userKey].count = warningsData[userKey].warnings.length;
+                localStorage.setItem('userWarnings', JSON.stringify(warningsData));
+                
+                // Удаляем элемент из DOM
+                const notificationElement = document.getElementById(`notification_${index}`);
+                if (notificationElement) {
+                    notificationElement.remove();
+                }
+                
+                // Обновляем счетчик уведомлений
+                updateNotificationBadge();
+                
+                // Если больше нет уведомлений, закрываем модальное окно
+                if (warningsData[userKey].warnings.length === 0) {
+                    closeUserNotificationsModal();
+                    showNotification('Все уведомления удалены');
+                } else {
+                    // Перезагружаем уведомления
+                    closeUserNotificationsModal();
+                    setTimeout(() => showUserNotifications(), 100);
+                }
+            }
+        }
+        
+        // Функция закрытия модального окна уведомлений
+        function closeUserNotificationsModal() {
+            const modal = document.getElementById('userNotificationsModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+        
+        // Функция пометки уведомлений как прочитанных
+        function markNotificationsAsRead() {
+            if (!user) return;
+            
+            const warningsData = JSON.parse(localStorage.getItem('userWarnings') || '{}');
+            const userKey = user.id.toString();
+            
+            if (warningsData[userKey]) {
+                warningsData[userKey].unread = 0;
+                localStorage.setItem('userWarnings', JSON.stringify(warningsData));
+                updateNotificationBadge();
+            }
+        }
+        
+        // Функция обновления значка уведомлений
+        function updateNotificationBadge() {
+            if (!user) return;
+            
+            const userWarnings = getUserWarnings(user.id);
+            const notificationBtn = document.getElementById('userNotificationsBtn');
+            const notificationBadge = document.getElementById('notificationBadge');
+            
+            if (userWarnings.count > 0) {
+                notificationBtn.style.display = 'block';
+                
+                // Показываем количество непрочитанных
+                const unreadCount = userWarnings.unread || userWarnings.count;
+                if (unreadCount > 0) {
+                    notificationBadge.style.display = 'flex';
+                    notificationBadge.textContent = unreadCount;
+                } else {
+                    notificationBadge.style.display = 'none';
+                }
+            } else {
+                notificationBtn.style.display = 'none';
+            }
         }
         
         // Функция проверки блокировки пользователя
@@ -4951,6 +5213,9 @@
             // Запускаем обновление онлайн пользователей
             updateOnlineUsers();
             setInterval(updateOnlineUsers, 30000); // Обновляем каждые 30 секунд
+            
+            // Обновляем значок уведомлений
+            setTimeout(() => updateNotificationBadge(), 1000);
         });
 
         // Анимация появления кнопок
