@@ -1984,7 +1984,26 @@
                 cacheCleared: 'Кэш очищен',
                 exportStarted: 'Экспорт данных начат...',
                 systemChecked: 'Проверка системы...',
-                analyticsUpdated: 'Аналитика обновлена для периода'
+                analyticsUpdated: 'Аналитика обновлена для периода',
+                // Просмотр чата пользователя
+                viewUserChat: 'Просмотр чата',
+                selectAI: 'Выберите ИИ',
+                mainAI: 'Основной ИИ',
+                chatHistory: 'История чата',
+                noMessages: 'Нет сообщений',
+                userChat: 'Чат пользователя',
+                closeChat: 'Закрыть чат',
+                chatWithUser: 'Чат с пользователем',
+                loadingChat: 'Загрузка чата...',
+                chatLoaded: 'Чат загружен',
+                searchMessages: 'Поиск в сообщениях...',
+                allMessages: 'Все сообщения',
+                userOnly: 'Только пользователь',
+                aiOnly: 'Только ИИ',
+                clearFilters: 'Очистить',
+                scrollToTop: 'В начало',
+                scrollToBottom: 'В конец',
+                messagesCount: 'Сообщений:'
             },
             en: {
                 loading: 'Loading...',
@@ -2098,7 +2117,26 @@
                 cacheCleared: 'Cache cleared',
                 exportStarted: 'Data export started...',
                 systemChecked: 'System check...',
-                analyticsUpdated: 'Analytics updated for period'
+                analyticsUpdated: 'Analytics updated for period',
+                // View user chat
+                viewUserChat: 'View Chat',
+                selectAI: 'Select AI',
+                mainAI: 'Main AI',
+                chatHistory: 'Chat History',
+                noMessages: 'No messages',
+                userChat: 'User Chat',
+                closeChat: 'Close Chat',
+                chatWithUser: 'Chat with User',
+                loadingChat: 'Loading chat...',
+                chatLoaded: 'Chat loaded',
+                searchMessages: 'Search messages...',
+                allMessages: 'All messages',
+                userOnly: 'User only',
+                aiOnly: 'AI only',
+                clearFilters: 'Clear',
+                scrollToTop: 'To top',
+                scrollToBottom: 'To bottom',
+                messagesCount: 'Messages:'
             },
             es: {
                 loading: 'Cargando...',
@@ -2212,7 +2250,18 @@
                 cacheCleared: 'Caché limpiado',
                 exportStarted: 'Exportación de datos iniciada...',
                 systemChecked: 'Verificación del sistema...',
-                analyticsUpdated: 'Analíticas actualizadas para el período'
+                analyticsUpdated: 'Analíticas actualizadas para el período',
+                // Ver chat del usuario
+                viewUserChat: 'Ver Chat',
+                selectAI: 'Seleccionar IA',
+                mainAI: 'IA Principal',
+                chatHistory: 'Historial de Chat',
+                noMessages: 'Sin mensajes',
+                userChat: 'Chat del Usuario',
+                closeChat: 'Cerrar Chat',
+                chatWithUser: 'Chat con Usuario',
+                loadingChat: 'Cargando chat...',
+                chatLoaded: 'Chat cargado'
             },
             fr: {
                 loading: 'Chargement...',
@@ -2326,7 +2375,18 @@
                 cacheCleared: 'Cache vidé',
                 exportStarted: 'Exportation de données démarrée...',
                 systemChecked: 'Vérification du système...',
-                analyticsUpdated: 'Analytiques mises à jour pour la période'
+                analyticsUpdated: 'Analytiques mises à jour pour la période',
+                // Voir le chat de l'utilisateur
+                viewUserChat: 'Voir le Chat',
+                selectAI: 'Sélectionner IA',
+                mainAI: 'IA Principal',
+                chatHistory: 'Historique du Chat',
+                noMessages: 'Aucun message',
+                userChat: 'Chat de l\'Utilisateur',
+                closeChat: 'Fermer le Chat',
+                chatWithUser: 'Chat avec l\'Utilisateur',
+                loadingChat: 'Chargement du chat...',
+                chatLoaded: 'Chat chargé'
             },
             de: {
                 loading: 'Laden...',
@@ -2440,7 +2500,18 @@
                 cacheCleared: 'Cache geleert',
                 exportStarted: 'Datenexport gestartet...',
                 systemChecked: 'Systemprüfung...',
-                analyticsUpdated: 'Analytik aktualisiert für den Zeitraum'
+                analyticsUpdated: 'Analytik aktualisiert für den Zeitraum',
+                // Benutzer-Chat anzeigen
+                viewUserChat: 'Chat anzeigen',
+                selectAI: 'KI auswählen',
+                mainAI: 'Haupt-KI',
+                chatHistory: 'Chat-Verlauf',
+                noMessages: 'Keine Nachrichten',
+                userChat: 'Benutzer-Chat',
+                closeChat: 'Chat schließen',
+                chatWithUser: 'Chat mit Benutzer',
+                loadingChat: 'Chat wird geladen...',
+                chatLoaded: 'Chat geladen'
             },
             zh: {
                 loading: '加载中...',
@@ -2554,7 +2625,18 @@
                 cacheCleared: '缓存已清除',
                 exportStarted: '数据导出已开始...',
                 systemChecked: '系统检查中...',
-                analyticsUpdated: '分析已更新期间'
+                analyticsUpdated: '分析已更新期间',
+                // 查看用户聊天
+                viewUserChat: '查看聊天',
+                selectAI: '选择AI',
+                mainAI: '主要AI',
+                chatHistory: '聊天历史',
+                noMessages: '无消息',
+                userChat: '用户聊天',
+                closeChat: '关闭聊天',
+                chatWithUser: '与用户聊天',
+                loadingChat: '加载聊天中...',
+                chatLoaded: '聊天已加载'
             }
         };
 
@@ -3809,13 +3891,16 @@
                                    style="background: rgba(0, 255, 255, 0.1); border: 2px solid rgba(0, 255, 255, 0.3); 
                                           border-radius: 10px; padding: 10px; color: white; width: 100%;">
                         </div>
-                        <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
                             <button onclick="saveUserSettings(${telegramId})" 
                                     style="background: linear-gradient(45deg, #00ffff, #0080ff); border: none; color: white; 
-                                           padding: 10px 20px; border-radius: 20px; cursor: pointer;">💾 Сохранить</button>
+                                           padding: 10px 20px; border-radius: 20px; cursor: pointer;">💾 ${t('save')}</button>
+                            <button onclick="viewUserChat(${telegramId})" 
+                                    style="background: rgba(0, 255, 0, 0.2); border: 2px solid rgba(0, 255, 0, 0.4); 
+                                           color: #00ff00; padding: 10px 20px; border-radius: 20px; cursor: pointer;">💬 ${t('viewUserChat')}</button>
                             <button onclick="blockUser(${telegramId})" 
                                     style="background: rgba(255, 0, 0, 0.2); border: 2px solid rgba(255, 0, 0, 0.4); 
-                                           color: #ff4444; padding: 10px 20px; border-radius: 20px; cursor: pointer;">🚫 Заблокировать</button>
+                                           color: #ff4444; padding: 10px 20px; border-radius: 20px; cursor: pointer;">🚫 ${t('block')}</button>
                         </div>
                     </div>
                 </div>
@@ -3851,11 +3936,363 @@
         }
 
         function blockUser(telegramId) {
-            if (confirm(`Заблокировать пользователя ${telegramId}?`)) {
-                showNotification(`Пользователь ${telegramId} заблокирован`);
+            if (confirm(`${t('blockConfirm')} ${telegramId}?`)) {
+                showNotification(`${t('userBlocked')} ${telegramId}`);
                 // Закрываем модальное окно
                 document.querySelector('[style*="position: fixed"]').remove();
             }
+        }
+
+        function viewUserChat(telegramId) {
+            // Создаем модальное окно выбора ИИ
+            const aiSelectionHtml = `
+                <div style="background: rgba(0, 255, 255, 0.1); padding: 20px; border-radius: 15px; margin: 20px;">
+                    <h3>💬 ${t('selectAI')}</h3>
+                    <div style="margin-top: 20px;">
+                        <button onclick="openUserChat(${telegramId}, 'main')" 
+                                style="background: linear-gradient(45deg, #00ffff, #0080ff); border: none; color: white; 
+                                       padding: 15px 30px; border-radius: 25px; cursor: pointer; width: 100%; 
+                                       margin-bottom: 10px; font-size: 16px;">
+                            🤖 ${t('mainAI')}
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // Создаем модальное окно
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                background: rgba(0, 0, 0, 0.8); z-index: 10000; 
+                display: flex; align-items: center; justify-content: center;
+            `;
+            modal.innerHTML = `
+                <div style="background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%); 
+                           border: 2px solid rgba(0, 255, 255, 0.3); border-radius: 20px; 
+                           padding: 30px; max-width: 400px; max-height: 80vh; overflow-y: auto;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="color: #00ffff; margin: 0;">${t('viewUserChat')}</h2>
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()" 
+                                style="background: rgba(255, 0, 0, 0.2); border: 2px solid rgba(255, 0, 0, 0.4); 
+                                       color: #ff4444; width: 30px; height: 30px; border-radius: 50%; cursor: pointer;">✕</button>
+                    </div>
+                    ${aiSelectionHtml}
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function openUserChat(telegramId, aiType) {
+            // Закрываем модальное окно выбора ИИ
+            document.querySelector('[style*="position: fixed"]').remove();
+            
+            // Создаем модальное окно чата
+            const userInfo = getUserInfo(telegramId);
+            const chatHtml = `
+                <div style="background: rgba(0, 255, 255, 0.1); padding: 20px; border-radius: 15px; margin: 20px;">
+                    <h3>💬 ${t('chatWithUser')} ${userInfo.name}</h3>
+                    <div style="margin-top: 15px; margin-bottom: 15px; padding: 10px; background: rgba(0, 255, 255, 0.05); border-radius: 10px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <img src="${userInfo.avatar}" style="width: 30px; height: 30px; border-radius: 50%;">
+                            <span style="color: #00ffff; font-weight: bold;">${userInfo.name}</span>
+                            <span style="color: rgba(255, 255, 255, 0.7);">ID: ${telegramId}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Панель поиска и фильтров -->
+                    <div style="margin-bottom: 15px; padding: 15px; background: rgba(0, 255, 255, 0.05); border-radius: 10px; border: 1px solid rgba(0, 255, 255, 0.2);">
+                        <div style="display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;">
+                            <input type="text" id="chatSearchInput" placeholder="${t('searchMessages')}" 
+                                   style="flex: 1; min-width: 200px; background: rgba(0, 255, 255, 0.1); border: 2px solid rgba(0, 255, 255, 0.3); 
+                                          border-radius: 10px; padding: 8px 12px; color: white; font-size: 14px;">
+                            <select id="chatFilterRole" style="background: rgba(0, 255, 255, 0.1); border: 2px solid rgba(0, 255, 255, 0.3); 
+                                                              border-radius: 10px; padding: 8px 12px; color: white; font-size: 14px;">
+                                <option value="all">${t('allMessages')}</option>
+                                <option value="user">${t('userOnly')}</option>
+                                <option value="assistant">${t('aiOnly')}</option>
+                            </select>
+                            <button onclick="clearChatFilters()" style="background: rgba(255, 165, 0, 0.2); border: 2px solid rgba(255, 165, 0, 0.4); 
+                                                                      color: #ffa500; padding: 8px 12px; border-radius: 10px; cursor: pointer; font-size: 14px;">
+                                🗑️ ${t('clearFilters')}
+                            </button>
+                        </div>
+                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <button onclick="scrollToTop()" style="background: rgba(0, 255, 0, 0.2); border: 2px solid rgba(0, 255, 0, 0.4); 
+                                                                   color: #00ff00; padding: 6px 10px; border-radius: 8px; cursor: pointer; font-size: 12px;">
+                                ⬆️ ${t('scrollToTop')}
+                            </button>
+                            <button onclick="scrollToBottom()" style="background: rgba(0, 255, 0, 0.2); border: 2px solid rgba(0, 255, 0, 0.4); 
+                                                                     color: #00ff00; padding: 6px 10px; border-radius: 8px; cursor: pointer; font-size: 12px;">
+                                ⬇️ ${t('scrollToBottom')}
+                            </button>
+                            <button onclick="exportChatHistory()" style="background: rgba(0, 255, 255, 0.2); border: 2px solid rgba(0, 255, 255, 0.4); 
+                                                                     color: #00ffff; padding: 6px 10px; border-radius: 8px; cursor: pointer; font-size: 12px;">
+                                📥 Экспорт
+                            </button>
+                            <span id="chatMessageCount" style="color: rgba(255, 255, 255, 0.7); font-size: 12px; margin-left: auto;">
+                                ${t('messagesCount')} 0
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div id="userChatMessages" style="height: 300px; overflow-y: auto; border: 2px solid rgba(0, 255, 255, 0.2); 
+                                                   border-radius: 10px; padding: 15px; background: rgba(0, 255, 255, 0.05);">
+                        <div style="text-align: center; color: rgba(255, 255, 255, 0.7); padding: 50px;">
+                            ${t('loadingChat')}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Создаем модальное окно чата
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                background: rgba(0, 0, 0, 0.8); z-index: 10000; 
+                display: flex; align-items: center; justify-content: center;
+            `;
+            modal.innerHTML = `
+                <div style="background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%); 
+                           border: 2px solid rgba(0, 255, 255, 0.3); border-radius: 20px; 
+                           padding: 30px; max-width: 600px; max-height: 80vh; overflow-y: auto;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="color: #00ffff; margin: 0;">${t('userChat')}</h2>
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()" 
+                                style="background: rgba(255, 0, 0, 0.2); border: 2px solid rgba(255, 0, 0, 0.4); 
+                                       color: #ff4444; width: 30px; height: 30px; border-radius: 50%; cursor: pointer;">✕</button>
+                    </div>
+                    ${chatHtml}
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            // Загружаем историю чата пользователя
+            loadUserChatHistory(telegramId, aiType);
+        }
+
+        async function loadUserChatHistory(telegramId, aiType) {
+            const chatMessages = document.getElementById('userChatMessages');
+            
+            try {
+                if (database) {
+                    // Загружаем историю чата из базы данных
+                    const chatHistory = await database.getChatHistory(telegramId, 50);
+                    
+                    if (chatHistory.length === 0) {
+                        chatMessages.innerHTML = `
+                            <div style="text-align: center; color: rgba(255, 255, 255, 0.7); padding: 50px;">
+                                ${t('noMessages')}
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    // Отображаем историю чата
+                    chatMessages.innerHTML = '';
+                    chatHistory.forEach(msg => {
+                        const messageDiv = document.createElement('div');
+                        messageDiv.className = 'chat-message';
+                        messageDiv.setAttribute('data-role', msg.role);
+                        messageDiv.setAttribute('data-timestamp', msg.created_at);
+                        messageDiv.style.cssText = `
+                            margin-bottom: 15px; padding: 10px 15px; border-radius: 10px;
+                            background: ${msg.role === 'user' ? 'rgba(0, 255, 255, 0.1)' : 'rgba(0, 255, 255, 0.05)'};
+                            border: 1px solid ${msg.role === 'user' ? 'rgba(0, 255, 255, 0.3)' : 'rgba(0, 255, 255, 0.2)'};
+                        `;
+                        
+                        const time = new Date(msg.created_at).toLocaleTimeString('ru-RU', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                        
+                        messageDiv.innerHTML = `
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                                <span style="color: #00ffff; font-weight: bold;">
+                                    ${msg.role === 'user' ? '👤 Пользователь' : '🤖 ИИ'}
+                                </span>
+                                <span style="color: rgba(255, 255, 255, 0.5); font-size: 12px;">${time}</span>
+                            </div>
+                            <div style="color: white; line-height: 1.4;">${msg.content}</div>
+                        `;
+                        
+                        chatMessages.appendChild(messageDiv);
+                    });
+                    
+                    // Прокручиваем к последнему сообщению
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                    
+                } else {
+                    // Показываем тестовые данные
+                    chatMessages.innerHTML = `
+                        <div class="chat-message" data-role="user" data-timestamp="${new Date().toISOString()}">
+                            <div style="margin-bottom: 15px; padding: 10px 15px; border-radius: 10px; background: rgba(0, 255, 255, 0.1); border: 1px solid rgba(0, 255, 255, 0.3);">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                                    <span style="color: #00ffff; font-weight: bold;">👤 Пользователь</span>
+                                    <span style="color: rgba(255, 255, 255, 0.5); font-size: 12px;">10:30</span>
+                                </div>
+                                <div style="color: white; line-height: 1.4;">Привет! Как дела?</div>
+                            </div>
+                        </div>
+                        <div class="chat-message" data-role="assistant" data-timestamp="${new Date().toISOString()}">
+                            <div style="margin-bottom: 15px; padding: 10px 15px; border-radius: 10px; background: rgba(0, 255, 255, 0.05); border: 1px solid rgba(0, 255, 255, 0.2);">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                                    <span style="color: #00ffff; font-weight: bold;">🤖 ИИ</span>
+                                    <span style="color: rgba(255, 255, 255, 0.5); font-size: 12px;">10:31</span>
+                                </div>
+                                <div style="color: white; line-height: 1.4;">Привет! У меня все хорошо, спасибо! Чем могу помочь?</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                showNotification(t('chatLoaded'));
+                
+                // Инициализируем обработчики событий для поиска и фильтрации
+                initializeChatFilters();
+                
+            } catch (error) {
+                console.error('Ошибка загрузки чата:', error);
+                chatMessages.innerHTML = `
+                    <div style="text-align: center; color: #ff4444; padding: 50px;">
+                        Ошибка загрузки чата
+                    </div>
+                `;
+            }
+        }
+        
+        function initializeChatFilters() {
+            const searchInput = document.getElementById('chatSearchInput');
+            const filterRole = document.getElementById('chatFilterRole');
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', searchChatMessages);
+            }
+            
+            if (filterRole) {
+                filterRole.addEventListener('change', searchChatMessages);
+            }
+            
+            // Обновляем счетчик сообщений
+            updateChatMessageCount();
+        }
+
+        // Функции для работы с чатом
+        function searchChatMessages() {
+            const searchInput = document.getElementById('chatSearchInput');
+            const filterRole = document.getElementById('chatFilterRole');
+            const chatMessages = document.getElementById('userChatMessages');
+            const messageCount = document.getElementById('chatMessageCount');
+            
+            if (!searchInput || !filterRole || !chatMessages) return;
+            
+            const searchTerm = searchInput.value.toLowerCase();
+            const roleFilter = filterRole.value;
+            const messages = chatMessages.querySelectorAll('.chat-message');
+            let visibleCount = 0;
+            
+            messages.forEach(message => {
+                const messageText = message.textContent.toLowerCase();
+                const messageRole = message.getAttribute('data-role');
+                
+                const matchesSearch = searchTerm === '' || messageText.includes(searchTerm);
+                const matchesRole = roleFilter === 'all' || messageRole === roleFilter;
+                
+                if (matchesSearch && matchesRole) {
+                    message.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    message.style.display = 'none';
+                }
+            });
+            
+            if (messageCount) {
+                messageCount.textContent = `${t('messagesCount')} ${visibleCount}`;
+            }
+        }
+        
+        function clearChatFilters() {
+            const searchInput = document.getElementById('chatSearchInput');
+            const filterRole = document.getElementById('chatFilterRole');
+            const chatMessages = document.getElementById('userChatMessages');
+            const messageCount = document.getElementById('chatMessageCount');
+            
+            if (searchInput) searchInput.value = '';
+            if (filterRole) filterRole.value = 'all';
+            
+            if (chatMessages) {
+                const messages = chatMessages.querySelectorAll('.chat-message');
+                messages.forEach(message => {
+                    message.style.display = 'block';
+                });
+                
+                if (messageCount) {
+                    messageCount.textContent = `${t('messagesCount')} ${messages.length}`;
+                }
+            }
+        }
+        
+        function scrollToTop() {
+            const chatMessages = document.getElementById('userChatMessages');
+            if (chatMessages) {
+                chatMessages.scrollTop = 0;
+            }
+        }
+        
+        function scrollToBottom() {
+            const chatMessages = document.getElementById('userChatMessages');
+            if (chatMessages) {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        }
+        
+        function updateChatMessageCount() {
+            const chatMessages = document.getElementById('userChatMessages');
+            const messageCount = document.getElementById('chatMessageCount');
+            
+            if (chatMessages && messageCount) {
+                const messages = chatMessages.querySelectorAll('.chat-message');
+                const visibleMessages = Array.from(messages).filter(msg => msg.style.display !== 'none');
+                messageCount.textContent = `${t('messagesCount')} ${visibleMessages.length}`;
+            }
+        }
+        
+        function exportChatHistory() {
+            const chatMessages = document.getElementById('userChatMessages');
+            if (!chatMessages) return;
+            
+            const messages = chatMessages.querySelectorAll('.chat-message');
+            if (messages.length === 0) {
+                showNotification('Нет сообщений для экспорта');
+                return;
+            }
+            
+            let exportText = 'История чата\n';
+            exportText += '='.repeat(50) + '\n\n';
+            
+            messages.forEach((message, index) => {
+                const role = message.getAttribute('data-role');
+                const timestamp = message.getAttribute('data-timestamp');
+                const time = new Date(timestamp).toLocaleString('ru-RU');
+                
+                const messageText = message.querySelector('div:last-child').textContent;
+                const sender = role === 'user' ? 'Пользователь' : 'ИИ';
+                
+                exportText += `[${time}] ${sender}:\n`;
+                exportText += `${messageText}\n\n`;
+            });
+            
+            // Создаем и скачиваем файл
+            const blob = new Blob([exportText], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `chat_history_${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            showNotification('История чата экспортирована');
         }
 
         function exportData() {
