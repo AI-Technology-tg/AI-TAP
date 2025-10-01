@@ -1,43 +1,4 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -785,6 +746,7 @@
                 <div style="font-size: 48px; margin-bottom: 10px;">🤖</div>
                 <div style="font-size: 28px; font-weight: 600; color: white; margin-bottom: 5px;">AI-TAP</div>
                 <div style="font-size: 16px; color: rgba(255,255,255,0.8);">Инициализация системы...</div>
+                <button onclick="startApp()" style="margin-top: 20px; padding: 10px 20px; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 10px; cursor: pointer; font-size: 14px;">🔄 Запустить приложение</button>
             </div>
             <div id="progress-bar">
                 <div id="progress-fill"></div>
@@ -994,6 +956,50 @@
     </div>
     <audio id="tap-sound" src="https://freesound.org/data/previews/571/571811_11955436-lq.mp3" preload="auto"></audio>
     <script>
+        // IMMEDIATE START - Force loading to start
+        console.log('🚀 AI-TAP: Immediate start...');
+        
+        // Start loading immediately
+        function forceStartLoading() {
+            console.log('🔄 Force starting loading...');
+            const progressFill = document.getElementById('progress-fill');
+            const progressText = document.getElementById('progress-text');
+            const robot = document.getElementById('robot');
+            let progress = 0;
+            
+            if (!progressFill || !progressText) {
+                console.log('⚠️ Elements not ready, retrying...');
+                setTimeout(forceStartLoading, 100);
+                return;
+            }
+            
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 3 + 1;
+                if (progress > 100) progress = 100;
+                
+                progressFill.style.width = `${progress}%`;
+                progressText.textContent = `${Math.floor(progress)}%`;
+                
+                if (robot) {
+                    robot.style.left = `${progress}%`;
+                }
+                
+                if (progress >= 100) {
+                    clearInterval(progressInterval);
+                    setTimeout(() => {
+                        document.getElementById('loader').classList.add('fade-out');
+                        setTimeout(() => {
+                            document.getElementById('loader').style.display = 'none';
+                            document.getElementById('chat-container').style.display = 'flex';
+                        }, 2000);
+                    }, 500);
+                }
+            }, 50);
+        }
+        
+        // Start immediately
+        forceStartLoading();
+        
         // Multilingual support
         const translations = {
             ru: {
@@ -1242,16 +1248,37 @@
             }
         
         // Start loading immediately when page loads
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', function() {
-                startProgressLoading();
-                initGame();
-            });
-        } else {
-            // DOM already loaded
+        function startApp() {
+            console.log('🚀 Starting AI-TAP application...');
             startProgressLoading();
             initGame();
         }
+        
+        // Make startApp globally available
+        window.startApp = startApp;
+        
+        // Force start immediately
+        console.log('🔄 Force starting AI-TAP...');
+        startApp();
+        
+        // Multiple ways to start the app
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('📱 DOM loaded, starting app...');
+                startApp();
+            });
+        } else {
+            console.log('📱 DOM already loaded, starting app...');
+            startApp();
+        }
+        
+        // Fallback - start after a short delay
+        setTimeout(() => {
+            if (document.getElementById('loader') && document.getElementById('loader').style.display !== 'none') {
+                console.log('🔄 Fallback start...');
+                startApp();
+            }
+        }, 100);
 
         function initGame() {
             // Initialize chat functionality
@@ -1630,45 +1657,45 @@
                         return;
                     }
                     
-                    userList.innerHTML = '';
-                    
+                userList.innerHTML = '';
+                
                     // Sort users by last activity
                     const sortedUsers = Object.values(users).sort((a, b) => 
                         new Date(b.lastActivity || b.lastSeen || 0) - new Date(a.lastActivity || a.lastSeen || 0)
                     );
                     
                     sortedUsers.forEach(userData => {
-                        const userItem = document.createElement('div');
-                        userItem.className = 'user-item';
-                        userItem.onclick = () => viewUserChat(userData);
+                    const userItem = document.createElement('div');
+                    userItem.className = 'user-item';
+                    userItem.onclick = () => viewUserChat(userData);
                         
                         const lastActivity = userData.lastActivity || userData.lastSeen || userData.firstSeen;
                         const isOnline = new Date() - new Date(lastActivity) < 5 * 60 * 1000; // 5 minutes
-                        
-                        userItem.innerHTML = `
-                            <div class="user-info">
+                    
+                    userItem.innerHTML = `
+                        <div class="user-info">
                                 <div class="user-avatar-admin" style="position: relative;">
                                     👤
                                     ${isOnline ? '<div style="position: absolute; bottom: -2px; right: -2px; width: 12px; height: 12px; background: #2ecc71; border-radius: 50%; border: 2px solid white;"></div>' : ''}
                                 </div>
-                                <div class="user-details">
+                            <div class="user-details">
                                     <h3>${userData.firstName || 'Unknown'} ${userData.lastName || ''}</h3>
-                                    <p>@${userData.username || 'no_username'}</p>
+                                <p>@${userData.username || 'no_username'}</p>
                                     <small style="color: rgba(255,255,255,0.6);">
                                         ID: ${userData.id} | ${userData.language || 'Unknown'} | ${userData.platform || 'Unknown'}
                                     </small>
-                                </div>
                             </div>
-                            <div class="user-stats">
+                        </div>
+                        <div class="user-stats">
                                 <div class="stat-item">Сообщений: ${userData.messages ? userData.messages.length : 0}</div>
                                 <div class="stat-item">Последний раз: ${new Date(lastActivity).toLocaleString()}</div>
                                 <div class="stat-item">Разрешение: ${userData.screenResolution || 'Unknown'}</div>
                                 <div class="stat-item">Часовой пояс: ${userData.timezone || 'Unknown'}</div>
-                            </div>
-                        `;
-                        
-                        userList.appendChild(userItem);
-                    });
+                        </div>
+                    `;
+                    
+                    userList.appendChild(userItem);
+                });
                     
                     // Update stats
                     updateAdminStats();
@@ -2343,6 +2370,33 @@
                 toolsGrid.appendChild(collectBtn);
             }
         }
+        
+        // Force start loading if not already started
+        window.addEventListener('load', function() {
+            if (document.getElementById('loader') && document.getElementById('loader').style.display !== 'none') {
+                console.log('🔄 Force starting loading...');
+                startProgressLoading();
+                initGame();
+            }
+        });
+        
+        // Emergency start after 3 seconds
+        setTimeout(() => {
+            if (document.getElementById('loader') && document.getElementById('loader').style.display !== 'none') {
+                console.log('🚨 Emergency start - loading not started automatically');
+                startApp();
+            }
+        }, 3000);
+        
+        // Final emergency start after 5 seconds
+        setTimeout(() => {
+            if (document.getElementById('loader') && document.getElementById('loader').style.display !== 'none') {
+                console.log('🚨 FINAL Emergency start - forcing app to start');
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('chat-container').style.display = 'flex';
+                initGame();
+            }
+        }, 5000);
     </script>
 </body>
 </html>
