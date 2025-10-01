@@ -1312,7 +1312,13 @@
             
             // Сохраняем пользователя в базу данных
             if (database) {
-                database.saveUser(userId, username, firstName);
+                // Сохраняем пользователя с полными данными
+                database.saveUser(userId, username || '', firstName || 'Пользователь');
+                console.log('Пользователь сохранен в базу данных:', {
+                    id: userId,
+                    username: username || '',
+                    firstName: firstName || 'Пользователь'
+                });
             }
         } else {
             console.log('Данные пользователя недоступны');
@@ -1524,6 +1530,18 @@
             try {
                 console.log('Отправляем запрос к Groq API...');
                 
+                // Подготавливаем сообщения для API (без timestamp)
+                const apiMessages = [
+                    {
+                        role: 'system',
+                        content: `Ты полезный AI ассистент. Отвечай на языке: ${currentLanguage === 'ru' ? 'русском' : currentLanguage === 'en' ? 'английском' : currentLanguage === 'es' ? 'испанском' : currentLanguage === 'fr' ? 'французском' : currentLanguage === 'de' ? 'немецком' : currentLanguage === 'zh' ? 'китайском' : 'русском'}. Будь дружелюбным и полезным.`
+                    },
+                    ...chatHistory.map(msg => ({
+                        role: msg.role,
+                        content: msg.content
+                    }))
+                ];
+                
                 const response = await fetch(GROQ_API_URL, {
                     method: 'POST',
                     headers: {
@@ -1532,13 +1550,7 @@
                     },
                     body: JSON.stringify({
                         model: 'llama-3.1-8b-instant',
-                        messages: [
-                            {
-                                role: 'system',
-                                content: `Ты полезный AI ассистент. Отвечай на языке: ${currentLanguage === 'ru' ? 'русском' : currentLanguage === 'en' ? 'английском' : currentLanguage === 'es' ? 'испанском' : currentLanguage === 'fr' ? 'французском' : currentLanguage === 'de' ? 'немецком' : currentLanguage === 'zh' ? 'китайском' : 'русском'}. Будь дружелюбным и полезным.`
-                            },
-                            ...chatHistory
-                        ],
+                        messages: apiMessages,
                         max_tokens: 1000,
                         temperature: 0.7
                     })
@@ -1633,15 +1645,20 @@
 
         async function loadAdminStats() {
             try {
+                console.log('Загружаем статистику админ панели...');
+                
                 if (database) {
+                    console.log('База данных подключена, загружаем статистику...');
                     // Загружаем реальную статистику из Supabase
                     const stats = await database.getApiStats();
+                    console.log('Статистика из базы:', stats);
                     
                     document.getElementById('totalRequests').textContent = stats.totalRequests || 0;
                     document.getElementById('requestsPerHour').textContent = stats.requestsPerHour || 0;
                     document.getElementById('cacheHitRate').textContent = '0%';
                     document.getElementById('avgResponseTime').textContent = '0ms';
                 } else {
+                    console.log('База данных не подключена');
                     // Если база данных не инициализирована
                     document.getElementById('totalRequests').textContent = '0';
                     document.getElementById('requestsPerHour').textContent = '0';
