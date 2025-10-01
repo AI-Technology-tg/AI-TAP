@@ -118,8 +118,9 @@
             padding: 10px 0;
             min-width: 150px;
             display: none;
-            z-index: 1000;
+            z-index: 1002;
             backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
         .language-dropdown.show {
@@ -311,17 +312,25 @@
             position: fixed;
             top: 20px;
             right: 20px;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.9);
             color: white;
             padding: 15px 20px;
             border-radius: 10px;
             z-index: 1001;
             transform: translateX(400px);
-            transition: transform 0.3s ease;
+            transition: all 0.3s ease;
+            max-width: 300px;
+            word-wrap: break-word;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
         .notification.show {
             transform: translateX(0);
+        }
+
+        .notification.fade-out {
+            opacity: 0;
+            transform: translateX(400px);
         }
 
         /* Чат интерфейс */
@@ -717,7 +726,7 @@
                 loading: 'Загрузка...',
                 userId: 'ID: ...',
                 welcome: 'Добро пожаловать!',
-                aiPortal: 'AI Portal',
+                aiPortal: 'AI-TAP',
                 selectAi: 'Выберите ИИ для ваших задач',
                 chatAi: 'ИИ для общения',
                 chatDescription: 'Умный собеседник для любых разговоров',
@@ -743,7 +752,7 @@
                 loading: 'Loading...',
                 userId: 'ID: ...',
                 welcome: 'Welcome!',
-                aiPortal: 'AI Portal',
+                aiPortal: 'AI-TAP',
                 selectAi: 'Choose AI for your tasks',
                 chatAi: 'Chat AI',
                 chatDescription: 'Smart conversationalist for any discussions',
@@ -1001,16 +1010,25 @@
         function showNotification(message) {
             const notification = document.getElementById('notification');
             notification.textContent = message;
+            notification.classList.remove('fade-out');
             notification.classList.add('show');
             
+            // Автоматическое скрытие через 3 секунды
             setTimeout(() => {
                 notification.classList.remove('show');
+                notification.classList.add('fade-out');
+                
+                // Полное удаление после анимации
+                setTimeout(() => {
+                    notification.classList.remove('fade-out');
+                    notification.textContent = '';
+                }, 300);
             }, 3000);
         }
 
         // Конфигурация Google AI API
         const GOOGLE_AI_API_KEY = 'AIzaSyBQskMJsn52upW1O6eUITiA4xWj10gwumo';
-        const GOOGLE_AI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+        const GOOGLE_AI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
 
         // Функции для работы с чатом
         function openChat() {
@@ -1076,7 +1094,7 @@
             showTyping();
             
             try {
-                // Отправляем запрос к Google AI API
+                // Простой запрос к Google AI API
                 const response = await fetch(`${GOOGLE_AI_API_URL}?key=${GOOGLE_AI_API_KEY}`, {
                     method: 'POST',
                     headers: {
@@ -1087,59 +1105,44 @@
                             parts: [{
                                 text: message
                             }]
-                        }],
-                        generationConfig: {
-                            temperature: 0.7,
-                            topK: 40,
-                            topP: 0.95,
-                            maxOutputTokens: 1024,
-                        },
-                        safetySettings: [
-                            {
-                                category: "HARM_CATEGORY_HARASSMENT",
-                                threshold: "BLOCK_MEDIUM_AND_ABOVE"
-                            },
-                            {
-                                category: "HARM_CATEGORY_HATE_SPEECH",
-                                threshold: "BLOCK_MEDIUM_AND_ABOVE"
-                            },
-                            {
-                                category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-                                threshold: "BLOCK_MEDIUM_AND_ABOVE"
-                            },
-                            {
-                                category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-                                threshold: "BLOCK_MEDIUM_AND_ABOVE"
-                            }
-                        ]
+                        }]
                     })
                 });
                 
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    console.error('API Error:', errorData);
-                    throw new Error(`API Error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
+                    const errorText = await response.text();
+                    console.error('API Error Response:', errorText);
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
                 }
                 
                 const data = await response.json();
                 console.log('API Response:', data);
                 
-                if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
-                    const aiResponse = data.candidates[0].content.parts[0].text;
-                    hideTyping();
-                    addMessage(aiResponse);
-                } else if (data.candidates && data.candidates[0] && data.candidates[0].finishReason === 'SAFETY') {
-                    hideTyping();
-                    addMessage('Извините, ваше сообщение было заблокировано системой безопасности. Попробуйте переформулировать вопрос.');
+                if (data.candidates && data.candidates.length > 0) {
+                    const candidate = data.candidates[0];
+                    if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) {
+                        const aiResponse = candidate.content.parts[0].text;
+                        hideTyping();
+                        addMessage(aiResponse);
+                    } else if (candidate.finishReason === 'SAFETY') {
+                        hideTyping();
+                        addMessage('Извините, ваше сообщение было заблокировано системой безопасности. Попробуйте переформулировать вопрос.');
+                    } else {
+                        console.error('No content in candidate:', candidate);
+                        throw new Error('Пустой ответ от ИИ');
+                    }
                 } else {
-                    console.error('Unexpected API response format:', data);
-                    throw new Error('Неожиданный формат ответа от API');
+                    console.error('No candidates in response:', data);
+                    throw new Error('Нет ответа от ИИ');
                 }
                 
             } catch (error) {
                 console.error('Ошибка при отправке сообщения:', error);
                 hideTyping();
-                addMessage(t('error'));
+                addMessage(`Ошибка: ${error.message}. Проверьте API ключ и попробуйте еще раз.`);
             } finally {
                 sendButton.disabled = false;
             }
