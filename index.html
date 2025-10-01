@@ -620,6 +620,78 @@
             background: rgba(255, 255, 255, 0.5);
         }
 
+        /* Технологичный дизайн чата */
+        .chat-container {
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            box-shadow: 
+                0 0 30px rgba(0, 255, 255, 0.2),
+                inset 0 0 30px rgba(0, 255, 255, 0.1);
+        }
+
+        .chat-header {
+            background: linear-gradient(90deg, rgba(0, 255, 255, 0.1) 0%, rgba(0, 255, 255, 0.05) 100%);
+            border-bottom: 2px solid rgba(0, 255, 255, 0.3);
+        }
+
+        .chat-title {
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            font-weight: 700;
+        }
+
+        .message {
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.1);
+        }
+
+        .message.user {
+            background: rgba(0, 255, 255, 0.1);
+            border-color: rgba(0, 255, 255, 0.4);
+        }
+
+        .message.ai {
+            background: rgba(0, 255, 255, 0.05);
+            border-color: rgba(0, 255, 255, 0.3);
+        }
+
+        .message-content {
+            color: #e0e0e0;
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+        }
+
+        .chat-input {
+            background: rgba(0, 255, 255, 0.05);
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            color: #e0e0e0;
+        }
+
+        .chat-input:focus {
+            border-color: rgba(0, 255, 255, 0.6);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        }
+
+        .chat-input::placeholder {
+            color: rgba(224, 224, 224, 0.6);
+        }
+
+        .send-button {
+            background: rgba(0, 255, 255, 0.1);
+            border: 2px solid rgba(0, 255, 255, 0.4);
+            color: #00ffff;
+        }
+
+        .send-button:hover {
+            background: rgba(0, 255, 255, 0.2);
+            border-color: rgba(0, 255, 255, 0.6);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+        }
+
+        .typing-indicator {
+            color: rgba(0, 255, 255, 0.7);
+        }
+
         /* Адаптивность */
         @media (max-width: 768px) {
             .ai-panel {
@@ -693,13 +765,13 @@
         <p class="subtitle">Выберите ИИ для ваших задач</p>
         
         <div class="ai-panel">
-            <div class="ai-button" onclick="showNotification('Основной ИИ - в разработке')">
+            <div class="ai-button" onclick="openMainAI()">
                 <span class="ai-icon">🤖</span>
                 <div class="ai-title">Основной ИИ</div>
                 <div class="ai-description">Универсальный помощник для любых задач</div>
             </div>
 
-            <div class="ai-button" onclick="showNotification('Генератор изображений - в разработке')">
+            <div class="ai-button" onclick="showNotification(t('imageGenNotification'))">
                 <span class="ai-icon">🎨</span>
                 <div class="ai-title">Генератор изображений</div>
                 <div class="ai-description">Создание уникальных изображений по описанию</div>
@@ -707,6 +779,42 @@
         </div>
     </div>
 
+    <!-- Чат с Основным ИИ -->
+    <div id="chatModal" class="chat-modal">
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="chat-title">🤖 Основной ИИ</div>
+                <span class="chat-close" onclick="closeChat()">&times;</span>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="message ai">
+                    <div class="message-content">
+                        Привет! Я Основной ИИ. К сожалению, я пока в разработке, но скоро буду готов помочь!
+                    </div>
+                    <div class="message-time" id="welcomeTime"></div>
+                </div>
+            </div>
+            
+            <div class="typing-indicator" id="typingIndicator">
+                ИИ печатает<span class="typing-dots"></span>
+            </div>
+            
+            <div class="chat-input-container">
+                <div class="chat-input-wrapper">
+                    <textarea 
+                        id="chatInput" 
+                        class="chat-input" 
+                        placeholder="Напишите сообщение..."
+                        rows="1"
+                    ></textarea>
+                    <button id="sendButton" class="send-button" onclick="sendMessage()">
+                        ➤
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Уведомления -->
     <div id="notification" class="notification"></div>
@@ -725,6 +833,12 @@
                 imageGen: 'Генератор изображений',
                 imageDescription: 'Создание уникальных изображений по описанию',
                 inDevelopment: 'в разработке',
+                mainAiNotification: 'Основной ИИ - в разработке',
+                imageGenNotification: 'Генератор изображений - в разработке',
+                chatWelcome: 'Привет! Я Основной ИИ. К сожалению, я пока в разработке, но скоро буду готов помочь!',
+                chatPlaceholder: 'Напишите сообщение...',
+                chatTyping: 'ИИ печатает',
+                chatResponse: 'Извините, я пока в разработке. Скоро буду готов помочь вам!',
                 chatTitle: 'ИИ Ассистент',
                 chatWelcome: 'Привет! Я ваш ИИ ассистент. Чем могу помочь?',
                 typing: 'ИИ печатает',
@@ -743,6 +857,12 @@
                 imageGen: 'Image Generator',
                 imageDescription: 'Creating unique images from descriptions',
                 inDevelopment: 'in development',
+                mainAiNotification: 'Main AI - in development',
+                imageGenNotification: 'Image Generator - in development',
+                chatWelcome: 'Hello! I am Main AI. Unfortunately, I am still in development, but I will be ready to help soon!',
+                chatPlaceholder: 'Write a message...',
+                chatTyping: 'AI is typing',
+                chatResponse: 'Sorry, I am still in development. I will be ready to help you soon!',
                 chatTitle: 'AI Assistant',
                 chatWelcome: 'Hello! I am your AI assistant. How can I help?',
                 typing: 'AI is typing',
@@ -761,6 +881,8 @@
                 imageGen: 'Generador de Imágenes',
                 imageDescription: 'Creando imágenes únicas desde descripciones',
                 inDevelopment: 'en desarrollo',
+                mainAiNotification: 'IA Principal - en desarrollo',
+                imageGenNotification: 'Generador de Imágenes - en desarrollo',
                 chatTitle: 'Asistente IA',
                 chatWelcome: '¡Hola! Soy tu asistente IA. ¿Cómo puedo ayudar?',
                 typing: 'IA está escribiendo',
@@ -779,6 +901,8 @@
                 imageGen: 'Générateur d\'Images',
                 imageDescription: 'Création d\'images uniques à partir de descriptions',
                 inDevelopment: 'en développement',
+                mainAiNotification: 'IA Principal - en développement',
+                imageGenNotification: 'Générateur d\'Images - en développement',
                 chatTitle: 'Assistant IA',
                 chatWelcome: 'Bonjour! Je suis votre assistant IA. Comment puis-je aider?',
                 typing: 'IA tape',
@@ -797,6 +921,8 @@
                 imageGen: 'Bildgenerator',
                 imageDescription: 'Erstellung einzigartiger Bilder aus Beschreibungen',
                 inDevelopment: 'in Entwicklung',
+                mainAiNotification: 'Haupt-KI - in Entwicklung',
+                imageGenNotification: 'Bildgenerator - in Entwicklung',
                 chatTitle: 'KI Assistent',
                 chatWelcome: 'Hallo! Ich bin Ihr KI-Assistent. Wie kann ich helfen?',
                 typing: 'KI tippt',
@@ -815,6 +941,8 @@
                 imageGen: '图像生成器',
                 imageDescription: '根据描述创建独特图像',
                 inDevelopment: '开发中',
+                mainAiNotification: '主要AI - 开发中',
+                imageGenNotification: '图像生成器 - 开发中',
                 chatTitle: 'AI助手',
                 chatWelcome: '你好！我是你的AI助手。我能如何帮助？',
                 typing: 'AI正在输入',
@@ -964,7 +1092,114 @@
             }, 3000);
         }
 
+        // Функции для чата с Основным ИИ
+        function openMainAI() {
+            document.getElementById('chatModal').style.display = 'block';
+            document.getElementById('chatInput').focus();
+            
+            // Обновляем интерфейс чата на текущем языке
+            updateChatInterface();
+        }
 
+        function closeChat() {
+            document.getElementById('chatModal').style.display = 'none';
+        }
+
+        function updateChatInterface() {
+            // Обновляем заголовок
+            document.querySelector('.chat-title').textContent = '🤖 ' + t('mainAi');
+            
+            // Обновляем приветственное сообщение
+            const welcomeMessage = document.querySelector('.chat-messages .message.ai .message-content');
+            if (welcomeMessage) {
+                welcomeMessage.textContent = t('chatWelcome');
+            }
+            
+            // Обновляем плейсхолдер
+            document.getElementById('chatInput').placeholder = t('chatPlaceholder');
+            
+            // Обновляем индикатор печати
+            document.getElementById('typingIndicator').innerHTML = t('chatTyping') + '<span class="typing-dots"></span>';
+            
+            // Устанавливаем время приветственного сообщения
+            document.getElementById('welcomeTime').textContent = getCurrentTime();
+        }
+
+        function getCurrentTime() {
+            const now = new Date();
+            return now.toLocaleTimeString('ru-RU', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+        }
+
+        function addMessage(content, isUser = false) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'ai'}`;
+            
+            messageDiv.innerHTML = `
+                <div class="message-content">${content}</div>
+                <div class="message-time">${getCurrentTime()}</div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function showTyping() {
+            document.getElementById('typingIndicator').style.display = 'flex';
+        }
+
+        function hideTyping() {
+            document.getElementById('typingIndicator').style.display = 'none';
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const sendButton = document.getElementById('sendButton');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Добавляем сообщение пользователя
+            addMessage(message, true);
+            input.value = '';
+            input.style.height = 'auto';
+            
+            // Блокируем кнопку отправки
+            sendButton.disabled = true;
+            showTyping();
+            
+            // Имитируем задержку ответа
+            setTimeout(() => {
+                hideTyping();
+                addMessage(t('chatResponse'));
+                sendButton.disabled = false;
+            }, 1500);
+        }
+
+
+
+        // Обработка нажатия Enter в поле ввода
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatInput = document.getElementById('chatInput');
+            
+            if (chatInput) {
+                chatInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        sendMessage();
+                    }
+                });
+                
+                // Автоматическое изменение высоты textarea
+                chatInput.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+                });
+            }
+        });
 
         // Анимация появления кнопок
         document.addEventListener('DOMContentLoaded', function() {
