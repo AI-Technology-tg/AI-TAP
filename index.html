@@ -158,6 +158,60 @@
             background: rgba(102, 126, 234, 0.3);
         }
 
+        /* Секция выбора языка в профиле */
+        .language-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .language-section h3 {
+            color: white;
+            font-size: 18px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .language-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .language-grid .language-option {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .language-grid .language-option:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .language-grid .language-option.active {
+            background: rgba(102, 126, 234, 0.4);
+            border-color: rgba(102, 126, 234, 0.6);
+        }
+
+        .language-grid .language-option span:first-child {
+            font-size: 24px;
+        }
+
+        .language-grid .language-option span:last-child {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
         /* Модальное окно с данными пользователя */
         .modal {
             display: none;
@@ -590,39 +644,6 @@
             <div id="userName" class="user-name">Загрузка...</div>
             <div id="userId" class="user-id">ID: ...</div>
         </div>
-        <div class="language-selector">
-            <div class="language-button" onclick="toggleLanguageDropdown()">
-                <span id="currentLanguageFlag">🇷🇺</span>
-                <span id="currentLanguageName">Русский</span>
-                <span>▼</span>
-            </div>
-            <div id="languageDropdown" class="language-dropdown">
-                <div class="language-option active" onclick="changeLanguage('ru')">
-                    <span>🇷🇺</span>
-                    <span>Русский</span>
-                </div>
-                <div class="language-option" onclick="changeLanguage('en')">
-                    <span>🇺🇸</span>
-                    <span>English</span>
-                </div>
-                <div class="language-option" onclick="changeLanguage('es')">
-                    <span>🇪🇸</span>
-                    <span>Español</span>
-                </div>
-                <div class="language-option" onclick="changeLanguage('fr')">
-                    <span>🇫🇷</span>
-                    <span>Français</span>
-                </div>
-                <div class="language-option" onclick="changeLanguage('de')">
-                    <span>🇩🇪</span>
-                    <span>Deutsch</span>
-                </div>
-                <div class="language-option" onclick="changeLanguage('zh')">
-                    <span>🇨🇳</span>
-                    <span>中文</span>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Модальное окно с данными пользователя -->
@@ -633,6 +654,36 @@
             <h2 id="modalName">Имя пользователя</h2>
             <p id="modalId">ID: ...</p>
             <p id="modalUsername">@username</p>
+            
+            <div class="language-section">
+                <h3>Выбор языка / Language Selection</h3>
+                <div class="language-grid">
+                    <div class="language-option active" onclick="changeLanguage('ru')">
+                        <span>🇷🇺</span>
+                        <span>Русский</span>
+                    </div>
+                    <div class="language-option" onclick="changeLanguage('en')">
+                        <span>🇺🇸</span>
+                        <span>English</span>
+                    </div>
+                    <div class="language-option" onclick="changeLanguage('es')">
+                        <span>🇪🇸</span>
+                        <span>Español</span>
+                    </div>
+                    <div class="language-option" onclick="changeLanguage('fr')">
+                        <span>🇫🇷</span>
+                        <span>Français</span>
+                    </div>
+                    <div class="language-option" onclick="changeLanguage('de')">
+                        <span>🇩🇪</span>
+                        <span>Deutsch</span>
+                    </div>
+                    <div class="language-option" onclick="changeLanguage('zh')">
+                        <span>🇨🇳</span>
+                        <span>中文</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -913,39 +964,24 @@
         }
 
         // Функции для работы с языками
-        function toggleLanguageDropdown() {
-            const dropdown = document.getElementById('languageDropdown');
-            dropdown.classList.toggle('show');
-        }
-
         function changeLanguage(lang) {
             currentLanguage = lang;
             updateInterface();
             
-            // Обновляем селектор языка
-            const flags = {'ru': '🇷🇺', 'en': '🇺🇸', 'es': '🇪🇸', 'fr': '🇫🇷', 'de': '🇩🇪', 'zh': '🇨🇳'};
-            const names = {'ru': 'Русский', 'en': 'English', 'es': 'Español', 'fr': 'Français', 'de': 'Deutsch', 'zh': '中文'};
-            
-            document.getElementById('currentLanguageFlag').textContent = flags[lang];
-            document.getElementById('currentLanguageName').textContent = names[lang];
-            
-            // Обновляем активную опцию
-            document.querySelectorAll('.language-option').forEach(option => {
+            // Обновляем активную опцию в профиле
+            document.querySelectorAll('.language-grid .language-option').forEach(option => {
                 option.classList.remove('active');
             });
             event.target.closest('.language-option').classList.add('active');
             
-            // Закрываем dropdown
-            document.getElementById('languageDropdown').classList.remove('show');
+            // Показываем уведомление об изменении языка
+            showNotification(`Язык изменен на ${getLanguageName(lang)}`);
         }
 
-        // Закрытие dropdown при клике вне его
-        document.addEventListener('click', function(event) {
-            const selector = document.querySelector('.language-selector');
-            if (!selector.contains(event.target)) {
-                document.getElementById('languageDropdown').classList.remove('show');
-            }
-        });
+        function getLanguageName(lang) {
+            const names = {'ru': 'Русский', 'en': 'English', 'es': 'Español', 'fr': 'Français', 'de': 'Deutsch', 'zh': '中文'};
+            return names[lang] || 'Русский';
+        }
 
         // Инициализация Telegram Web App
         const tg = window.Telegram.WebApp;
@@ -1101,6 +1137,7 @@
                     headers: {
                         'Authorization': `Bearer ${HF_API_KEY}`,
                         'Content-Type': 'application/json',
+                        'X-API-Key': HF_API_KEY,
                     },
                     body: JSON.stringify({
                         inputs: message,
