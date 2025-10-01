@@ -1378,15 +1378,16 @@
             right: 20px;
             background: rgba(0, 255, 255, 0.1);
             border: 2px solid rgba(0, 255, 255, 0.3);
-            border-radius: 25px;
-            padding: 10px 20px;
+            border-radius: 15px;
+            padding: 6px 12px;
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 8px;
             backdrop-filter: blur(10px);
             box-shadow: 0 4px 15px rgba(0, 255, 255, 0.2);
             z-index: 1000;
             animation: onlinePanelSlide 0.5s ease-out;
+            font-size: 12px;
         }
 
         @keyframes onlinePanelSlide {
@@ -1437,6 +1438,27 @@
         .online-label {
             color: rgba(255, 255, 255, 0.7);
             font-size: 12px;
+        }
+
+        .notifications-btn {
+            background: rgba(255, 165, 0, 0.2);
+            border: 2px solid rgba(255, 165, 0, 0.4);
+            color: #ffa500;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .notifications-btn:hover {
+            background: rgba(255, 165, 0, 0.3);
+            border-color: rgba(255, 165, 0, 0.6);
+            transform: scale(1.1);
         }
 
         /* Адаптивность */
@@ -1862,8 +1884,10 @@
         </div>
         <div class="online-count">
             <span id="onlineUsersCount">0</span>
-            <span class="online-label">пользователей</span>
         </div>
+        <button id="notificationsBtn" class="notifications-btn" onclick="showNotifications()" style="display: none;">
+            🔔
+        </button>
     </div>
 
     <!-- Подключение модулей -->
@@ -3586,17 +3610,20 @@
             
             if (user) {
                 return {
-                    name: user.firstName || 'Пользователь',
+                    name: user.firstName || user.name || 'Пользователь',
                     username: user.username || 'unknown',
-                    avatar: user.avatar || 'https://via.placeholder.com/40x40/00ffff/ffffff?text=U'
+                    avatar: user.avatar || user.photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.firstName || 'User')}&background=00ffff&color=ffffff&size=40`
                 };
             }
             
-            // Тестовые данные если нет информации
+            // Создаем более реалистичные тестовые данные
+            const names = ['Алексей', 'Мария', 'Дмитрий', 'Анна', 'Сергей', 'Елена', 'Иван', 'Ольга', 'Михаил', 'Татьяна'];
+            const randomName = names[telegramId % names.length];
+            
             return {
-                name: 'Пользователь',
+                name: randomName,
                 username: 'user' + telegramId.toString().slice(-4),
-                avatar: 'https://via.placeholder.com/40x40/00ffff/ffffff?text=U'
+                avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(randomName)}&background=00ffff&color=ffffff&size=40`
             };
         }
 
@@ -3864,6 +3891,8 @@
 
         function openUserSettings(telegramId) {
             const userInfo = getUserInfo(telegramId);
+            const userWarnings = getUserWarnings(telegramId);
+            const userStatus = getUserStatus(telegramId);
             
             const settingsHtml = `
                 <div style="background: rgba(0, 255, 255, 0.1); padding: 20px; border-radius: 15px; margin: 20px;">
@@ -3873,35 +3902,50 @@
                         <div>
                             <h4 style="color: #00ffff; margin: 0;">${userInfo.name}</h4>
                             <p style="margin: 5px 0; color: rgba(255, 255, 255, 0.7);">ID: ${telegramId}</p>
+                            <p style="margin: 5px 0; color: ${getStatusColor(userStatus)}; font-weight: bold;">
+                                Статус: ${getStatusText(userStatus)}
+                            </p>
                         </div>
                     </div>
+                    
+                    <!-- Статус нарушений -->
+                    <div style="margin-top: 20px; padding: 15px; background: rgba(0, 255, 255, 0.05); border-radius: 10px; border: 1px solid rgba(0, 255, 255, 0.2);">
+                        <h4 style="color: #00ffff; margin: 0 0 10px 0;">📊 Статус нарушений</h4>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span>Предупреждения:</span>
+                            <span style="color: ${userWarnings.count >= 3 ? '#ff4444' : userWarnings.count >= 1 ? '#ffa500' : '#00ff00'}; font-weight: bold;">
+                                ${userWarnings.count}/3
+                            </span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>Следующая блокировка:</span>
+                            <span style="color: #00ffff;">${userWarnings.count >= 3 ? '3ч' : userWarnings.count >= 2 ? '2ч' : userWarnings.count >= 1 ? '1ч' : 'Нет'}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Выдача предупреждения -->
                     <div style="margin-top: 20px;">
+                        <h4 style="color: #00ffff; margin: 0 0 15px 0;">⚠️ Выдать предупреждение</h4>
                         <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 5px; color: rgba(255, 255, 255, 0.8);">Статус пользователя:</label>
-                            <select style="background: rgba(0, 255, 255, 0.1); border: 2px solid rgba(0, 255, 255, 0.3); 
-                                         border-radius: 10px; padding: 10px; color: white; width: 100%;">
-                                <option value="active">Активен</option>
-                                <option value="blocked">Заблокирован</option>
-                                <option value="limited">Ограничен</option>
-                            </select>
+                            <label style="display: block; margin-bottom: 5px; color: rgba(255, 255, 255, 0.8);">Причина предупреждения:</label>
+                            <textarea id="warningReason" placeholder="Укажите причину предупреждения..." 
+                                      style="background: rgba(0, 255, 255, 0.1); border: 2px solid rgba(0, 255, 255, 0.3); 
+                                             border-radius: 10px; padding: 10px; color: white; width: 100%; height: 80px; resize: vertical;"></textarea>
                         </div>
-                        <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 5px; color: rgba(255, 255, 255, 0.8);">Лимит запросов в день:</label>
-                            <input type="number" value="50" min="1" max="1000" 
-                                   style="background: rgba(0, 255, 255, 0.1); border: 2px solid rgba(0, 255, 255, 0.3); 
-                                          border-radius: 10px; padding: 10px; color: white; width: 100%;">
-                        </div>
-                        <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
-                            <button onclick="saveUserSettings(${telegramId})" 
-                                    style="background: linear-gradient(45deg, #00ffff, #0080ff); border: none; color: white; 
-                                           padding: 10px 20px; border-radius: 20px; cursor: pointer;">💾 ${t('save')}</button>
-                            <button onclick="viewUserChat(${telegramId})" 
-                                    style="background: rgba(0, 255, 0, 0.2); border: 2px solid rgba(0, 255, 0, 0.4); 
-                                           color: #00ff00; padding: 10px 20px; border-radius: 20px; cursor: pointer;">💬 ${t('viewUserChat')}</button>
-                            <button onclick="blockUser(${telegramId})" 
-                                    style="background: rgba(255, 0, 0, 0.2); border: 2px solid rgba(255, 0, 0, 0.4); 
-                                           color: #ff4444; padding: 10px 20px; border-radius: 20px; cursor: pointer;">🚫 ${t('block')}</button>
-                        </div>
+                        <button onclick="issueWarning(${telegramId})" 
+                                style="background: rgba(255, 165, 0, 0.2); border: 2px solid rgba(255, 165, 0, 0.4); 
+                                       color: #ffa500; padding: 10px 20px; border-radius: 20px; cursor: pointer; width: 100%;">
+                            ⚠️ Выдать предупреждение
+                        </button>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
+                        <button onclick="viewUserChat(${telegramId})" 
+                                style="background: rgba(0, 255, 0, 0.2); border: 2px solid rgba(0, 255, 0, 0.4); 
+                                       color: #00ff00; padding: 10px 20px; border-radius: 20px; cursor: pointer;">💬 ${t('viewUserChat')}</button>
+                        <button onclick="viewUserNotifications(${telegramId})" 
+                                style="background: rgba(0, 255, 255, 0.2); border: 2px solid rgba(0, 255, 255, 0.4); 
+                                       color: #00ffff; padding: 10px 20px; border-radius: 20px; cursor: pointer;">🔔 Уведомления</button>
                     </div>
                 </div>
             `;
@@ -3929,18 +3973,143 @@
             document.body.appendChild(modal);
         }
 
-        function saveUserSettings(telegramId) {
-            showNotification(`Настройки пользователя ${telegramId} сохранены`);
+        // Система предупреждений и блокировок
+        function getUserWarnings(telegramId) {
+            const warnings = JSON.parse(localStorage.getItem('ai-tap-warnings') || '{}');
+            return warnings[telegramId] || { count: 0, warnings: [] };
+        }
+        
+        function getUserStatus(telegramId) {
+            const warnings = getUserWarnings(telegramId);
+            const blocks = JSON.parse(localStorage.getItem('ai-tap-blocks') || '{}');
+            const userBlock = blocks[telegramId];
+            
+            if (userBlock && new Date() < new Date(userBlock.until)) {
+                return 'blocked';
+            }
+            
+            if (warnings.count >= 3) {
+                return 'warning_3';
+            } else if (warnings.count >= 2) {
+                return 'warning_2';
+            } else if (warnings.count >= 1) {
+                return 'warning_1';
+            }
+            
+            return 'active';
+        }
+        
+        function getStatusText(status) {
+            switch(status) {
+                case 'blocked': return 'Заблокирован';
+                case 'warning_3': return '3 предупреждения';
+                case 'warning_2': return '2 предупреждения';
+                case 'warning_1': return '1 предупреждение';
+                default: return 'Активен';
+            }
+        }
+        
+        function getStatusColor(status) {
+            switch(status) {
+                case 'blocked': return '#ff4444';
+                case 'warning_3': return '#ff4444';
+                case 'warning_2': return '#ffa500';
+                case 'warning_1': return '#ffa500';
+                default: return '#00ff00';
+            }
+        }
+        
+        function issueWarning(telegramId) {
+            const reason = document.getElementById('warningReason').value.trim();
+            if (!reason) {
+                showNotification('Укажите причину предупреждения');
+                return;
+            }
+            
+            const warnings = JSON.parse(localStorage.getItem('ai-tap-warnings') || '{}');
+            const userWarnings = warnings[telegramId] || { count: 0, warnings: [] };
+            
+            // Добавляем новое предупреждение
+            userWarnings.warnings.push({
+                reason: reason,
+                date: new Date().toISOString(),
+                admin: 'Администратор'
+            });
+            userWarnings.count++;
+            
+            warnings[telegramId] = userWarnings;
+            localStorage.setItem('ai-tap-warnings', JSON.stringify(warnings));
+            
+            // Если 3 предупреждения - блокируем пользователя
+            if (userWarnings.count >= 3) {
+                const blockDuration = userWarnings.count * 60 * 60 * 1000; // часы в миллисекундах
+                const blockUntil = new Date(Date.now() + blockDuration);
+                
+                const blocks = JSON.parse(localStorage.getItem('ai-tap-blocks') || '{}');
+                blocks[telegramId] = {
+                    until: blockUntil.toISOString(),
+                    reason: '3 предупреждения',
+                    warnings: userWarnings.count
+                };
+                localStorage.setItem('ai-tap-blocks', JSON.stringify(blocks));
+                
+                showNotification(`Пользователь заблокирован на ${userWarnings.count} часов`);
+            } else {
+                showNotification(`Предупреждение выдано (${userWarnings.count}/3)`);
+            }
+            
             // Закрываем модальное окно
             document.querySelector('[style*="position: fixed"]').remove();
         }
-
-        function blockUser(telegramId) {
-            if (confirm(`${t('blockConfirm')} ${telegramId}?`)) {
-                showNotification(`${t('userBlocked')} ${telegramId}`);
-                // Закрываем модальное окно
-                document.querySelector('[style*="position: fixed"]').remove();
+        
+        function viewUserNotifications(telegramId) {
+            const userInfo = getUserInfo(telegramId);
+            const warnings = getUserWarnings(telegramId);
+            
+            let notificationsHtml = '';
+            if (warnings.warnings.length === 0) {
+                notificationsHtml = '<div style="text-align: center; color: rgba(255, 255, 255, 0.7); padding: 20px;">Нет уведомлений</div>';
+            } else {
+                notificationsHtml = warnings.warnings.map((warning, index) => `
+                    <div style="margin-bottom: 15px; padding: 15px; background: rgba(255, 165, 0, 0.1); border-radius: 10px; border: 1px solid rgba(255, 165, 0, 0.3);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span style="color: #ffa500; font-weight: bold;">⚠️ Предупреждение #${index + 1}</span>
+                            <span style="color: rgba(255, 255, 255, 0.7); font-size: 12px;">
+                                ${new Date(warning.date).toLocaleString('ru-RU')}
+                            </span>
+                        </div>
+                        <div style="color: white; margin-bottom: 5px;">
+                            <strong>Причина:</strong> ${warning.reason}
+                        </div>
+                        <div style="color: rgba(255, 255, 255, 0.7); font-size: 12px;">
+                            Выдано: ${warning.admin}
+                        </div>
+                    </div>
+                `).join('');
             }
+            
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                background: rgba(0, 0, 0, 0.8); z-index: 10000; 
+                display: flex; align-items: center; justify-content: center;
+            `;
+            modal.innerHTML = `
+                <div style="background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%); 
+                           border: 2px solid rgba(0, 255, 255, 0.3); border-radius: 20px; 
+                           padding: 30px; max-width: 600px; max-height: 80vh; overflow-y: auto;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="color: #00ffff; margin: 0;">🔔 Уведомления ${userInfo.name}</h2>
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()" 
+                                style="background: rgba(255, 0, 0, 0.2); border: 2px solid rgba(255, 0, 0, 0.4); 
+                                       color: #ff4444; width: 30px; height: 30px; border-radius: 50%; cursor: pointer;">✕</button>
+                    </div>
+                    <div style="max-height: 400px; overflow-y: auto;">
+                        ${notificationsHtml}
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
         }
 
         function viewUserChat(telegramId) {
@@ -4448,3 +4617,4 @@
     </script>
 </body>
 </html>
+
