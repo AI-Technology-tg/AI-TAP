@@ -4600,6 +4600,359 @@
             }
         });
 
+        // Функция обновления онлайн пользователей
+        function updateOnlineUsers() {
+            const onlineCount = document.getElementById('onlineUsersCount');
+            const notificationsBtn = document.getElementById('notificationsBtn');
+            
+            if (onlineCount) {
+                // Получаем реальное количество онлайн пользователей
+                let realOnlineCount = 0;
+                
+                if (database) {
+                    // Здесь можно добавить запрос к базе данных для получения реального количества онлайн пользователей
+                    // Пока используем симуляцию
+                    realOnlineCount = Math.floor(Math.random() * 50) + 10;
+                } else {
+                    // Тестовые данные
+                    realOnlineCount = Math.floor(Math.random() * 20) + 5;
+                }
+                
+                onlineCount.textContent = realOnlineCount;
+                
+                // Показываем кнопку уведомлений если есть предупреждения
+                if (notificationsBtn) {
+                    const userWarnings = getUserWarnings(user?.id || 0);
+                    if (userWarnings.count > 0) {
+                        notificationsBtn.style.display = 'flex';
+                    } else {
+                        notificationsBtn.style.display = 'none';
+                    }
+                }
+            }
+        }
+        
+        // Функция показа уведомлений пользователя
+        function showNotifications() {
+            const userWarnings = getUserWarnings(user?.id || 0);
+            
+            if (userWarnings.warnings.length === 0) {
+                showNotification('У вас нет уведомлений');
+                return;
+            }
+            
+            let notificationsHtml = '';
+            notificationsHtml = userWarnings.warnings.map((warning, index) => `
+                <div style="margin-bottom: 15px; padding: 15px; background: rgba(255, 165, 0, 0.1); border-radius: 10px; border: 1px solid rgba(255, 165, 0, 0.3);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span style="color: #ffa500; font-weight: bold;">⚠️ Предупреждение #${index + 1}</span>
+                        <span style="color: rgba(255, 255, 255, 0.7); font-size: 12px;">
+                            ${new Date(warning.date).toLocaleString('ru-RU')}
+                        </span>
+                    </div>
+                    <div style="color: white; margin-bottom: 5px;">
+                        <strong>Причина:</strong> ${warning.reason}
+                    </div>
+                    <div style="color: rgba(255, 255, 255, 0.7); font-size: 12px;">
+                        Выдано: ${warning.admin}
+                    </div>
+                </div>
+            `).join('');
+            
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                background: rgba(0, 0, 0, 0.8); z-index: 10000; 
+                display: flex; align-items: center; justify-content: center;
+            `;
+            modal.innerHTML = `
+                <div style="background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%); 
+                           border: 2px solid rgba(0, 255, 255, 0.3); border-radius: 20px; 
+                           padding: 30px; max-width: 600px; max-height: 80vh; overflow-y: auto;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="color: #00ffff; margin: 0;">🔔 Ваши уведомления</h2>
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()" 
+                                style="background: rgba(255, 0, 0, 0.2); border: 2px solid rgba(255, 0, 0, 0.4); 
+                                       color: #ff4444; width: 30px; height: 30px; border-radius: 50%; cursor: pointer;">✕</button>
+                    </div>
+                    <div style="max-height: 400px; overflow-y: auto;">
+                        ${notificationsHtml}
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        // Функция проверки блокировки пользователя
+        function checkUserBlocked() {
+            if (!user) return false;
+            
+            const userStatus = getUserStatus(user.id);
+            return userStatus === 'blocked';
+        }
+        
+        // Обновляем функцию отправки сообщения для проверки блокировки
+        async function sendMessage() {
+            // Проверяем, не заблокирован ли пользователь
+            if (checkUserBlocked()) {
+                showNotification('Вы заблокированы и не можете использовать ИИ');
+                return;
+            }
+            
+            const input = document.getElementById('chatInput');
+            const sendButton = document.getElementById('sendButton');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Добавляем сообщение пользователя в интерфейс и получаем время
+            const userTime = addMessage(message, true);
+            
+            // Добавляем сообщение пользователя в историю с временем
+            chatHistory.push({ role: 'user', content: message, timestamp: userTime });
+            localStorage.setItem('ai-tap-chat-history', JSON.stringify(chatHistory));
+            
+            // Сохраняем в базу данных
+            if (database && user) {
+                await database.saveMessage(user.id, 'user', message);
+            }
+            
+            input.value = '';
+            input.style.height = 'auto';
+            
+            // Блокируем кнопку отправки
+            sendButton.disabled = true;
+            showTyping();
+            
+            const startTime = Date.now();
+            
+            try {
+                console.log('Отправляем запрос к Groq API...');
+                
+                // Подготавливаем сообщения для API (без timestamp)
+                // Ограничиваем историю чата до последних 10 сообщений для экономии токенов
+                const recentHistory = chatHistory.slice(-10);
+                
+                // Определяем язык для ИИ
+                const aiLanguage = localStorage.getItem('ai-language') || 'auto';
+                let systemPrompt = 'Ты полезный AI ассистент. Будь дружелюбным и полезным. Отвечай кратко и по делу.';
+                
+                if (aiLanguage === 'auto') {
+                    // Автоматически определяем язык по языку приложения
+                    const languageMap = {
+                        'ru': 'русском',
+                        'en': 'английском', 
+                        'es': 'испанском',
+                        'fr': 'французском',
+                        'de': 'немецком',
+                        'zh': 'китайском'
+                    };
+                    const targetLanguage = languageMap[currentLanguage] || 'русском';
+                    systemPrompt += ` Отвечай на ${targetLanguage} языке.`;
+                } else {
+                    // Используем выбранный язык
+                    const languageMap = {
+                        'ru': 'русском',
+                        'en': 'английском',
+                        'es': 'испанском', 
+                        'fr': 'французском',
+                        'de': 'немецком',
+                        'zh': 'китайском'
+                    };
+                    const targetLanguage = languageMap[aiLanguage] || 'русском';
+                    systemPrompt += ` Отвечай на ${targetLanguage} языке.`;
+                }
+                
+                const apiMessages = [
+                    {
+                        role: 'system',
+                        content: systemPrompt
+                    },
+                    ...recentHistory.map(msg => ({
+                        role: msg.role,
+                        content: msg.content
+                    }))
+                ];
+                
+                const response = await fetch(GROQ_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${GROQ_API_KEY}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        model: 'llama-3.1-8b-instant',
+                        messages: apiMessages,
+                        max_tokens: 300, // Уменьшили с 1000 до 300 для более коротких ответов
+                        temperature: 0.7
+                    })
+                });
+                
+                console.log('Статус ответа:', response.status);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Ошибка API:', errorText);
+                    
+                    // Если ошибка 429 (rate limit), ждем и повторяем запрос
+                    if (response.status === 429) {
+                        console.log('Превышен лимит API, ждем...');
+                        
+                        // Парсим время ожидания из ответа
+                        let retryAfter = 2; // по умолчанию 2 секунды
+                        try {
+                            const errorData = JSON.parse(errorText);
+                            if (errorData.error && errorData.error.message) {
+                                const match = errorData.error.message.match(/try again in (\d+\.?\d*)s/);
+                                if (match) {
+                                    retryAfter = Math.ceil(parseFloat(match[1]));
+                                }
+                            }
+                        } catch (e) {
+                            console.log('Не удалось распарсить время ожидания, используем 2 секунды');
+                        }
+                        
+                        // Ждем указанное время
+                        await waitForRateLimit(retryAfter);
+                        
+                        // Повторяем запрос
+                        console.log('Повторяем запрос...');
+                        const retryResponse = await fetch(GROQ_API_URL, {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${GROQ_API_KEY}`,
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                model: 'llama-3.1-8b-instant',
+                                messages: apiMessages,
+                                max_tokens: 300, // Уменьшили с 1000 до 300 для более коротких ответов
+                                temperature: 0.7
+                            })
+                        });
+                        
+                        if (!retryResponse.ok) {
+                            const retryErrorText = await retryResponse.text();
+                            throw new Error(`Ошибка API после повтора: ${retryResponse.status} - ${retryErrorText}`);
+                        }
+                        
+                        // Обрабатываем успешный ответ
+                        const retryData = await retryResponse.json();
+                        if (retryData.choices && retryData.choices.length > 0 && retryData.choices[0].message && retryData.choices[0].message.content) {
+                            const aiResponse = retryData.choices[0].message.content;
+                            
+                            // Добавляем ответ ИИ в интерфейс и получаем время
+                            const aiTime = addMessage(aiResponse);
+                            
+                            // Добавляем ответ ИИ в историю с временем
+                            chatHistory.push({ role: 'assistant', content: aiResponse, timestamp: aiTime });
+                            localStorage.setItem('ai-tap-chat-history', JSON.stringify(chatHistory));
+                            
+                            // Сохраняем в базу данных
+                            if (database && user) {
+                                await database.saveMessage(user.id, 'assistant', aiResponse);
+                                
+                                // Логируем использование API
+                                const responseTime = Date.now() - startTime;
+                                const tokensUsed = aiResponse.length; // Примерный подсчет токенов
+                                await database.logApiUsage(user.id, tokensUsed, responseTime);
+                            }
+                            
+                            // Сохраняем в кэш
+                            if (responseCache) {
+                                responseCache.setCache(message, currentLanguage, aiResponse);
+                                responseCache.saveToLocalStorage();
+                            }
+                            
+                            hideTyping();
+                            sendButton.disabled = false;
+                            return;
+                        }
+                    }
+                    
+                    throw new Error(`Ошибка API: ${response.status} - ${errorText}`);
+                }
+                
+                const data = await response.json();
+                console.log('Ответ от Groq:', data);
+                
+                if (data.choices && data.choices.length > 0 && data.choices[0].message && data.choices[0].message.content) {
+                    const aiResponse = data.choices[0].message.content;
+                    
+                    // Добавляем ответ ИИ в интерфейс и получаем время
+                    const aiTime = addMessage(aiResponse);
+                    
+                    // Добавляем ответ ИИ в историю с временем
+                    chatHistory.push({ role: 'assistant', content: aiResponse, timestamp: aiTime });
+                    localStorage.setItem('ai-tap-chat-history', JSON.stringify(chatHistory));
+                    
+                    // Сохраняем в базу данных
+                    if (database && user) {
+                        await database.saveMessage(user.id, 'assistant', aiResponse);
+                        
+                        // Логируем использование API
+                        const responseTime = Date.now() - startTime;
+                        const tokensUsed = aiResponse.length; // Примерный подсчет токенов
+                        await database.logApiUsage(user.id, tokensUsed, responseTime);
+                    }
+                    
+                    // Сохраняем в кэш
+                    if (responseCache) {
+                        responseCache.setCache(message, currentLanguage, aiResponse);
+                        responseCache.saveToLocalStorage();
+                    }
+                    
+                    hideTyping();
+                } else {
+                    console.error('Неожиданный формат ответа:', data);
+                    throw new Error('ИИ не смог сформировать ответ');
+                }
+                
+            } catch (error) {
+                console.error('Ошибка при отправке сообщения:', error);
+                hideTyping();
+                addMessage(`Ошибка: ${error.message}. Попробуйте еще раз.`);
+            } finally {
+                sendButton.disabled = false;
+            }
+        }
+        
+        // Обновляем функцию открытия чата для проверки блокировки
+        function openMainAI() {
+            // Проверяем, не заблокирован ли пользователь
+            if (checkUserBlocked()) {
+                showNotification('Вы заблокированы и не можете использовать ИИ');
+                return;
+            }
+            
+            document.getElementById('chatModal').style.display = 'block';
+            document.getElementById('chatInput').focus();
+            
+            // Восстанавливаем чат из истории
+            restoreChatHistory();
+            
+            // Обновляем интерфейс чата на текущем языке
+            updateChatInterface();
+        }
+        
+        // Обновляем инициализацию для запуска обновления онлайн пользователей
+        document.addEventListener('DOMContentLoaded', function() {
+            // Обновляем интерфейс на сохраненном языке
+            updateInterface();
+            
+            // Восстанавливаем активный язык в профиле
+            document.querySelectorAll('.language-grid .language-option').forEach(option => {
+                option.classList.remove('active');
+                if (option.onclick.toString().includes(`'${currentLanguage}'`)) {
+                    option.classList.add('active');
+                }
+            });
+            
+            // Запускаем обновление онлайн пользователей
+            updateOnlineUsers();
+            setInterval(updateOnlineUsers, 30000); // Обновляем каждые 30 секунд
+        });
+
         // Анимация появления кнопок
         document.addEventListener('DOMContentLoaded', function() {
             const buttons = document.querySelectorAll('.ai-button');
