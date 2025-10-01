@@ -1214,12 +1214,21 @@
             }
         }
         
-        // Конфигурация Groq AI API
+        // Конфигурация AI API
         const GROQ_API_KEY = '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';
         const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
         
         // Память для чата
         let chatHistory = JSON.parse(localStorage.getItem('ai-tap-chat-history') || '[]');
+        
+        // Функция ожидания при превышении лимита
+        function waitForRateLimit(retryAfterSeconds) {
+            return new Promise(resolve => {
+                console.log(`Ожидаем ${retryAfterSeconds} секунд...`);
+                showNotification(`Превышен лимит API. Ожидаем ${retryAfterSeconds} секунд...`);
+                setTimeout(resolve, retryAfterSeconds * 1000);
+            });
+        }
 
         // Функция получения перевода
         function t(key) {
@@ -1531,12 +1540,15 @@
                 console.log('Отправляем запрос к Groq API...');
                 
                 // Подготавливаем сообщения для API (без timestamp)
+                // Ограничиваем историю чата до последних 10 сообщений для экономии токенов
+                const recentHistory = chatHistory.slice(-10);
+                
                 const apiMessages = [
                     {
                         role: 'system',
-                        content: `Ты полезный AI ассистент. Отвечай на языке: ${currentLanguage === 'ru' ? 'русском' : currentLanguage === 'en' ? 'английском' : currentLanguage === 'es' ? 'испанском' : currentLanguage === 'fr' ? 'французском' : currentLanguage === 'de' ? 'немецком' : currentLanguage === 'zh' ? 'китайском' : 'русском'}. Будь дружелюбным и полезным.`
+                        content: `Ты полезный AI ассистент. Отвечай на языке: ${currentLanguage === 'ru' ? 'русском' : currentLanguage === 'en' ? 'английском' : currentLanguage === 'es' ? 'испанском' : currentLanguage === 'fr' ? 'французском' : currentLanguage === 'de' ? 'немецком' : currentLanguage === 'zh' ? 'китайском' : 'русском'}. Будь дружелюбным и полезным. Отвечай кратко и по делу.`
                     },
-                    ...chatHistory.map(msg => ({
+                    ...recentHistory.map(msg => ({
                         role: msg.role,
                         content: msg.content
                     }))
@@ -1551,7 +1563,7 @@
                     body: JSON.stringify({
                         model: 'llama-3.1-8b-instant',
                         messages: apiMessages,
-                        max_tokens: 1000,
+                        max_tokens: 300, // Уменьшили с 1000 до 300 для более коротких ответов
                         temperature: 0.7
                     })
                 });
@@ -1561,6 +1573,83 @@
                 if (!response.ok) {
                     const errorText = await response.text();
                     console.error('Ошибка API:', errorText);
+                    
+                    // Если ошибка 429 (rate limit), ждем и повторяем запрос
+                    if (response.status === 429) {
+                        console.log('Превышен лимит API, ждем...');
+                        
+                        // Парсим время ожидания из ответа
+                        let retryAfter = 2; // по умолчанию 2 секунды
+                        try {
+                            const errorData = JSON.parse(errorText);
+                            if (errorData.error && errorData.error.message) {
+                                const match = errorData.error.message.match(/try again in (\d+\.?\d*)s/);
+                                if (match) {
+                                    retryAfter = Math.ceil(parseFloat(match[1]));
+                                }
+                            }
+                        } catch (e) {
+                            console.log('Не удалось распарсить время ожидания, используем 2 секунды');
+                        }
+                        
+                        // Ждем указанное время
+                        await waitForRateLimit(retryAfter);
+                        
+                        // Повторяем запрос
+                        console.log('Повторяем запрос...');
+                        const retryResponse = await fetch(GROQ_API_URL, {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${GROQ_API_KEY}`,
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                model: 'llama-3.1-8b-instant',
+                                messages: apiMessages,
+                                max_tokens: 300, // Уменьшили с 1000 до 300 для более коротких ответов
+                                temperature: 0.7
+                            })
+                        });
+                        
+                        if (!retryResponse.ok) {
+                            const retryErrorText = await retryResponse.text();
+                            throw new Error(`Ошибка API после повтора: ${retryResponse.status} - ${retryErrorText}`);
+                        }
+                        
+                        // Обрабатываем успешный ответ
+                        const retryData = await retryResponse.json();
+                        if (retryData.choices && retryData.choices.length > 0 && retryData.choices[0].message && retryData.choices[0].message.content) {
+                            const aiResponse = retryData.choices[0].message.content;
+                            
+                            // Добавляем ответ ИИ в интерфейс и получаем время
+                            const aiTime = addMessage(aiResponse);
+                            
+                            // Добавляем ответ ИИ в историю с временем
+                            chatHistory.push({ role: 'assistant', content: aiResponse, timestamp: aiTime });
+                            localStorage.setItem('ai-tap-chat-history', JSON.stringify(chatHistory));
+                            
+                            // Сохраняем в базу данных
+                            if (database && user) {
+                                await database.saveMessage(user.id, 'assistant', aiResponse);
+                                
+                                // Логируем использование API
+                                const responseTime = Date.now() - startTime;
+                                const tokensUsed = aiResponse.length; // Примерный подсчет токенов
+                                await database.logApiUsage(user.id, tokensUsed, responseTime);
+                            }
+                            
+                            // Сохраняем в кэш
+                            if (responseCache) {
+                                responseCache.setCache(message, currentLanguage, aiResponse);
+                                responseCache.saveToLocalStorage();
+                            }
+                            
+                            hideTyping();
+                            sendButton.disabled = false;
+                            return;
+                        }
+                    }
+                    
                     throw new Error(`Ошибка API: ${response.status} - ${errorText}`);
                 }
                 
