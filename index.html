@@ -637,6 +637,25 @@
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(46, 204, 113, 0.4);
         }
+        
+        /* Image Styles */
+        .message-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease;
+        }
+        .message-content img:hover {
+            transform: scale(1.02);
+        }
+        .image-prompt {
+            font-size: 14px;
+            color: rgba(255,255,255,0.8);
+            margin-top: 10px;
+            font-style: italic;
+        }
         #chat-messages {
             flex: 1;
             overflow-y: auto;
@@ -1195,10 +1214,10 @@
                 systemPrompt: 'Ты Grok - продвинутый AI-ассистент для текстовых задач. Ты помогаешь с написанием текстов, редактированием, анализом, переводом, созданием контента. Отвечай качественно, структурированно и полезно.'
             },
             image: {
-                name: '🎨 AI для изображений',
-                apiKey: 'sk-proj-1234567890abcdef', // Замените на реальный ключ
-                model: 'dall-e-3',
-                endpoint: 'https://api.openai.com/v1/images/generations',
+                name: '🎨 AI для изображений (HunyuanImage-3.0)',
+                apiKey: 'hf_your_token_here', // Замените на ваш HF_TOKEN
+                model: 'tencent/HunyuanImage-3.0',
+                endpoint: 'https://router.huggingface.co/fal-ai/fal-ai/hunyuan-image/v3/text-to-image',
                 systemPrompt: 'Ты Grok - AI для генерации изображений. Ты создаешь качественные, красивые и релевантные изображения по описанию пользователя.'
             },
             profile: {
@@ -1335,7 +1354,13 @@
                 const response = await processWithFallback(selectedAI, message);
                 
                 chatMessages.removeChild(typingDiv);
-                addMessage(response);
+                
+                // Handle image response
+                if (response && response.type === 'image') {
+                    addMessage(response.text, false, response);
+                } else {
+                    addMessage(response);
+                }
                 
             } catch (error) {
                 console.log('All AI systems failed, using final fallback:', error.message);
@@ -1354,6 +1379,15 @@
                 return await generateImage(ai, message);
             } else {
                 return await generateText(ai, message);
+            }
+        }
+        
+        // Handle image response
+        function handleImageResponse(response) {
+            if (response && response.type === 'image') {
+                return response;
+            } else {
+                return response;
             }
         }
         
@@ -1424,9 +1458,37 @@
         
         // Generate image
         async function generateImage(ai, message) {
-            // For now, return a placeholder message
-            // In real implementation, you would call DALL-E API
-            return `🎨 Я бы создал изображение по запросу: "${message}". Для генерации изображений нужен API ключ DALL-E. Пока что я могу помочь с описанием того, как должно выглядеть изображение!`;
+            try {
+                const response = await fetch(ai.endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${ai.apiKey}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        sync_mode: true,
+                        prompt: message
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Image API Error: ${response.status}`);
+                }
+                
+                const imageBlob = await response.blob();
+                const imageUrl = URL.createObjectURL(imageBlob);
+                
+                return {
+                    type: 'image',
+                    url: imageUrl,
+                    prompt: message,
+                    text: `🎨 Изображение создано по запросу: "${message}"`
+                };
+                
+            } catch (error) {
+                console.log('Image generation failed:', error.message);
+                return `🎨 Ошибка генерации изображения: ${error.message}. Попробуйте другой запрос или проверьте API ключ.`;
+            }
         }
         
         // API Configuration
@@ -1880,7 +1942,7 @@ ${openaiKey ? `Ключ: ${openaiKey.substring(0, 10)}...` : ''}
         }
         
         // Single add message function
-        function addMessage(text, isUser = false) {
+        function addMessage(text, isUser = false, imageData = null) {
             const chatMessages = document.getElementById('chat-messages');
             if (!chatMessages) return;
             
@@ -1910,9 +1972,30 @@ ${openaiKey ? `Ключ: ${openaiKey.substring(0, 10)}...` : ''}
             const contentDiv = document.createElement('div');
             contentDiv.className = 'message-content';
             
-            const textElement = document.createElement('div');
-            textElement.textContent = text;
-            contentDiv.appendChild(textElement);
+            if (imageData && imageData.type === 'image') {
+                // Display image
+                const imageElement = document.createElement('img');
+                imageElement.src = imageData.url;
+                imageElement.alt = imageData.prompt;
+                imageElement.style.maxWidth = '100%';
+                imageElement.style.height = 'auto';
+                imageElement.style.borderRadius = '10px';
+                imageElement.style.marginBottom = '10px';
+                imageElement.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+                
+                const imageText = document.createElement('div');
+                imageText.textContent = imageData.text;
+                imageText.style.marginTop = '10px';
+                imageText.style.fontSize = '14px';
+                imageText.style.color = 'rgba(255,255,255,0.8)';
+                
+                contentDiv.appendChild(imageElement);
+                contentDiv.appendChild(imageText);
+            } else {
+                const textElement = document.createElement('div');
+                textElement.textContent = text;
+                contentDiv.appendChild(textElement);
+            }
             
             messageDiv.appendChild(contentDiv);
             chatMessages.appendChild(messageDiv);
