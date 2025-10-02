@@ -201,6 +201,35 @@
             box-shadow: 0 5px 15px rgba(0, 255, 255, 0.3);
         }
 
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .admin-panel-btn {
+            background: linear-gradient(135deg, #ffd700 0%, #ffb347 100%);
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            color: #8b4513;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .admin-panel-btn:hover {
+            background: linear-gradient(135deg, #ffed4e 0%, #ffc947 100%);
+            border-color: rgba(255, 215, 0, 0.8);
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
+        }
+
         .language-selector {
             margin-left: 15px;
             position: relative;
@@ -1636,6 +1665,360 @@
             line-height: 1.4;
         }
 
+        /* Стили для админ панели */
+        .admin-content {
+            padding: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .admin-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .admin-menu-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .admin-menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 215, 0, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.2);
+        }
+
+        .admin-menu-icon {
+            font-size: 32px;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .admin-menu-text {
+            flex: 1;
+        }
+
+        .admin-menu-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .admin-menu-desc {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 8px 15px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(0, 255, 255, 0.4);
+        }
+
+        /* Стили для управления пользователями */
+        .users-content {
+            padding: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .users-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .user-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(0, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .user-item.banned {
+            border-color: rgba(255, 0, 0, 0.5);
+            background: rgba(255, 0, 0, 0.1);
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .user-id {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            margin-bottom: 3px;
+        }
+
+        .user-username {
+            color: rgba(0, 255, 255, 0.8);
+            font-size: 13px;
+        }
+
+        .user-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .user-status.online {
+            background: rgba(0, 255, 0, 0.2);
+            color: rgba(0, 255, 0, 0.9);
+        }
+
+        .user-status.banned {
+            background: rgba(255, 0, 0, 0.2);
+            color: rgba(255, 0, 0, 0.9);
+        }
+
+        /* Стили для деталей пользователя */
+        .user-details-content {
+            padding: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .user-details-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .user-details-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
+
+        .user-details-info h3 {
+            color: white;
+            margin-bottom: 8px;
+            font-size: 20px;
+        }
+
+        .user-details-info p {
+            color: rgba(255, 255, 255, 0.7);
+            margin: 4px 0;
+            font-size: 14px;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .user-action-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-action-btn.view {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .user-action-btn.ban {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            color: white;
+        }
+
+        .user-action-btn.unban {
+            background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+            color: white;
+        }
+
+        .user-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Стили для модального окна бана */
+        .ban-content {
+            padding: 20px;
+        }
+
+        .ban-section {
+            margin-bottom: 25px;
+        }
+
+        .ban-section h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .ban-time-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .ban-time-option {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .ban-time-option:hover,
+        .ban-time-option.selected {
+            background: rgba(255, 0, 0, 0.2);
+            border-color: rgba(255, 0, 0, 0.5);
+        }
+
+        .custom-time input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            color: white;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .custom-time input:focus {
+            border-color: rgba(0, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .custom-time input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        #banReason {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            color: white;
+            font-size: 14px;
+            outline: none;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        #banReason:focus {
+            border-color: rgba(0, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        #banReason::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .ban-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .ban-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .ban-btn.confirm {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            color: white;
+        }
+
+        .ban-btn.cancel {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .ban-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
         /* Селектор режимов ИИ */
         .mode-selector {
             display: grid;
@@ -1821,7 +2204,10 @@
             <div id="userName" class="user-name">Загрузка...</div>
             <div id="userId" class="user-id">ID: ...</div>
         </div>
-        <button class="main-settings-btn" onclick="openMainSettings()" title="Настройки приложения">⚙️</button>
+        <div class="header-buttons">
+            <button id="adminPanelBtn" class="admin-panel-btn" onclick="openAdminPanel()" title="Админ панель" style="display: none;">👑</button>
+            <button class="main-settings-btn" onclick="openMainSettings()" title="Настройки приложения">⚙️</button>
+        </div>
     </div>
 
     <!-- Модальное окно с данными пользователя -->
@@ -2130,6 +2516,103 @@
         </div>
     </div>
 
+    <!-- Админ панель -->
+    <div id="adminModal" class="chat-modal" style="display: none;">
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="chat-title">👑 Админ панель</div>
+                <span class="chat-close" onclick="closeAdminPanel()">&times;</span>
+            </div>
+            <div id="adminContent" class="admin-content">
+                <div class="admin-menu">
+                    <div class="admin-menu-item" onclick="openUsersManagement()">
+                        <div class="admin-menu-icon">👥</div>
+                        <div class="admin-menu-text">
+                            <div class="admin-menu-title">Пользователи</div>
+                            <div class="admin-menu-desc">Управление пользователями</div>
+                        </div>
+                    </div>
+                    <div class="admin-menu-item" onclick="openAISettings()">
+                        <div class="admin-menu-icon">🤖</div>
+                        <div class="admin-menu-text">
+                            <div class="admin-menu-title">Настройки ИИ</div>
+                            <div class="admin-menu-desc">Конфигурация ИИ системы</div>
+                        </div>
+                    </div>
+                    <div class="admin-menu-item" onclick="openAppSettings()">
+                        <div class="admin-menu-icon">⚙️</div>
+                        <div class="admin-menu-text">
+                            <div class="admin-menu-title">Настройки веб-приложения</div>
+                            <div class="admin-menu-desc">Конфигурация приложения</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Управление пользователями -->
+    <div id="usersModal" class="chat-modal" style="display: none;">
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="chat-title">👥 Управление пользователями</div>
+                <button class="back-btn" onclick="backToAdmin()">← Назад</button>
+                <span class="chat-close" onclick="closeUsersModal()">&times;</span>
+            </div>
+            <div id="usersContent" class="users-content">
+                <!-- Список пользователей загружается динамически -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Детали пользователя -->
+    <div id="userDetailsModal" class="chat-modal" style="display: none;">
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="chat-title" id="userDetailsTitle">👤 Пользователь</div>
+                <button class="back-btn" onclick="backToUsers()">← Назад</button>
+                <span class="chat-close" onclick="closeUserDetails()">&times;</span>
+            </div>
+            <div id="userDetailsContent" class="user-details-content">
+                <!-- Детали пользователя загружаются динамически -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно бана -->
+    <div id="banModal" class="chat-modal" style="display: none;">
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="chat-title">🚫 Заблокировать пользователя</div>
+                <span class="chat-close" onclick="closeBanModal()">&times;</span>
+            </div>
+            <div class="ban-content">
+                <div class="ban-section">
+                    <h3>Время блокировки</h3>
+                    <div class="ban-time-options">
+                        <div class="ban-time-option" onclick="selectBanTime(1800)">30 минут</div>
+                        <div class="ban-time-option" onclick="selectBanTime(3600)">1 час</div>
+                        <div class="ban-time-option" onclick="selectBanTime(21600)">6 часов</div>
+                        <div class="ban-time-option" onclick="selectBanTime(86400)">1 день</div>
+                        <div class="ban-time-option" onclick="selectBanTime(604800)">7 дней</div>
+                        <div class="ban-time-option" onclick="selectBanTime(2592000)">30 дней</div>
+                    </div>
+                    <div class="custom-time">
+                        <input type="number" id="customBanTime" placeholder="Свое время (минуты)" min="1">
+                    </div>
+                </div>
+                <div class="ban-section">
+                    <h3>Причина блокировки</h3>
+                    <textarea id="banReason" placeholder="Укажите причину блокировки..." rows="3"></textarea>
+                </div>
+                <div class="ban-actions">
+                    <button class="ban-btn confirm" onclick="confirmBan()">🚫 Заблокировать</button>
+                    <button class="ban-btn cancel" onclick="closeBanModal()">❌ Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Уведомления -->
     <div id="notification" class="notification"></div>
 
@@ -2410,9 +2893,9 @@
             return names[lang] || 'Русский';
         }
 
-        // Инициализация Telegram Web App
-        const tg = window.Telegram.WebApp;
-        tg.ready();
+        // Инициализация Telegram Web App (перенесено в админ систему)
+        // const tg = window.Telegram.WebApp;
+        // tg.ready();
         
         // Инициализация интерфейса при загрузке
         document.addEventListener('DOMContentLoaded', function() {
@@ -2428,8 +2911,8 @@
             });
         });
 
-        // Получение данных пользователя
-        const user = tg.initDataUnsafe.user;
+        // Получение данных пользователя (перенесено в админ систему)
+        // const user = tg.initDataUnsafe.user;
 
         if (user) {
             const userId = user.id;
@@ -2479,6 +2962,10 @@
             const mainSettingsModal = document.getElementById('mainSettingsModal');
             const weatherModal = document.getElementById('weatherModal');
             const newsModal = document.getElementById('newsModal');
+            const adminModal = document.getElementById('adminModal');
+            const usersModal = document.getElementById('usersModal');
+            const userDetailsModal = document.getElementById('userDetailsModal');
+            const banModal = document.getElementById('banModal');
             
             if (event.target === userModal) {
                 userModal.style.display = 'none';
@@ -2497,6 +2984,18 @@
             }
             if (event.target === newsModal) {
                 newsModal.style.display = 'none';
+            }
+            if (event.target === adminModal) {
+                adminModal.style.display = 'none';
+            }
+            if (event.target === usersModal) {
+                usersModal.style.display = 'none';
+            }
+            if (event.target === userDetailsModal) {
+                userDetailsModal.style.display = 'none';
+            }
+            if (event.target === banModal) {
+                banModal.style.display = 'none';
             }
         }
 
@@ -4080,6 +4579,426 @@
                 
                 container.appendChild(particle);
             }
+        }
+
+        // Админ система
+        const ADMIN_ID = 1485058648; // ID админа Андрея
+        let isAdmin = false;
+        let currentUser = null;
+        let selectedBanTime = 0;
+        let selectedUserId = null;
+
+        // Инициализация пользователя
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+
+        const user = tg.initDataUnsafe.user;
+        if (user) {
+            currentUser = user;
+            document.getElementById('userName').textContent = user.first_name + (user.last_name ? ' ' + user.last_name : '');
+            document.getElementById('userId').textContent = 'ID: ' + user.id;
+            
+            if (user.photo_url) {
+                document.getElementById('userAvatar').src = user.photo_url;
+            }
+            
+            // Проверяем, является ли пользователь админом
+            isAdmin = user.id === ADMIN_ID;
+            if (isAdmin) {
+                document.getElementById('adminPanelBtn').style.display = 'flex';
+            }
+            
+            // Сохраняем данные пользователя
+            localStorage.setItem('ai-tap-user', JSON.stringify(user));
+            
+            // Регистрируем пользователя в системе
+            registerUser(user);
+            
+            // Проверяем статус бана
+            checkBanStatus(user.id);
+        } else {
+            console.log('Данные пользователя недоступны');
+        }
+
+        // Функция регистрации пользователя
+        function registerUser(userData) {
+            let users = JSON.parse(localStorage.getItem('ai-tap-users') || '[]');
+            
+            // Проверяем, есть ли уже такой пользователь
+            const existingUserIndex = users.findIndex(u => u.id === userData.id);
+            
+            const userRecord = {
+                id: userData.id,
+                first_name: userData.first_name,
+                last_name: userData.last_name || '',
+                username: userData.username || '',
+                photo_url: userData.photo_url || '',
+                last_seen: new Date().toISOString(),
+                registered: existingUserIndex === -1 ? new Date().toISOString() : users[existingUserIndex].registered
+            };
+            
+            if (existingUserIndex !== -1) {
+                users[existingUserIndex] = userRecord;
+            } else {
+                users.push(userRecord);
+            }
+            
+            localStorage.setItem('ai-tap-users', JSON.stringify(users));
+        }
+
+        // Проверка статуса бана
+        function checkBanStatus(userId) {
+            const bans = JSON.parse(localStorage.getItem('ai-tap-bans') || '[]');
+            const userBan = bans.find(ban => ban.userId === userId && ban.expiresAt > new Date().toISOString());
+            
+            if (userBan) {
+                showBanScreen(userBan);
+            }
+        }
+
+        // Показать экран бана
+        function showBanScreen(banInfo) {
+            const banScreen = document.createElement('div');
+            banScreen.id = 'banScreen';
+            banScreen.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.95);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                text-align: center;
+                padding: 20px;
+                box-sizing: border-box;
+            `;
+            
+            banScreen.innerHTML = `
+                <div style="max-width: 400px;">
+                    <div style="font-size: 64px; margin-bottom: 20px;">🚫</div>
+                    <h2 style="color: #ff6b6b; margin-bottom: 15px;">Вы заблокированы</h2>
+                    <p style="margin-bottom: 20px; line-height: 1.5;">
+                        <strong>Причина:</strong> ${banInfo.reason}
+                    </p>
+                    <div style="background: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+                        <div style="font-size: 24px; font-weight: bold; color: #ff6b6b;" id="banTimer">
+                            Загрузка...
+                        </div>
+                        <div style="font-size: 14px; opacity: 0.8;">до разблокировки</div>
+                    </div>
+                    <p style="font-size: 14px; opacity: 0.7;">
+                        Блокировка будет автоматически снята по истечении времени.
+                    </p>
+                </div>
+            `;
+            
+            document.body.appendChild(banScreen);
+            
+            // Запускаем таймер
+            updateBanTimer(banInfo.expiresAt);
+            
+            // Блокируем основные функции
+            blockUserFunctions();
+        }
+
+        // Обновление таймера бана
+        function updateBanTimer(expiresAt) {
+            const timer = document.getElementById('banTimer');
+            if (!timer) return;
+            
+            const interval = setInterval(() => {
+                const now = new Date().getTime();
+                const expiry = new Date(expiresAt).getTime();
+                const remaining = expiry - now;
+                
+                if (remaining <= 0) {
+                    clearInterval(interval);
+                    // Убираем экран бана
+                    const banScreen = document.getElementById('banScreen');
+                    if (banScreen) {
+                        banScreen.remove();
+                    }
+                    unblockUserFunctions();
+                    showNotification('🎉 Блокировка снята! Добро пожаловать обратно!');
+                    return;
+                }
+                
+                const hours = Math.floor(remaining / (1000 * 60 * 60));
+                const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+                
+                timer.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        // Блокировка функций для забаненного пользователя
+        function blockUserFunctions() {
+            // Блокируем кнопки ИИ, погоды и новостей
+            const buttons = document.querySelectorAll('.main-ai-card, .function-button');
+            buttons.forEach(button => {
+                button.style.opacity = '0.3';
+                button.style.pointerEvents = 'none';
+                button.onclick = () => showNotification('❌ Функция недоступна во время блокировки');
+            });
+        }
+
+        // Разблокировка функций
+        function unblockUserFunctions() {
+            const buttons = document.querySelectorAll('.main-ai-card, .function-button');
+            buttons.forEach(button => {
+                button.style.opacity = '1';
+                button.style.pointerEvents = 'auto';
+            });
+            
+            // Восстанавливаем оригинальные обработчики
+            document.querySelector('.main-ai-card[onclick*="openMainAI"]').onclick = openMainAI;
+            document.querySelector('.function-button[onclick*="showWeather"]').onclick = showWeather;
+            document.querySelector('.function-button[onclick*="showNews"]').onclick = showNews;
+        }
+
+        // Функции админ панели
+        function openAdminPanel() {
+            if (!isAdmin) {
+                showNotification('❌ Доступ запрещен');
+                return;
+            }
+            document.getElementById('adminModal').style.display = 'block';
+        }
+
+        function closeAdminPanel() {
+            document.getElementById('adminModal').style.display = 'none';
+        }
+
+        function openUsersManagement() {
+            document.getElementById('adminModal').style.display = 'none';
+            document.getElementById('usersModal').style.display = 'block';
+            loadUsersList();
+        }
+
+        function closeUsersModal() {
+            document.getElementById('usersModal').style.display = 'none';
+        }
+
+        function backToAdmin() {
+            document.getElementById('usersModal').style.display = 'none';
+            document.getElementById('adminModal').style.display = 'block';
+        }
+
+        function loadUsersList() {
+            const users = JSON.parse(localStorage.getItem('ai-tap-users') || '[]');
+            const bans = JSON.parse(localStorage.getItem('ai-tap-bans') || '[]');
+            const usersContent = document.getElementById('usersContent');
+            
+            if (users.length === 0) {
+                usersContent.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: rgba(255, 255, 255, 0.7);">
+                        <div style="font-size: 48px; margin-bottom: 15px;">👥</div>
+                        <div>Пользователи не найдены</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            const usersHTML = `
+                <div class="users-list">
+                    ${users.map(user => {
+                        const userBan = bans.find(ban => ban.userId === user.id && ban.expiresAt > new Date().toISOString());
+                        const isBanned = !!userBan;
+                        
+                        return `
+                            <div class="user-item ${isBanned ? 'banned' : ''}" onclick="openUserDetails(${user.id})">
+                                <div class="user-avatar">
+                                    ${user.photo_url ? 
+                                        `<img src="${user.photo_url}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">` : 
+                                        '👤'
+                                    }
+                                </div>
+                                <div class="user-info">
+                                    <div class="user-name">${user.first_name} ${user.last_name}</div>
+                                    <div class="user-id">ID: ${user.id}</div>
+                                    <div class="user-username">${user.username ? '@' + user.username : 'Без username'}</div>
+                                </div>
+                                <div class="user-status ${isBanned ? 'banned' : 'online'}">
+                                    ${isBanned ? 'Заблокирован' : 'Активен'}
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+            
+            usersContent.innerHTML = usersHTML;
+        }
+
+        function openUserDetails(userId) {
+            selectedUserId = userId;
+            const users = JSON.parse(localStorage.getItem('ai-tap-users') || '[]');
+            const bans = JSON.parse(localStorage.getItem('ai-tap-bans') || '[]');
+            const user = users.find(u => u.id === userId);
+            const userBan = bans.find(ban => ban.userId === userId && ban.expiresAt > new Date().toISOString());
+            
+            if (!user) return;
+            
+            document.getElementById('usersModal').style.display = 'none';
+            document.getElementById('userDetailsModal').style.display = 'block';
+            document.getElementById('userDetailsTitle').textContent = `👤 ${user.first_name} ${user.last_name}`;
+            
+            const detailsContent = document.getElementById('userDetailsContent');
+            detailsContent.innerHTML = `
+                <div class="user-details-header">
+                    <div class="user-details-avatar">
+                        ${user.photo_url ? 
+                            `<img src="${user.photo_url}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">` : 
+                            '👤'
+                        }
+                    </div>
+                    <div class="user-details-info">
+                        <h3>${user.first_name} ${user.last_name}</h3>
+                        <p><strong>ID:</strong> ${user.id}</p>
+                        <p><strong>Username:</strong> ${user.username ? '@' + user.username : 'Не указан'}</p>
+                        <p><strong>Регистрация:</strong> ${new Date(user.registered).toLocaleString('ru-RU')}</p>
+                        <p><strong>Последняя активность:</strong> ${new Date(user.last_seen).toLocaleString('ru-RU')}</p>
+                        ${userBan ? `<p style="color: #ff6b6b;"><strong>Статус:</strong> Заблокирован до ${new Date(userBan.expiresAt).toLocaleString('ru-RU')}</p>` : ''}
+                    </div>
+                </div>
+                
+                <div class="user-actions">
+                    <button class="user-action-btn view" onclick="viewUserChat(${user.id})">
+                        👁️ Смотреть чат
+                    </button>
+                    <button class="user-action-btn ${userBan ? 'unban' : 'ban'}" onclick="${userBan ? `unbanUser(${user.id})` : `openBanModal(${user.id})`}">
+                        ${userBan ? '✅ Разблокировать' : '🚫 Заблокировать'}
+                    </button>
+                </div>
+            `;
+        }
+
+        function backToUsers() {
+            document.getElementById('userDetailsModal').style.display = 'none';
+            document.getElementById('usersModal').style.display = 'block';
+        }
+
+        function closeUserDetails() {
+            document.getElementById('userDetailsModal').style.display = 'none';
+        }
+
+        function viewUserChat(userId) {
+            // Показываем чат пользователя (можно расширить функционал)
+            showNotification(`Просмотр чата пользователя ${userId} - функция в разработке`);
+        }
+
+        function openBanModal(userId) {
+            selectedUserId = userId;
+            document.getElementById('banModal').style.display = 'block';
+            
+            // Сбрасываем форму
+            document.querySelectorAll('.ban-time-option').forEach(option => option.classList.remove('selected'));
+            document.getElementById('customBanTime').value = '';
+            document.getElementById('banReason').value = '';
+            selectedBanTime = 0;
+        }
+
+        function closeBanModal() {
+            document.getElementById('banModal').style.display = 'none';
+        }
+
+        function selectBanTime(seconds) {
+            selectedBanTime = seconds;
+            document.querySelectorAll('.ban-time-option').forEach(option => option.classList.remove('selected'));
+            event.target.classList.add('selected');
+            document.getElementById('customBanTime').value = '';
+        }
+
+        function confirmBan() {
+            const customTime = document.getElementById('customBanTime').value;
+            const reason = document.getElementById('banReason').value.trim();
+            
+            let banDuration = selectedBanTime;
+            if (customTime && parseInt(customTime) > 0) {
+                banDuration = parseInt(customTime) * 60; // Конвертируем минуты в секунды
+            }
+            
+            if (banDuration === 0) {
+                showNotification('❌ Выберите время блокировки');
+                return;
+            }
+            
+            if (!reason) {
+                showNotification('❌ Укажите причину блокировки');
+                return;
+            }
+            
+            // Создаем запись о бане
+            const bans = JSON.parse(localStorage.getItem('ai-tap-bans') || '[]');
+            const banRecord = {
+                userId: selectedUserId,
+                reason: reason,
+                bannedAt: new Date().toISOString(),
+                expiresAt: new Date(Date.now() + banDuration * 1000).toISOString(),
+                bannedBy: currentUser.id
+            };
+            
+            // Удаляем старые баны этого пользователя
+            const filteredBans = bans.filter(ban => ban.userId !== selectedUserId);
+            filteredBans.push(banRecord);
+            
+            localStorage.setItem('ai-tap-bans', JSON.stringify(filteredBans));
+            
+            showNotification(`✅ Пользователь заблокирован на ${formatBanDuration(banDuration)}`);
+            closeBanModal();
+            
+            // Обновляем список пользователей
+            loadUsersList();
+            
+            // Если забанили текущего пользователя, показываем экран бана
+            if (selectedUserId === currentUser.id) {
+                showBanScreen(banRecord);
+            }
+        }
+
+        function unbanUser(userId) {
+            if (confirm('Разблокировать пользователя?')) {
+                const bans = JSON.parse(localStorage.getItem('ai-tap-bans') || '[]');
+                const filteredBans = bans.filter(ban => ban.userId !== userId);
+                localStorage.setItem('ai-tap-bans', JSON.stringify(filteredBans));
+                
+                showNotification('✅ Пользователь разблокирован');
+                loadUsersList();
+                
+                // Если разбанили текущего пользователя, убираем экран бана
+                if (userId === currentUser.id) {
+                    const banScreen = document.getElementById('banScreen');
+                    if (banScreen) {
+                        banScreen.remove();
+                    }
+                    unblockUserFunctions();
+                }
+            }
+        }
+
+        function formatBanDuration(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const days = Math.floor(hours / 24);
+            
+            if (days > 0) {
+                return `${days} дн.`;
+            } else if (hours > 0) {
+                return `${hours} ч.`;
+            } else {
+                return `${Math.floor(seconds / 60)} мин.`;
+            }
+        }
+
+        function openAISettings() {
+            showNotification('🤖 Настройки ИИ - в разработке');
+        }
+
+        function openAppSettings() {
+            showNotification('⚙️ Настройки веб-приложения - в разработке');
         }
 
         // Анимация появления кнопок
