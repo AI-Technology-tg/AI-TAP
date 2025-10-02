@@ -3320,23 +3320,32 @@
         }
 
         function updateChatInterface() {
-            // Обновляем заголовок
-            document.querySelector('.chat-title').textContent = t('mainAi');
-            
-            // Обновляем приветственное сообщение
-            const welcomeMessage = document.querySelector('.chat-messages .message.ai .message-content');
-            if (welcomeMessage) {
-                welcomeMessage.textContent = t('chatWelcome');
+            try {
+                // Обновляем заголовок
+                const chatTitle = document.querySelector('.chat-title');
+                if (chatTitle) chatTitle.textContent = t('mainAi');
+                
+                // Обновляем приветственное сообщение
+                const welcomeMessage = document.querySelector('.chat-messages .message.ai .message-content');
+                if (welcomeMessage) {
+                    welcomeMessage.textContent = t('chatWelcome');
+                }
+                
+                // Обновляем плейсхолдер
+                const chatInput = document.getElementById('chatInput');
+                if (chatInput) chatInput.placeholder = t('chatPlaceholder');
+                
+                // Обновляем индикатор печати
+                const typingText = document.getElementById('typingText');
+                if (typingText) typingText.textContent = t('chatTyping');
+                
+                // Устанавливаем время приветственного сообщения
+                const welcomeTime = document.getElementById('welcomeTime');
+                if (welcomeTime) welcomeTime.textContent = getCurrentTime();
+                
+            } catch (error) {
+                console.error('Ошибка обновления интерфейса чата:', error);
             }
-            
-            // Обновляем плейсхолдер
-            document.getElementById('chatInput').placeholder = t('chatPlaceholder');
-            
-            // Обновляем индикатор печати
-            document.getElementById('typingText').textContent = t('chatTyping');
-            
-            // Устанавливаем время приветственного сообщения
-            document.getElementById('welcomeTime').textContent = getCurrentTime();
         }
 
         // Функция очистки истории чата
@@ -4028,8 +4037,9 @@
             `;
 
             try {
-                // Используем NewsAPI с вашим ключом
-                const API_KEY = 'eae37e99b83c43a6be87f3ae09deb219';
+                // NewsAPI не работает из браузера (CORS ошибка), используем mock данные
+                console.log('NewsAPI недоступен из браузера, используем демо данные...');
+                throw new Error('NewsAPI CORS ограничение');
                 
                 // Определяем параметры поиска в зависимости от региона
                 let searchQuery = location;
@@ -4764,22 +4774,30 @@
         }
 
         function loadSettingsUI() {
-            // Загружаем текущие настройки в интерфейс
-            const currentMode = aiSettings.mode || 'smart';
-            
-            // Устанавливаем активный режим
-            document.querySelectorAll('.mode-option').forEach(option => {
-                option.classList.remove('active');
-                if (option.dataset.mode === currentMode) {
-                    option.classList.add('active');
+            try {
+                // Загружаем текущие настройки в интерфейс
+                const currentMode = aiSettings.mode || 'smart';
+                
+                // Устанавливаем активный режим
+                document.querySelectorAll('.mode-option').forEach(option => {
+                    option.classList.remove('active');
+                    if (option.dataset.mode === currentMode) {
+                        option.classList.add('active');
+                    }
+                });
+                
+                const soundEnabled = localStorage.getItem('ai-tap-sound') !== 'false';
+                const soundToggle = document.getElementById('soundToggle');
+                if (soundToggle) {
+                    soundToggle.checked = soundEnabled;
                 }
-            });
-            
-            const soundEnabled = localStorage.getItem('ai-tap-sound') !== 'false';
-            document.getElementById('soundToggle').checked = soundEnabled;
-            
-            // Обновляем статистику
-            updateStatistics();
+                
+                // Обновляем статистику
+                updateStatistics();
+                
+            } catch (error) {
+                console.error('Ошибка загрузки настроек UI:', error);
+            }
         }
 
         function selectMode(mode) {
@@ -4805,35 +4823,66 @@
         }
 
         function updateStatistics() {
-            // Обновляем статистику
-            document.getElementById('statMessages').textContent = aiMemory.interactionCount || 0;
-            document.getElementById('statFacts').textContent = (aiMemory.rememberedFacts || []).length;
-            
-            // Вычисляем дни общения
-            if (aiMemory.lastInteraction) {
-                const firstInteraction = new Date(aiMemory.lastInteraction);
-                const now = new Date();
-                const daysDiff = Math.ceil((now - firstInteraction) / (1000 * 60 * 60 * 24));
-                document.getElementById('statDays').textContent = Math.max(1, daysDiff);
-            } else {
-                document.getElementById('statDays').textContent = 0;
+            try {
+                // Обновляем статистику
+                const statMessages = document.getElementById('statMessages');
+                if (statMessages) {
+                    statMessages.textContent = aiMemory.interactionCount || 0;
+                }
+                
+                const statFacts = document.getElementById('statFacts');
+                if (statFacts) {
+                    statFacts.textContent = (aiMemory.rememberedFacts || []).length;
+                }
+                
+                // Вычисляем дни общения
+                const statDays = document.getElementById('statDays');
+                if (statDays) {
+                    if (aiMemory.lastInteraction) {
+                        const firstInteraction = new Date(aiMemory.lastInteraction);
+                        const now = new Date();
+                        const daysDiff = Math.ceil((now - firstInteraction) / (1000 * 60 * 60 * 24));
+                        statDays.textContent = Math.max(1, daysDiff);
+                    } else {
+                        statDays.textContent = 0;
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Ошибка обновления статистики:', error);
             }
         }
 
         function saveSettings() {
-            // Сохраняем настройки ИИ
-            aiSettings.temperature = parseFloat(document.getElementById('temperatureSlider').value);
-            aiSettings.maxTokens = parseInt(document.getElementById('tokensSlider').value);
-            localStorage.setItem('ai-tap-settings', JSON.stringify(aiSettings));
-            
-            // Сохраняем настройки звука
-            const soundEnabled = document.getElementById('soundToggle').checked;
-            localStorage.setItem('ai-tap-sound', soundEnabled.toString());
-            
-            closeSettings();
-            updateConnectionStatus('🟢', 'Настройки сохранены');
-            showNotification('✅ Настройки сохранены');
-            playNotificationSound();
+            try {
+                // Сохраняем настройки ИИ
+                const temperatureSlider = document.getElementById('temperatureSlider');
+                const tokensSlider = document.getElementById('tokensSlider');
+                
+                if (temperatureSlider) {
+                    aiSettings.temperature = parseFloat(temperatureSlider.value);
+                }
+                if (tokensSlider) {
+                    aiSettings.maxTokens = parseInt(tokensSlider.value);
+                }
+                localStorage.setItem('ai-tap-settings', JSON.stringify(aiSettings));
+                
+                // Сохраняем настройки звука
+                const soundToggle = document.getElementById('soundToggle');
+                if (soundToggle) {
+                    const soundEnabled = soundToggle.checked;
+                    localStorage.setItem('ai-tap-sound', soundEnabled.toString());
+                }
+                
+                closeSettings();
+                updateConnectionStatus('🟢', 'Настройки сохранены');
+                showNotification('✅ Настройки сохранены');
+                playNotificationSound();
+                
+            } catch (error) {
+                console.error('Ошибка сохранения настроек:', error);
+                showNotification('❌ Ошибка сохранения настроек');
+            }
         }
 
         function resetSettings() {
