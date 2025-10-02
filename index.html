@@ -2359,6 +2359,7 @@
         }
 
     </style>
+    <script src="database.js"></script>
 </head>
 <body>
     <!-- Экран входа -->
@@ -5213,9 +5214,9 @@
 
         function registerUserInSystem() {
             // Получаем данные пользователя из Telegram
-            const tg = window.Telegram.WebApp;
-            const user = tg.initDataUnsafe.user;
-            
+            const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+            const user = tg && tg.initDataUnsafe ? tg.initDataUnsafe.user : null;
+
             if (user) {
                 const userData = {
                     id: user.id,
@@ -5229,11 +5230,11 @@
                     total_messages: 0,
                     session_count: 1
                 };
-                
+
                 // Получаем существующих пользователей
                 const existingUsers = JSON.parse(localStorage.getItem('ai-tap-users') || '[]');
                 const existingUserIndex = existingUsers.findIndex(u => u.id === user.id);
-                
+
                 if (existingUserIndex !== -1) {
                     // Обновляем данные существующего пользователя
                     existingUsers[existingUserIndex] = {
@@ -5249,13 +5250,33 @@
                     // Добавляем нового пользователя
                     existingUsers.push(userData);
                 }
-                
-                // Сохраняем в localStorage
+
+                // Сохраняем в localStorage для админ-панели
                 localStorage.setItem('ai-tap-users', JSON.stringify(existingUsers));
-                
+
                 // Устанавливаем текущего пользователя
                 window.currentUser = userData;
-                
+
+                // Сохранение в базу Supabase (database.js)
+                try {
+                    if (window.Database) {
+                        if (!window.db) {
+                            window.db = new window.Database();
+                        }
+                        // Ждем готовности клиента supabase и сохраняем пользователя
+                        const trySave = () => {
+                            if (window.db && window.db.supabase) {
+                                window.db.saveUser(user.id, user.username || '', user.first_name || '');
+                            } else {
+                                setTimeout(trySave, 300);
+                            }
+                        };
+                        trySave();
+                    }
+                } catch (e) {
+                    console.error('Ошибка сохранения пользователя в базу:', e);
+                }
+
                 console.log('Пользователь зарегистрирован/обновлен:', userData);
             }
         }
