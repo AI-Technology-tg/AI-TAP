@@ -6680,6 +6680,35 @@
             }
         }
 
+        // Функция для проверки срока действия согласия
+        function checkPrivacyConsent() {
+            const privacyAccepted = localStorage.getItem('ai-tap-privacy-accepted');
+            const privacyDate = localStorage.getItem('ai-tap-privacy-date');
+            
+            console.log('🔍 Проверяем согласие с политикой:', { privacyAccepted, privacyDate });
+            
+            if (!privacyAccepted || !privacyDate) {
+                console.log('❌ Согласие не найдено');
+                return false;
+            }
+            
+            // Проверяем, не прошло ли более года с момента согласия
+            const consentDate = new Date(privacyDate);
+            const currentDate = new Date();
+            const oneYear = 365 * 24 * 60 * 60 * 1000; // миллисекунды в году
+            
+            if (currentDate - consentDate > oneYear) {
+                // Согласие истекло, удаляем его
+                localStorage.removeItem('ai-tap-privacy-accepted');
+                localStorage.removeItem('ai-tap-privacy-date');
+                console.log('⏰ Согласие истекло, требуется повторное подтверждение');
+                return false;
+            }
+            
+            console.log('✅ Согласие действительно');
+            return true;
+        }
+
         // Глобальный обработчик для кнопки входа
         function handleEnterApp() {
             console.log('🔘 Кнопка входа нажата');
@@ -6695,12 +6724,29 @@
         }
 
         async function enterApp() {
+            console.log('Начинаем процесс входа в приложение...');
+            
+            // Сначала проверяем согласие с политикой конфиденциальности
+            console.log('🔍 Проверяем согласие с политикой конфиденциальности...');
+            const consentResult = checkPrivacyConsent();
+            console.log('📋 Результат проверки согласия:', consentResult);
+            
+            if (!consentResult) {
+                console.log('📝 Показываем политику конфиденциальности...');
+                await showPrivacyPolicyFirst();
+            } else {
+                console.log('✅ Согласие получено, переходим к проверкам системы...');
+                await performSystemChecks();
+            }
+        }
+
+        async function performSystemChecks() {
             const enterButton = document.getElementById('enterButton');
             const statusContainer = document.getElementById('statusContainer');
             const databaseStatus = document.getElementById('databaseStatus');
             const appStatus = document.getElementById('appStatus');
             
-            console.log('Начинаем процесс входа в приложение...');
+            console.log('🔧 Начинаем проверки системы...');
             
             // Блокируем кнопку и показываем статус
             enterButton.disabled = true;
@@ -6763,16 +6809,12 @@
                 // Небольшая задержка для показа успешного статуса
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 
-                // Проверяем согласие с политикой конфиденциальности
-                if (!checkPrivacyConsent()) {
-                    await showPrivacyPolicy();
-                } else {
-                    // Запускаем основное приложение
-                    await launchMainApp();
-                }
+                console.log('✅ Все проверки пройдены, запускаем приложение...');
+                // Запускаем основное приложение
+                await launchMainApp();
                 
             } catch (error) {
-                console.error('Ошибка при входе в приложение:', error);
+                console.error('Ошибка при проверке системы:', error);
                 
                 // Показываем ошибку в соответствующем статусе
                 if (error.message.includes('база данных') || error.message.includes('Supabase')) {
@@ -6864,80 +6906,175 @@
         }
 
         // Функции для работы с политикой конфиденциальности
-        async function showPrivacyPolicy() {
+        async function showPrivacyPolicyFirst() {
+            console.log('🔒 Показываем политику конфиденциальности перед входом');
             return new Promise((resolve) => {
                 const privacyModal = document.getElementById('privacyModal');
                 const privacyAcceptCheckbox = document.getElementById('privacyAccept');
                 const privacyAcceptBtn = document.getElementById('privacyAcceptBtn');
                 const privacyDeclineBtn = document.getElementById('privacyDecline');
                 
+                console.log('🔍 Элементы модального окна:', {
+                    privacyModal: !!privacyModal,
+                    privacyAcceptCheckbox: !!privacyAcceptCheckbox,
+                    privacyAcceptBtn: !!privacyAcceptBtn,
+                    privacyDeclineBtn: !!privacyDeclineBtn
+                });
+                
+                if (!privacyModal) {
+                    console.error('❌ Модальное окно политики не найдено!');
+                    resolve();
+                    return;
+                }
+                
                 // Показываем модальное окно
+                console.log('👁️ Показываем модальное окно политики');
                 privacyModal.style.display = 'flex';
                 
+                // Сбрасываем состояние чекбокса и кнопки
+                if (privacyAcceptCheckbox) {
+                    privacyAcceptCheckbox.checked = false;
+                }
+                if (privacyAcceptBtn) {
+                    privacyAcceptBtn.disabled = true;
+                }
+                
                 // Обработчик изменения чекбокса
-                privacyAcceptCheckbox.addEventListener('change', function() {
-                    privacyAcceptBtn.disabled = !this.checked;
-                });
+                if (privacyAcceptCheckbox && privacyAcceptBtn) {
+                    const checkboxHandler = function() {
+                        console.log('☑️ Чекбокс изменен:', this.checked);
+                        privacyAcceptBtn.disabled = !this.checked;
+                    };
+                    privacyAcceptCheckbox.addEventListener('change', checkboxHandler);
+                }
                 
                 // Обработчик кнопки "Accept & Continue"
-                privacyAcceptBtn.addEventListener('click', async function() {
-                    if (privacyAcceptCheckbox.checked) {
-                        // Сохраняем согласие в localStorage
-                        localStorage.setItem('ai-tap-privacy-accepted', 'true');
-                        localStorage.setItem('ai-tap-privacy-date', new Date().toISOString());
-                        
-                        // Скрываем модальное окно
-                        privacyModal.style.display = 'none';
-                        
-                        console.log('✅ Пользователь принял политику конфиденциальности');
-                        
-                        // Запускаем основное приложение
-                        await launchMainApp();
-                        resolve();
-                    }
-                });
+                if (privacyAcceptBtn) {
+                    const acceptHandler = async function() {
+                        console.log('✅ Кнопка Accept нажата');
+                        if (privacyAcceptCheckbox && privacyAcceptCheckbox.checked) {
+                            console.log('💾 Сохраняем согласие...');
+                            // Сохраняем согласие в localStorage
+                            localStorage.setItem('ai-tap-privacy-accepted', 'true');
+                            localStorage.setItem('ai-tap-privacy-date', new Date().toISOString());
+                            
+                            // Скрываем модальное окно
+                            privacyModal.style.display = 'none';
+                            
+                            console.log('✅ Пользователь принял политику конфиденциальности');
+                            
+                            // Переходим к проверкам системы
+                            console.log('🔧 Переходим к проверкам системы...');
+                            await performSystemChecks();
+                            resolve();
+                        } else {
+                            console.log('❌ Чекбокс не отмечен');
+                        }
+                    };
+                    privacyAcceptBtn.addEventListener('click', acceptHandler);
+                }
                 
                 // Обработчик кнопки "Decline"
-                privacyDeclineBtn.addEventListener('click', function() {
-                    // Показываем уведомление об отказе
-                    alert('You must accept the Privacy Policy to use AI-TAP. The application will now close.');
-                    
-                    // Закрываем приложение (возвращаемся к экрану входа)
-                    privacyModal.style.display = 'none';
-                    document.getElementById('loginScreen').style.display = 'flex';
-                    document.getElementById('statusContainer').style.display = 'none';
-                    document.getElementById('enterButton').disabled = false;
-                    document.getElementById('enterButton').textContent = 'Enter';
-                    
-                    console.log('❌ Пользователь отклонил политику конфиденциальности');
-                    resolve();
-                });
+                if (privacyDeclineBtn) {
+                    const declineHandler = function() {
+                        console.log('❌ Кнопка Decline нажата');
+                        // Показываем уведомление об отказе
+                        alert('You must accept the Privacy Policy to use AI-TAP. The application will now close.');
+                        
+                        // Закрываем приложение (возвращаемся к экрану входа)
+                        privacyModal.style.display = 'none';
+                        document.getElementById('loginScreen').style.display = 'flex';
+                        document.getElementById('statusContainer').style.display = 'none';
+                        document.getElementById('enterButton').disabled = false;
+                        document.getElementById('enterButton').textContent = 'Enter';
+                        
+                        console.log('❌ Пользователь отклонил политику конфиденциальности');
+                        resolve();
+                    };
+                    privacyDeclineBtn.addEventListener('click', declineHandler);
+                }
             });
         }
 
-        // Функция для проверки срока действия согласия (опционально)
-        function checkPrivacyConsent() {
-            const privacyAccepted = localStorage.getItem('ai-tap-privacy-accepted');
-            const privacyDate = localStorage.getItem('ai-tap-privacy-date');
-            
-            if (!privacyAccepted || !privacyDate) {
-                return false;
-            }
-            
-            // Проверяем, не прошло ли более года с момента согласия
-            const consentDate = new Date(privacyDate);
-            const currentDate = new Date();
-            const oneYear = 365 * 24 * 60 * 60 * 1000; // миллисекунды в году
-            
-            if (currentDate - consentDate > oneYear) {
-                // Согласие истекло, удаляем его
-                localStorage.removeItem('ai-tap-privacy-accepted');
-                localStorage.removeItem('ai-tap-privacy-date');
-                return false;
-            }
-            
-            return true;
+        async function showPrivacyPolicy() {
+            console.log('🔒 Функция showPrivacyPolicy вызвана');
+            return new Promise((resolve) => {
+                const privacyModal = document.getElementById('privacyModal');
+                const privacyAcceptCheckbox = document.getElementById('privacyAccept');
+                const privacyAcceptBtn = document.getElementById('privacyAcceptBtn');
+                const privacyDeclineBtn = document.getElementById('privacyDecline');
+                
+                console.log('🔍 Элементы модального окна:', {
+                    privacyModal: !!privacyModal,
+                    privacyAcceptCheckbox: !!privacyAcceptCheckbox,
+                    privacyAcceptBtn: !!privacyAcceptBtn,
+                    privacyDeclineBtn: !!privacyDeclineBtn
+                });
+                
+                if (!privacyModal) {
+                    console.error('❌ Модальное окно политики не найдено!');
+                    resolve();
+                    return;
+                }
+                
+                // Показываем модальное окно
+                console.log('👁️ Показываем модальное окно политики');
+                privacyModal.style.display = 'flex';
+                
+                // Обработчик изменения чекбокса
+                if (privacyAcceptCheckbox && privacyAcceptBtn) {
+                    privacyAcceptCheckbox.addEventListener('change', function() {
+                        console.log('☑️ Чекбокс изменен:', this.checked);
+                        privacyAcceptBtn.disabled = !this.checked;
+                    });
+                }
+                
+                // Обработчик кнопки "Accept & Continue"
+                if (privacyAcceptBtn) {
+                    privacyAcceptBtn.addEventListener('click', async function() {
+                        console.log('✅ Кнопка Accept нажата');
+                        if (privacyAcceptCheckbox && privacyAcceptCheckbox.checked) {
+                            console.log('💾 Сохраняем согласие...');
+                            // Сохраняем согласие в localStorage
+                            localStorage.setItem('ai-tap-privacy-accepted', 'true');
+                            localStorage.setItem('ai-tap-privacy-date', new Date().toISOString());
+                            
+                            // Скрываем модальное окно
+                            privacyModal.style.display = 'none';
+                            
+                            console.log('✅ Пользователь принял политику конфиденциальности');
+                            
+                            // Запускаем основное приложение
+                            console.log('🚀 Запускаем основное приложение...');
+                            await launchMainApp();
+                            resolve();
+                        } else {
+                            console.log('❌ Чекбокс не отмечен');
+                        }
+                    });
+                }
+                
+                // Обработчик кнопки "Decline"
+                if (privacyDeclineBtn) {
+                    privacyDeclineBtn.addEventListener('click', function() {
+                        console.log('❌ Кнопка Decline нажата');
+                        // Показываем уведомление об отказе
+                        alert('You must accept the Privacy Policy to use AI-TAP. The application will now close.');
+                        
+                        // Закрываем приложение (возвращаемся к экрану входа)
+                        privacyModal.style.display = 'none';
+                        document.getElementById('loginScreen').style.display = 'flex';
+                        document.getElementById('statusContainer').style.display = 'none';
+                        document.getElementById('enterButton').disabled = false;
+                        document.getElementById('enterButton').textContent = 'Enter';
+                        
+                        console.log('❌ Пользователь отклонил политику конфиденциальности');
+                        resolve();
+                    });
+                }
+            });
         }
+
 
         // Инициализация приложения
         document.addEventListener('DOMContentLoaded', async function() {
