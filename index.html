@@ -2223,8 +2223,8 @@
             font-size: 12px;
         }
 
-        /* Стили экрана загрузки */
-        .loading-screen {
+        /* Стили экрана входа */
+        .login-screen {
             position: fixed;
             top: 0;
             left: 0;
@@ -2238,15 +2238,15 @@
             overflow: hidden;
         }
 
-        .loading-container {
+        .login-container {
             text-align: center;
             z-index: 2;
             max-width: 500px;
             padding: 40px;
         }
 
-        .loading-logo {
-            margin-bottom: 50px;
+        .login-logo {
+            margin-bottom: 40px;
             animation: logoGlow 2s ease-in-out infinite alternate;
         }
 
@@ -2271,67 +2271,16 @@
             text-transform: uppercase;
         }
 
-        .loading-progress {
+        .login-description {
             margin: 40px 0;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
-            position: relative;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #00d4ff, #0099cc, #0066ff);
-            border-radius: 10px;
-            width: 0%;
-            transition: width 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .progress-fill::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-            animation: progressShine 2s infinite;
-        }
-
-        .progress-text {
-            color: #00d4ff;
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-top: 15px;
-            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
-        }
-
-        .ai-facts-container {
-            margin: 40px 0;
-            min-height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .ai-fact {
-            font-size: 1.1rem;
             color: rgba(255, 255, 255, 0.9);
-            text-align: center;
+        }
+
+        .login-description p {
+            font-size: 1.1rem;
             line-height: 1.6;
-            max-width: 400px;
-            opacity: 0;
-            transform: translateY(20px);
-            animation: factFadeIn 0.8s ease forwards;
-            text-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+            margin: 10px 0;
+            text-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
         }
 
         .enter-button {
@@ -2376,7 +2325,7 @@
             animation: buttonGlow 3s infinite;
         }
 
-        .loading-particles {
+        .login-particles {
             position: absolute;
             top: 0;
             left: 0;
@@ -2386,7 +2335,7 @@
             z-index: 1;
         }
 
-        .loading-particle {
+        .login-particle {
             position: absolute;
             width: 4px;
             height: 4px;
@@ -2407,22 +2356,6 @@
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
-        }
-
-        @keyframes progressShine {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-
-        @keyframes factFadeIn {
-            0% {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
 
         @keyframes buttonPulse {
@@ -2458,7 +2391,7 @@
 
         /* Адаптивность для мобильных */
         @media (max-width: 768px) {
-            .loading-container {
+            .login-container {
                 padding: 20px;
             }
             
@@ -2472,9 +2405,8 @@
                 letter-spacing: 2px;
             }
             
-            .ai-fact {
+            .login-description p {
                 font-size: 1rem;
-                max-width: 300px;
             }
             
             .enter-button {
@@ -2484,34 +2416,32 @@
         }
 
     </style>
+    
+    <!-- Подключение к базе данных -->
+    <script src="database.js"></script>
+    <script src="cache.js"></script>
 </head>
 <body>
-    <!-- Экран загрузки -->
-    <div id="loadingScreen" class="loading-screen">
-        <div class="loading-container">
-            <div class="loading-logo">
+    <!-- Экран входа -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-container">
+            <div class="login-logo">
                 <div class="logo-text">AI-TAP</div>
                 <div class="logo-subtitle">Искусственный интеллект</div>
             </div>
             
-            <div class="loading-progress">
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill"></div>
-                </div>
-                <div class="progress-text" id="progressText">0%</div>
+            <div class="login-description">
+                <p>Добро пожаловать в мир искусственного интеллекта!</p>
+                <p>Общайтесь с ИИ, получайте новости и прогноз погоды</p>
             </div>
             
-            <div class="ai-facts-container">
-                <div class="ai-fact" id="aiFact">Инициализация системы...</div>
-            </div>
-            
-            <button id="enterButton" class="enter-button" style="display: none;" onclick="enterApp()">
-                <span class="enter-text">🚀 Вход</span>
+            <button id="enterButton" class="enter-button" onclick="enterApp()">
+                <span class="enter-text">🚀 Войти в приложение</span>
                 <div class="enter-glow"></div>
             </button>
         </div>
         
-        <div class="loading-particles" id="loadingParticles"></div>
+        <div class="login-particles" id="loginParticles"></div>
     </div>
 
     <!-- Основное приложение (скрыто при загрузке) -->
@@ -4967,6 +4897,15 @@
             // Добавляем сообщение пользователя в историю с временем
             chatHistory.push({ role: 'user', content: message, timestamp: userTime });
             localStorage.setItem('ai-tap-chat-history', JSON.stringify(chatHistory));
+            
+            // Сохраняем сообщение пользователя в базу данных
+            if (database && currentUser) {
+                try {
+                    await database.saveMessage(currentUser.id, 'user', message);
+                } catch (error) {
+                    console.error('Ошибка сохранения сообщения пользователя:', error);
+                }
+            }
             input.value = '';
             input.style.height = 'auto';
             
@@ -5024,6 +4963,15 @@
                     // Добавляем ответ ИИ в историю с временем
                     chatHistory.push({ role: 'assistant', content: aiResponse, timestamp: aiTime });
                     localStorage.setItem('ai-tap-chat-history', JSON.stringify(chatHistory));
+                    
+                    // Сохраняем ответ ИИ в базу данных
+                    if (database && currentUser) {
+                        try {
+                            await database.saveMessage(currentUser.id, 'assistant', aiResponse);
+                        } catch (error) {
+                            console.error('Ошибка сохранения ответа ИИ:', error);
+                        }
+                    }
                     
                     hideTyping();
                     
@@ -5321,78 +5269,30 @@
 
         // Все функции управления пользователями удалены
 
-        // Система загрузки
-        let loadingProgress = 0;
-        let currentFactIndex = 0;
-        let loadingInterval;
-        let factInterval;
+        // Инициализация базы данных
+        let database = null;
+        let responseCache = null;
 
-        const aiFacts = [
-            "🤖 Инициализация нейронных сетей...",
-            "🧠 Загрузка алгоритмов машинного обучения...",
-            "⚡ Настройка квантовых вычислений...",
-            "🔮 Активация системы предсказаний...",
-            "🌐 Подключение к глобальной сети ИИ...",
-            "🎯 Калибровка точности ответов...",
-            "💡 Оптимизация творческих алгоритмов...",
-            "🔍 Индексация базы знаний...",
-            "🚀 Запуск турбо-режима обработки...",
-            "✨ Активация магии искусственного интеллекта...",
-            "🎨 Загрузка генераторов изображений...",
-            "📚 Синхронизация с библиотекой знаний...",
-            "🔬 Настройка научных вычислений...",
-            "🎵 Гармонизация алгоритмов...",
-            "🌟 Финальная настройка системы..."
-        ];
-
-        function startLoading() {
-            const progressFill = document.getElementById('progressFill');
-            const progressText = document.getElementById('progressText');
-            const aiFact = document.getElementById('aiFact');
-            const enterButton = document.getElementById('enterButton');
-
-            // Создаем частицы загрузки
-            createLoadingParticles();
-
-            // Анимация прогресса
-            loadingInterval = setInterval(() => {
-                loadingProgress += Math.random() * 3 + 1;
+        async function initializeDatabase() {
+            try {
+                database = new Database();
+                responseCache = new ResponseCache();
                 
-                if (loadingProgress >= 100) {
-                    loadingProgress = 100;
-                    clearInterval(loadingInterval);
-                    clearInterval(factInterval);
-                    
-                    // Показываем кнопку входа
-                    setTimeout(() => {
-                        aiFact.textContent = "🎉 Система готова к работе!";
-                        enterButton.style.display = 'block';
-                        enterButton.style.animation = 'factFadeIn 0.8s ease forwards';
-                    }, 500);
-                }
+                // Загружаем кэш из localStorage
+                responseCache.loadFromLocalStorage();
                 
-                progressFill.style.width = loadingProgress + '%';
-                progressText.textContent = Math.floor(loadingProgress) + '%';
-            }, 100);
-
-            // Анимация фактов об ИИ
-            factInterval = setInterval(() => {
-                if (currentFactIndex < aiFacts.length && loadingProgress < 100) {
-                    aiFact.style.animation = 'none';
-                    aiFact.offsetHeight; // Принудительный reflow
-                    aiFact.textContent = aiFacts[currentFactIndex];
-                    aiFact.style.animation = 'factFadeIn 0.8s ease forwards';
-                    currentFactIndex++;
-                }
-            }, 1200);
+                console.log('База данных и кэш инициализированы');
+            } catch (error) {
+                console.error('Ошибка инициализации базы данных:', error);
+            }
         }
 
-        function createLoadingParticles() {
-            const particlesContainer = document.getElementById('loadingParticles');
+        function createLoginParticles() {
+            const particlesContainer = document.getElementById('loginParticles');
             
-            for (let i = 0; i < 50; i++) {
+            for (let i = 0; i < 30; i++) {
                 const particle = document.createElement('div');
-                particle.className = 'loading-particle';
+                particle.className = 'login-particle';
                 particle.style.left = Math.random() * 100 + '%';
                 particle.style.animationDelay = Math.random() * 6 + 's';
                 particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
@@ -5400,34 +5300,50 @@
             }
         }
 
-        function enterApp() {
-            const loadingScreen = document.getElementById('loadingScreen');
+        async function enterApp() {
+            const loginScreen = document.getElementById('loginScreen');
             const mainApp = document.getElementById('mainApp');
             
-            // Анимация исчезновения экрана загрузки
-            loadingScreen.style.transition = 'opacity 1s ease, transform 1s ease';
-            loadingScreen.style.opacity = '0';
-            loadingScreen.style.transform = 'scale(0.9)';
-            
-            setTimeout(() => {
-                loadingScreen.style.display = 'none';
+            try {
+                // Сохраняем пользователя в базу данных
+                if (currentUser && database) {
+                    await database.saveUser(
+                        currentUser.id,
+                        currentUser.username || '',
+                        currentUser.first_name || ''
+                    );
+                    console.log('Пользователь сохранен в базу данных');
+                }
                 
-                // Показываем основное приложение
-                mainApp.style.position = 'relative';
-                mainApp.style.zIndex = '1';
-                mainApp.style.transition = 'opacity 1s ease, transform 1s ease';
-                mainApp.style.transform = 'scale(1.1)';
+                // Анимация исчезновения экрана входа
+                loginScreen.style.transition = 'opacity 1s ease, transform 1s ease';
+                loginScreen.style.opacity = '0';
+                loginScreen.style.transform = 'scale(0.9)';
                 
                 setTimeout(() => {
-                    mainApp.style.opacity = '1';
-                    mainApp.style.transform = 'scale(1)';
+                    loginScreen.style.display = 'none';
                     
-                    // Запускаем анимацию кнопок после появления приложения
+                    // Показываем основное приложение
+                    mainApp.style.position = 'relative';
+                    mainApp.style.zIndex = '1';
+                    mainApp.style.transition = 'opacity 1s ease, transform 1s ease';
+                    mainApp.style.transform = 'scale(1.1)';
+                    
                     setTimeout(() => {
-                        animateMainAppButtons();
-                    }, 500);
-                }, 50);
-            }, 1000);
+                        mainApp.style.opacity = '1';
+                        mainApp.style.transform = 'scale(1)';
+                        
+                        // Запускаем анимацию кнопок после появления приложения
+                        setTimeout(() => {
+                            animateMainAppButtons();
+                        }, 500);
+                    }, 50);
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Ошибка при входе в приложение:', error);
+                showNotification('❌ Ошибка при входе в приложение');
+            }
         }
 
         function initializeMainApp() {
@@ -5454,12 +5370,15 @@
         }
 
         // Инициализация приложения
-        document.addEventListener('DOMContentLoaded', function() {
-            // Сначала инициализируем основное приложение в фоне
-            initializeMainApp();
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Инициализируем базу данных
+            await initializeDatabase();
             
-            // Затем запускаем загрузку
-            startLoading();
+            // Создаем частицы для экрана входа
+            createLoginParticles();
+            
+            // Инициализируем основное приложение в фоне
+            initializeMainApp();
         });
 
         // Функция инициализации настроек
