@@ -4833,8 +4833,7 @@
             chatHistory.push({ role: 'user', content: message, timestamp: userTime });
             localStorage.setItem('ai-tap-chat-history', JSON.stringify(chatHistory));
             
-            // Обновляем статистику пользователя
-            updateUserChatStats(userMessage, aiResponse);
+            // Статистика обновится после получения ответа ИИ
             
             input.value = '';
             input.style.height = 'auto';
@@ -4903,6 +4902,9 @@
                     // Обновляем статус подключения
                     updateConnectionStatus('🟢', 'Подключено');
                     
+                    // Обновляем статистику пользователя (после успешного ответа)
+                    try { updateUserChatStats(message, aiResponse); } catch (e) { console.warn('Не удалось обновить статистику пользователя', e); }
+
                     // Обновляем память ИИ
                     aiMemory.interactionCount++;
                     aiMemory.lastInteraction = new Date().toISOString();
@@ -5304,6 +5306,9 @@
             
             // Инициализируем настройки
             initializeSettings();
+            
+            // Добавляем демо-пользователя для показа списка пользователей (если пусто)
+            try { initializeDemoUser(); } catch (e) { console.warn('Не удалось инициализировать демо-пользователя', e); }
             
             // Обновляем интерфейс
             updateInterface();
