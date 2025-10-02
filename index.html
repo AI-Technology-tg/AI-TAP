@@ -2580,9 +2580,9 @@
             <!-- Прогресс бар -->
             <div class="loading-progress">
                 <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill"></div>
+                    <div class="progress-fill" id="progressFill" style="width: 0%; transition: width 5s ease-in-out;"></div>
                 </div>
-                <div class="progress-text" id="progressText">0%</div>
+                <div class="progress-text" id="progressText">Загрузка...</div>
             </div>
             
             <!-- Анимированные тексты про ИИ -->
@@ -5434,18 +5434,12 @@
 
         // Система загрузки приложения
         let loadingMessages = [
-            "Инициализация нейронных сетей...",
-            "Подключение к облачным серверам ИИ...",
-            "Калибровка языковых моделей...",
-            "Настройка системы распознавания...",
-            "Оптимизация производительности...",
-            "Синхронизация с базой знаний...",
-            "Активация модулей обработки данных...",
-            "Проверка безопасности соединения...",
-            "Загрузка пользовательских настроек...",
-            "Инициализация интерфейса ИИ...",
-            "Подготовка системы к работе...",
-            "Финальная оптимизация..."
+            "Инициализация нейронных сетей...\nПодключение к серверам...",
+            "Калибровка языковых моделей...\nОптимизация производительности...",
+            "Настройка системы распознавания...\nСинхронизация с базой знаний...",
+            "Активация модулей обработки данных...\nПроверка безопасности...",
+            "Загрузка пользовательских настроек...\nИнициализация интерфейса...",
+            "Подготовка системы к работе...\nФинальная оптимизация..."
         ];
 
         let currentMessageIndex = 0;
@@ -5475,139 +5469,50 @@
             
             console.log('🚀 Запуск загрузки...');
             
-            // Создаем частицы для фона
-            createLoadingParticles();
-            
             // Запускаем анимацию сообщений
             startMessageAnimation();
             
-            // Запускаем прогресс бар
-            startProgressAnimation();
+            // Запускаем анимацию прогресс-бара
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
             
-            // Запускаем создание частиц
-            particleInterval = setInterval(createLoadingParticles, 500);
+            if (progressFill) {
+                progressFill.style.width = '100%';
+            }
+            if (progressText) {
+                progressText.textContent = 'Загрузка...';
+            }
+            
+            // Простая загрузка на 5 секунд
+            setTimeout(() => {
+                finishLoading();
+            }, 5000);
         }
 
-        function createLoadingParticles() {
-            const container = document.getElementById('loadingParticles');
-            if (!container) return;
-            
-            for (let i = 0; i < 3; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'loading-particle';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.animationDuration = (Math.random() * 3 + 2) + 's';
-                particle.style.animationDelay = Math.random() * 2 + 's';
-                container.appendChild(particle);
-                
-                // Удаляем частицу после анимации
-                setTimeout(() => {
-                    if (particle.parentNode) {
-                        particle.parentNode.removeChild(particle);
-                    }
-                }, 6000);
-            }
-        }
 
         function startMessageAnimation() {
             const messageElement = document.getElementById('currentMessage');
             
-            function showNextMessage() {
-                if (currentMessageIndex < loadingMessages.length) {
-                    if (messageElement) {
-                        messageElement.textContent = loadingMessages[currentMessageIndex];
-                    }
-                    console.log(`💬 Сообщение ${currentMessageIndex + 1}: ${loadingMessages[currentMessageIndex]}`);
-                    currentMessageIndex++;
-                } else {
-                    // Останавливаем анимацию сообщений когда дошли до конца
-                    clearInterval(messageInterval);
-                    if (messageElement) {
-                        messageElement.textContent = "Загрузка завершается...";
-                    }
-                    console.log('🛑 Анимация сообщений завершена');
+            function showRandomMessage() {
+                if (messageElement && loadingMessages.length > 0) {
+                    // Выбираем случайное сообщение
+                    const randomIndex = Math.floor(Math.random() * loadingMessages.length);
+                    const message = loadingMessages[randomIndex];
+                    
+                    // Заменяем \n на <br> для переноса строки
+                    messageElement.innerHTML = message.replace(/\n/g, '<br>');
+                    
+                    console.log(`💬 Случайное сообщение: ${message}`);
                 }
             }
             
-            // Показываем первое сообщение сразу
-            if (messageElement && loadingMessages.length > 0) {
-                messageElement.textContent = loadingMessages[0];
-                currentMessageIndex = 1;
-            }
+            // Показываем первое случайное сообщение сразу
+            showRandomMessage();
             
-            // Запускаем интервал для остальных сообщений
-            messageInterval = setInterval(showNextMessage, 1200);
+            // Запускаем интервал для случайных сообщений каждые 800ms
+            messageInterval = setInterval(showRandomMessage, 800);
         }
 
-        function startProgressAnimation() {
-            const progressFill = document.getElementById('progressFill');
-            const progressText = document.getElementById('progressText');
-            
-            // Более предсказуемая загрузка с фиксированными шагами
-            const totalSteps = 20;
-            const stepDuration = 250; // 250ms на каждый шаг
-            const stepSize = 100 / totalSteps;
-            
-            let currentStep = 0;
-            
-            loadingInterval = setInterval(() => {
-                if (currentStep < totalSteps) {
-                    currentStep++;
-                    loadingProgress = Math.min(100, currentStep * stepSize);
-                    
-                    if (progressFill) {
-                        progressFill.style.width = loadingProgress + '%';
-                    }
-                    if (progressText) {
-                        progressText.textContent = Math.floor(loadingProgress) + '%';
-                    }
-                    
-                    // Логируем каждые 20%
-                    if (currentStep % 4 === 0) {
-                        console.log(`📊 Прогресс: ${Math.floor(loadingProgress)}%`);
-                    }
-                    
-                    if (loadingProgress >= 100) {
-                        if (progressFill) {
-                            progressFill.style.width = '100%';
-                        }
-                        if (progressText) {
-                            progressText.textContent = '100%';
-                        }
-                        console.log('✅ Загрузка завершена!');
-                        clearInterval(loadingInterval);
-                        finishLoading();
-                    }
-                } else {
-                    // Если дошли до конца шагов, принудительно завершаем
-                    clearInterval(loadingInterval);
-                    if (progressFill) {
-                        progressFill.style.width = '100%';
-                    }
-                    if (progressText) {
-                        progressText.textContent = '100%';
-                    }
-                    console.log('✅ Загрузка завершена (достигнут лимит шагов)!');
-                    finishLoading();
-                }
-            }, stepDuration);
-            
-            // Принудительно завершаем загрузку через 6 секунд
-            setTimeout(() => {
-                if (loadingProgress < 100) {
-                    loadingProgress = 100;
-                    if (progressFill) {
-                        progressFill.style.width = '100%';
-                    }
-                    if (progressText) {
-                        progressText.textContent = '100%';
-                    }
-                    clearInterval(loadingInterval);
-                    console.log('✅ Загрузка завершена (по таймауту)!');
-                    finishLoading();
-                }
-            }, 6000);
-        }
 
         function finishLoading() {
             // Очищаем все интервалы
@@ -5626,24 +5531,28 @@
             
             console.log('🎯 Завершение загрузки...');
             
-            // Показываем кнопку входа
-            setTimeout(() => {
-                const enterSection = document.getElementById('enterSection');
-                const messageElement = document.getElementById('currentMessage');
-                
-                if (messageElement) {
-                    messageElement.textContent = "Система готова к запуску!";
-                    messageElement.style.color = '#00ffff';
-                    messageElement.style.fontWeight = '600';
-                }
-                
-                if (enterSection) {
-                    enterSection.style.display = 'block';
-                    enterSection.style.animation = 'fadeInUp 1s ease-out';
-                }
-                
-                console.log('✨ Кнопка входа показана');
-            }, 1000);
+            // Обновляем прогресс-бар
+            const progressText = document.getElementById('progressText');
+            if (progressText) {
+                progressText.textContent = 'Готово!';
+            }
+            
+            // Показываем кнопку входа сразу
+            const enterSection = document.getElementById('enterSection');
+            const messageElement = document.getElementById('currentMessage');
+            
+            if (messageElement) {
+                messageElement.innerHTML = "Система готова к запуску!";
+                messageElement.style.color = '#00ffff';
+                messageElement.style.fontWeight = '600';
+            }
+            
+            if (enterSection) {
+                enterSection.style.display = 'block';
+                enterSection.style.animation = 'fadeInUp 1s ease-out';
+            }
+            
+            console.log('✨ Кнопка входа показана');
         }
 
 
