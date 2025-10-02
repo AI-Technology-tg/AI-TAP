@@ -1254,6 +1254,148 @@
             line-height: 1.3;
         }
 
+        /* Стили для модального окна погоды */
+        .weather-content {
+            padding: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .weather-main {
+            text-align: center;
+        }
+
+        .weather-location {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .location-icon {
+            font-size: 18px;
+        }
+
+        .location-text {
+            color: white;
+            font-weight: 500;
+            font-size: 16px;
+        }
+
+        .weather-current {
+            margin-bottom: 30px;
+        }
+
+        .weather-temp {
+            font-size: 72px;
+            font-weight: 300;
+            color: white;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 10px rgba(0, 255, 255, 0.3);
+        }
+
+        .weather-desc {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.8);
+            text-transform: capitalize;
+        }
+
+        .weather-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .weather-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .weather-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .weather-value {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .weather-update {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .weather-error, .weather-loading {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .weather-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .weather-message {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .weather-desc {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .weather-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 24px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .weather-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #00ffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         /* Селектор режимов ИИ */
         .mode-selector {
             display: grid;
@@ -1539,13 +1681,6 @@
             
             <div class="chat-input-container">
                 <div class="chat-input-wrapper">
-                    <button id="attachButton" class="attach-button" onclick="toggleAttachMenu()" title="Прикрепить">📎</button>
-                    <div id="attachMenu" class="attach-menu" style="display: none;">
-                        <div class="attach-option" onclick="openMiniGames()">
-                            <span class="attach-icon">🎮</span>
-                            <span class="attach-text">Мини игры</span>
-                        </div>
-                    </div>
                     <textarea 
                         id="chatInput" 
                         class="chat-input" 
@@ -1706,6 +1841,19 @@
                     <button class="settings-btn primary" onclick="saveMainSettings()">💾 Сохранить</button>
                     <button class="settings-btn secondary" onclick="resetMainSettings()">🔄 Сбросить</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно погоды -->
+    <div id="weatherModal" class="chat-modal" style="display: none;">
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="chat-title">🌤️ Погода</div>
+                <span class="chat-close" onclick="closeWeatherModal()">&times;</span>
+            </div>
+            <div id="weatherContent" class="weather-content">
+                <!-- Контент загружается динамически -->
             </div>
         </div>
     </div>
@@ -2057,6 +2205,7 @@
             const chatModal = document.getElementById('chatModal');
             const settingsModal = document.getElementById('settingsModal');
             const mainSettingsModal = document.getElementById('mainSettingsModal');
+            const weatherModal = document.getElementById('weatherModal');
             
             if (event.target === userModal) {
                 userModal.style.display = 'none';
@@ -2069,6 +2218,9 @@
             }
             if (event.target === mainSettingsModal) {
                 mainSettingsModal.style.display = 'none';
+            }
+            if (event.target === weatherModal) {
+                weatherModal.style.display = 'none';
             }
         }
 
@@ -2314,6 +2466,9 @@
                     prompt += `Сегодня пользователь написал ${todayStats.messages} сообщений, проводит в чате ${todayStats.timeSpent} минут. `;
                 }
             }
+            
+            // Важные инструкции для ИИ
+            prompt += 'ВАЖНО: Если пользователь спрашивает о погоде, скажи ему что можно посмотреть актуальную погоду в главном меню приложения, нажав на кнопку "Погода". Ты не можешь обрабатывать голосовые сообщения или файлы - работаешь только с текстом. ';
             
             return prompt;
         }
@@ -2591,10 +2746,103 @@
 
         // Функции для дополнительных кнопок
         function showWeather() {
-            if (locationEnabled && currentWeather) {
-                showNotification(`🌤️ ${currentWeather.temp}°C, ${currentWeather.description} в ${userLocation.city || 'вашем городе'}`);
+            if (locationEnabled && userLocation) {
+                openWeatherModal();
             } else {
                 showNotification('Включите геолокацию в настройках для просмотра погоды');
+            }
+        }
+
+        function openWeatherModal() {
+            document.getElementById('weatherModal').style.display = 'block';
+            loadWeatherData();
+        }
+
+        function closeWeatherModal() {
+            document.getElementById('weatherModal').style.display = 'none';
+        }
+
+        async function loadWeatherData() {
+            const weatherContent = document.getElementById('weatherContent');
+            
+            if (!locationEnabled || !userLocation) {
+                weatherContent.innerHTML = `
+                    <div class="weather-error">
+                        <div class="weather-icon">📍</div>
+                        <div class="weather-message">Геолокация отключена</div>
+                        <div class="weather-desc">Включите геолокацию в настройках для просмотра погоды</div>
+                        <button class="weather-btn" onclick="closeWeatherModal(); openMainSettings();">Открыть настройки</button>
+                    </div>
+                `;
+                return;
+            }
+
+            // Показываем загрузку
+            weatherContent.innerHTML = `
+                <div class="weather-loading">
+                    <div class="loading-spinner"></div>
+                    <div class="weather-message">Загружаем погоду...</div>
+                </div>
+            `;
+
+            try {
+                // Обновляем погоду если нужно
+                await checkWeatherUpdate();
+                
+                if (currentWeather) {
+                    const locationText = userLocation.city ? 
+                        `${userLocation.city}, ${userLocation.country}` : 
+                        `${userLocation.country}`;
+                    
+                    weatherContent.innerHTML = `
+                        <div class="weather-main">
+                            <div class="weather-location">
+                                <div class="location-icon">📍</div>
+                                <div class="location-text">${locationText}</div>
+                            </div>
+                            
+                            <div class="weather-current">
+                                <div class="weather-temp">${Math.round(currentWeather.temp)}°</div>
+                                <div class="weather-desc">${currentWeather.description}</div>
+                            </div>
+                            
+                            <div class="weather-details">
+                                <div class="weather-item">
+                                    <div class="weather-label">Ощущается как</div>
+                                    <div class="weather-value">${Math.round(currentWeather.feels_like)}°C</div>
+                                </div>
+                                <div class="weather-item">
+                                    <div class="weather-label">Влажность</div>
+                                    <div class="weather-value">${currentWeather.humidity}%</div>
+                                </div>
+                                <div class="weather-item">
+                                    <div class="weather-label">Давление</div>
+                                    <div class="weather-value">${Math.round(currentWeather.pressure * 0.75)} мм рт.ст.</div>
+                                </div>
+                                <div class="weather-item">
+                                    <div class="weather-label">Ветер</div>
+                                    <div class="weather-value">${Math.round(currentWeather.wind_speed || 0)} м/с</div>
+                                </div>
+                            </div>
+                            
+                            <div class="weather-update">
+                                Обновлено: ${new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    throw new Error('Не удалось получить данные о погоде');
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки погоды:', error);
+                weatherContent.innerHTML = `
+                    <div class="weather-error">
+                        <div class="weather-icon">⚠️</div>
+                        <div class="weather-message">Ошибка загрузки</div>
+                        <div class="weather-desc">Не удалось получить данные о погоде</div>
+                        <button class="weather-btn" onclick="loadWeatherData()">Попробовать снова</button>
+                    </div>
+                `;
             }
         }
 
@@ -2742,61 +2990,6 @@
             }
         }
 
-        function addFileMessage(file) {
-            const chatMessages = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message user';
-            
-            const currentTime = getCurrentTime();
-            const fileSize = formatFileSize(file.size);
-            const fileType = getFileType(file.type);
-            
-            messageDiv.innerHTML = `
-                <div class="message-content">
-                    <div class="file-message">
-                        <div class="file-icon">${getFileIcon(file.type)}</div>
-                        <div class="file-info">
-                            <div class="file-name">${file.name}</div>
-                            <div class="file-details">${fileType} • ${fileSize}</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="message-time">${currentTime}</div>
-            `;
-            
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-            
-            return currentTime;
-        }
-
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        function getFileType(mimeType) {
-            if (mimeType.startsWith('image/')) return 'Изображение';
-            if (mimeType.startsWith('video/')) return 'Видео';
-            if (mimeType.startsWith('audio/')) return 'Аудио';
-            if (mimeType.includes('pdf')) return 'PDF';
-            if (mimeType.includes('document') || mimeType.includes('word')) return 'Документ';
-            if (mimeType.includes('text')) return 'Текст';
-            return 'Файл';
-        }
-
-        function getFileIcon(mimeType) {
-            if (mimeType.startsWith('image/')) return '🖼️';
-            if (mimeType.startsWith('video/')) return '🎬';
-            if (mimeType.startsWith('audio/')) return '🎵';
-            if (mimeType.includes('pdf')) return '📄';
-            if (mimeType.includes('document') || mimeType.includes('word')) return '📝';
-            if (mimeType.includes('text')) return '📋';
-            return '📎';
-        }
 
         // Анализ настроения пользователя
         function analyzeMood(message) {
