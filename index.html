@@ -5164,10 +5164,17 @@
 
         // Функция регистрации пользователя
         function registerUser(userData) {
-            let users = JSON.parse(localStorage.getItem('ai-tap-users') || '[]');
-            
-            // Проверяем, есть ли уже такой пользователь
-            const existingUserIndex = users.findIndex(u => u.id === userData.id);
+            try {
+                let users = JSON.parse(localStorage.getItem('ai-tap-users') || '[]');
+                
+                // Проверяем, что users является массивом
+                if (!Array.isArray(users)) {
+                    console.warn('Данные пользователей повреждены, создаем новый массив');
+                    users = [];
+                }
+                
+                // Проверяем, есть ли уже такой пользователь
+                const existingUserIndex = users.findIndex(u => u.id === userData.id);
             
             const userRecord = {
                 id: userData.id,
@@ -5186,6 +5193,11 @@
             }
             
             localStorage.setItem('ai-tap-users', JSON.stringify(users));
+            console.log('Пользователь зарегистрирован в системе:', userData.id);
+            
+            } catch (error) {
+                console.error('Ошибка регистрации пользователя:', error);
+            }
         }
 
         // Проверка статуса бана
@@ -5330,20 +5342,37 @@
         // Все функции управления пользователями удалены
 
         // Инициализация базы данных
-        let database = null;
-        let responseCache = null;
+        var database = null;
+        var responseCache = null;
 
         async function initializeDatabase() {
             try {
+                console.log('Проверяем наличие классов Database и ResponseCache...');
+                
+                if (typeof Database === 'undefined') {
+                    throw new Error('Класс Database не найден. Проверьте подключение database.js');
+                }
+                
+                if (typeof ResponseCache === 'undefined') {
+                    throw new Error('Класс ResponseCache не найден. Проверьте подключение cache.js');
+                }
+                
+                console.log('Создаем экземпляры классов...');
                 database = new Database();
                 responseCache = new ResponseCache();
+                
+                // Ждем инициализации базы данных
+                if (database.init) {
+                    await database.init();
+                }
                 
                 // Загружаем кэш из localStorage
                 responseCache.loadFromLocalStorage();
                 
-                console.log('База данных и кэш инициализированы');
+                console.log('База данных и кэш инициализированы успешно');
             } catch (error) {
                 console.error('Ошибка инициализации базы данных:', error);
+                throw error;
             }
         }
 
@@ -5391,8 +5420,15 @@
                 // Проверка 1: База данных
                 await updateStatus(databaseStatus, 'loading', '⏳', 'Проверка базы данных...');
                 
+                console.log('Проверяем database:', database);
+                
                 if (!database) {
-                    throw new Error('База данных не инициализирована');
+                    console.error('Database не инициализирована, пытаемся инициализировать...');
+                    await initializeDatabase();
+                    
+                    if (!database) {
+                        throw new Error('База данных не инициализирована');
+                    }
                 }
                 
                 // Проверяем подключение к базе данных
@@ -5535,6 +5571,11 @@
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('🚀 Начинаем инициализацию приложения...');
             
+            // Проверяем подключение внешних файлов
+            console.log('🔍 Проверяем подключение файлов...');
+            console.log('Database класс доступен:', typeof Database !== 'undefined');
+            console.log('ResponseCache класс доступен:', typeof ResponseCache !== 'undefined');
+            
             try {
                 // Инициализируем базу данных
                 console.log('📊 Инициализируем базу данных...');
@@ -5555,6 +5596,7 @@
                 
             } catch (error) {
                 console.error('❌ Ошибка инициализации:', error);
+                console.error('Детали ошибки:', error.stack);
             }
         });
 
