@@ -2613,6 +2613,13 @@
                     <span class="enter-text">Войти в AI-TAP</span>
                 </button>
             </div>
+            
+            <!-- Кнопка пропуска загрузки (для отладки) -->
+            <div class="skip-section" style="position: absolute; bottom: 20px; right: 20px;">
+                <button onclick="skipLoading()" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 16px; border-radius: 20px; font-size: 12px; cursor: pointer;">
+                    Пропустить загрузку
+                </button>
+            </div>
         </div>
         
         <!-- Фоновые частицы для загрузки -->
@@ -5456,6 +5463,17 @@
         let particleInterval;
 
         function startLoadingSequence() {
+            // Сбрасываем переменные
+            currentMessageIndex = 0;
+            loadingProgress = 0;
+            
+            // Очищаем предыдущие интервалы если есть
+            if (loadingInterval) clearInterval(loadingInterval);
+            if (messageInterval) clearInterval(messageInterval);
+            if (particleInterval) clearInterval(particleInterval);
+            
+            console.log('🚀 Запуск загрузки...');
+            
             // Создаем частицы для фона
             createLoadingParticles();
             
@@ -5496,17 +5514,19 @@
             function showNextMessage() {
                 if (currentMessageIndex < loadingMessages.length) {
                     messageElement.textContent = loadingMessages[currentMessageIndex];
-                    messageElement.style.animation = 'none';
-                    messageElement.offsetHeight; // Trigger reflow
-                    messageElement.style.animation = 'messageSlide 3s infinite';
+                    console.log(`💬 Сообщение ${currentMessageIndex + 1}: ${loadingMessages[currentMessageIndex]}`);
                     currentMessageIndex++;
                 } else {
-                    clearInterval(messageInterval);
+                    // Перезапускаем с начала если дошли до конца
+                    currentMessageIndex = 0;
+                    messageElement.textContent = loadingMessages[currentMessageIndex];
+                    console.log(`🔄 Перезапуск сообщений: ${loadingMessages[currentMessageIndex]}`);
+                    currentMessageIndex++;
                 }
             }
             
             showNextMessage();
-            messageInterval = setInterval(showNextMessage, 2000);
+            messageInterval = setInterval(showNextMessage, 1500);
         }
 
         function startProgressAnimation() {
@@ -5515,26 +5535,56 @@
             
             loadingInterval = setInterval(() => {
                 if (loadingProgress < 100) {
-                    // Случайное увеличение прогресса
-                    const increment = Math.random() * 8 + 2;
+                    // Увеличиваем прогресс более предсказуемо
+                    let increment;
+                    if (loadingProgress < 30) {
+                        increment = Math.random() * 3 + 2; // Быстрый старт
+                    } else if (loadingProgress < 70) {
+                        increment = Math.random() * 2 + 1; // Средняя скорость
+                    } else if (loadingProgress < 95) {
+                        increment = Math.random() * 1 + 0.5; // Замедляемся
+                    } else {
+                        increment = 0.2; // Очень медленно к концу
+                    }
+                    
                     loadingProgress = Math.min(100, loadingProgress + increment);
                     
                     progressFill.style.width = loadingProgress + '%';
                     progressText.textContent = Math.floor(loadingProgress) + '%';
                     
+                    // Логируем каждые 10%
+                    if (Math.floor(loadingProgress) % 10 === 0 && Math.floor(loadingProgress) !== Math.floor(loadingProgress - increment)) {
+                        console.log(`📊 Прогресс: ${Math.floor(loadingProgress)}%`);
+                    }
+                    
                     if (loadingProgress >= 100) {
+                        progressFill.style.width = '100%';
+                        progressText.textContent = '100%';
+                        console.log('✅ Загрузка завершена!');
+                        clearInterval(loadingInterval);
                         finishLoading();
                     }
-                } else {
-                    clearInterval(loadingInterval);
                 }
-            }, 200);
+            }, 150);
+            
+            // Принудительно завершаем загрузку через 15 секунд
+            setTimeout(() => {
+                if (loadingProgress < 100) {
+                    loadingProgress = 100;
+                    progressFill.style.width = '100%';
+                    progressText.textContent = '100%';
+                    clearInterval(loadingInterval);
+                    finishLoading();
+                }
+            }, 15000);
         }
 
         function finishLoading() {
             clearInterval(loadingInterval);
             clearInterval(messageInterval);
             clearInterval(particleInterval);
+            
+            console.log('🎯 Завершение загрузки...');
             
             // Показываем кнопку входа
             setTimeout(() => {
@@ -5547,7 +5597,19 @@
                 
                 enterSection.style.display = 'block';
                 enterSection.style.animation = 'fadeInUp 1s ease-out';
+                
+                console.log('✨ Кнопка входа показана');
             }, 1000);
+        }
+
+        function skipLoading() {
+            console.log('⏩ Пропуск загрузки');
+            loadingProgress = 100;
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            progressFill.style.width = '100%';
+            progressText.textContent = '100%';
+            finishLoading();
         }
 
         function enterApplication() {
