@@ -873,6 +873,42 @@
             border-color: rgba(0, 255, 255, 0.8);
         }
 
+        /* Кнопка голосовых сообщений */
+        .voice-button {
+            background: rgba(0, 255, 255, 0.1);
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            color: #00ffff;
+            padding: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .voice-button:hover {
+            background: rgba(0, 255, 255, 0.2);
+            border-color: rgba(0, 255, 255, 0.5);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+        }
+
+        .voice-button.recording {
+            background: rgba(255, 0, 0, 0.2);
+            border-color: rgba(255, 0, 0, 0.5);
+            color: #ff0000;
+            animation: recordPulse 1s infinite;
+        }
+
+        @keyframes recordPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); box-shadow: 0 0 20px rgba(255, 0, 0, 0.6); }
+        }
+
         .typing-indicator {
             color: rgba(0, 255, 255, 0.7);
             transition: all 0.3s ease;
@@ -1063,6 +1099,7 @@
                 <div class="chat-title">Основной ИИ</div>
                 <div class="chat-controls">
                     <button class="chat-control-btn" onclick="showPromptTemplates()" title="Шаблоны запросов">📝</button>
+                    <button class="chat-control-btn" onclick="toggleLocation()" title="Геолокация" id="locationBtn">📍</button>
                     <button class="chat-control-btn" onclick="clearChatHistory()" title="Очистить историю">🗑️</button>
                     <button class="chat-control-btn" onclick="toggleAISettings()" title="Настройки ИИ">⚙️</button>
                     <span class="connection-status" id="connectionStatus" title="Статус подключения">🟢</span>
@@ -1095,6 +1132,7 @@
             
             <div class="chat-input-container">
                 <div class="chat-input-wrapper">
+                    <button id="voiceButton" class="voice-button" onclick="toggleVoiceRecording()" title="Голосовое сообщение">🎤</button>
                     <textarea 
                         id="chatInput" 
                         class="chat-input" 
@@ -1580,6 +1618,9 @@
             // Обновляем интерфейс чата на текущем языке
             updateChatInterface();
             
+            // Обновляем кнопку геолокации
+            updateLocationButton();
+            
             // Мобильные оптимизации
             enableFullscreen();
             optimizeKeyboard();
@@ -1678,6 +1719,16 @@
         // Память персонажа ИИ
         let aiMemory = JSON.parse(localStorage.getItem('ai-tap-memory') || '{}');
         
+        // Геолокация
+        let userLocation = JSON.parse(localStorage.getItem('ai-tap-location') || 'null');
+        let locationEnabled = localStorage.getItem('ai-tap-location-enabled') === 'true';
+        
+        // Голосовые сообщения
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let isRecording = false;
+        let recognition = null;
+        
         // Инициализация памяти ИИ
         if (!aiMemory.userPreferences) {
             aiMemory = {
@@ -1735,7 +1786,275 @@
                 prompt += 'Мы уже хорошо знакомы, можешь быть более неформальным. ';
             }
             
+            // Добавляем информацию о местоположении
+            if (locationEnabled && userLocation) {
+                prompt += `Пользователь находится в городе ${userLocation.city || 'неизвестном'}, страна: ${userLocation.country || 'неизвестна'}. Учитывай это при ответах. `;
+            }
+            
             return prompt;
+        }
+
+        // Функции геолокации
+        function toggleLocation() {
+            if (locationEnabled) {
+                // Отключаем геолокацию
+                locationEnabled = false;
+                userLocation = null;
+                localStorage.setItem('ai-tap-location-enabled', 'false');
+                localStorage.removeItem('ai-tap-location');
+                updateLocationButton();
+                showNotification('Геолокация отключена');
+            } else {
+                // Включаем геолокацию
+                requestLocation();
+            }
+        }
+
+        function requestLocation() {
+            if (!navigator.geolocation) {
+                showNotification('Геолокация не поддерживается');
+                return;
+            }
+
+            showNotification('Запрашиваем местоположение...');
+            
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    
+                    try {
+                        // Получаем информацию о городе через обратное геокодирование
+                        const response = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=ru`);
+                        const data = await response.json();
+                        
+                        userLocation = {
+                            latitude: lat,
+                            longitude: lon,
+                            city: data.city || data.locality || 'Неизвестный город',
+                            country: data.countryName || 'Неизвестная страна',
+                            region: data.principalSubdivision || '',
+                            timestamp: new Date().toISOString()
+                        };
+                        
+                        locationEnabled = true;
+                        localStorage.setItem('ai-tap-location', JSON.stringify(userLocation));
+                        localStorage.setItem('ai-tap-location-enabled', 'true');
+                        
+                        updateLocationButton();
+                        showNotification(`Местоположение: ${userLocation.city}, ${userLocation.country}`);
+                        
+                    } catch (error) {
+                        console.error('Ошибка геокодирования:', error);
+                        userLocation = {
+                            latitude: lat,
+                            longitude: lon,
+                            city: 'Неизвестный город',
+                            country: 'Неизвестная страна',
+                            timestamp: new Date().toISOString()
+                        };
+                        
+                        locationEnabled = true;
+                        localStorage.setItem('ai-tap-location', JSON.stringify(userLocation));
+                        localStorage.setItem('ai-tap-location-enabled', 'true');
+                        
+                        updateLocationButton();
+                        showNotification('Местоположение получено');
+                    }
+                },
+                (error) => {
+                    console.error('Ошибка геолокации:', error);
+                    let errorMessage = 'Ошибка получения местоположения';
+                    
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMessage = 'Доступ к геолокации запрещен';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMessage = 'Местоположение недоступно';
+                            break;
+                        case error.TIMEOUT:
+                            errorMessage = 'Таймаут запроса геолокации';
+                            break;
+                    }
+                    
+                    showNotification(errorMessage);
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 300000 // 5 минут
+                }
+            );
+        }
+
+        function updateLocationButton() {
+            const btn = document.getElementById('locationBtn');
+            if (btn) {
+                if (locationEnabled && userLocation) {
+                    btn.textContent = '📍';
+                    btn.style.color = '#00ff00';
+                    btn.title = `Геолокация: ${userLocation.city}`;
+                } else {
+                    btn.textContent = '📍';
+                    btn.style.color = '#ffffff';
+                    btn.title = 'Включить геолокацию';
+                }
+            }
+        }
+
+        // Функции голосовых сообщений
+        async function toggleVoiceRecording() {
+            if (isRecording) {
+                stopRecording();
+            } else {
+                startRecording();
+            }
+        }
+
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                
+                mediaRecorder.ondataavailable = (event) => {
+                    audioChunks.push(event.data);
+                };
+                
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    processVoiceMessage(audioBlob);
+                    
+                    // Останавливаем поток
+                    stream.getTracks().forEach(track => track.stop());
+                };
+                
+                mediaRecorder.start();
+                isRecording = true;
+                
+                // Обновляем UI
+                const voiceBtn = document.getElementById('voiceButton');
+                voiceBtn.classList.add('recording');
+                voiceBtn.textContent = '⏹️';
+                voiceBtn.title = 'Остановить запись';
+                
+                showNotification('Запись началась... Говорите!');
+                triggerVibration();
+                
+                // Инициализируем распознавание речи
+                initSpeechRecognition();
+                
+            } catch (error) {
+                console.error('Ошибка доступа к микрофону:', error);
+                showNotification('Ошибка доступа к микрофону');
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                isRecording = false;
+                
+                // Обновляем UI
+                const voiceBtn = document.getElementById('voiceButton');
+                voiceBtn.classList.remove('recording');
+                voiceBtn.textContent = '🎤';
+                voiceBtn.title = 'Голосовое сообщение';
+                
+                showNotification('Запись остановлена');
+                
+                // Останавливаем распознавание речи
+                if (recognition) {
+                    recognition.stop();
+                }
+            }
+        }
+
+        function initSpeechRecognition() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                
+                recognition.continuous = true;
+                recognition.interimResults = true;
+                recognition.lang = currentLanguage === 'ru' ? 'ru-RU' : 
+                                 currentLanguage === 'en' ? 'en-US' : 
+                                 currentLanguage === 'es' ? 'es-ES' : 
+                                 currentLanguage === 'fr' ? 'fr-FR' : 
+                                 currentLanguage === 'de' ? 'de-DE' : 
+                                 currentLanguage === 'zh' ? 'zh-CN' : 'ru-RU';
+                
+                recognition.onresult = (event) => {
+                    let transcript = '';
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        if (event.results[i].isFinal) {
+                            transcript += event.results[i][0].transcript;
+                        }
+                    }
+                    
+                    if (transcript.trim()) {
+                        document.getElementById('chatInput').value = transcript;
+                    }
+                };
+                
+                recognition.onerror = (event) => {
+                    console.error('Ошибка распознавания речи:', event.error);
+                };
+                
+                recognition.start();
+            }
+        }
+
+        function processVoiceMessage(audioBlob) {
+            // Создаем URL для аудио
+            const audioUrl = URL.createObjectURL(audioBlob);
+            
+            // Добавляем голосовое сообщение в чат
+            addVoiceMessage(audioUrl, true);
+            
+            // Если есть текст из распознавания, отправляем его
+            const transcribedText = document.getElementById('chatInput').value.trim();
+            if (transcribedText) {
+                // Очищаем поле ввода и отправляем как обычное сообщение
+                setTimeout(() => {
+                    sendMessage();
+                }, 500);
+            } else {
+                showNotification('Голосовое сообщение записано, но текст не распознан');
+            }
+        }
+
+        function addVoiceMessage(audioUrl, isUser = false) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'ai'}`;
+            
+            const currentTime = getCurrentTime();
+            
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    <div class="voice-message">
+                        <button class="play-voice-btn" onclick="playVoiceMessage('${audioUrl}')">▶️</button>
+                        <span class="voice-duration">Голосовое сообщение</span>
+                    </div>
+                </div>
+                <div class="message-time">${currentTime}</div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            return currentTime;
+        }
+
+        function playVoiceMessage(audioUrl) {
+            const audio = new Audio(audioUrl);
+            audio.play().catch(error => {
+                console.error('Ошибка воспроизведения:', error);
+                showNotification('Ошибка воспроизведения аудио');
+            });
         }
 
         // Шаблоны запросов
