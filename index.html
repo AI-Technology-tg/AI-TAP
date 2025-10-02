@@ -5455,16 +5455,25 @@
         let particleInterval;
 
         function startLoadingSequence() {
+            console.log('🚀 Запуск загрузки...');
+            
             // Сбрасываем переменные
             currentMessageIndex = 0;
             loadingProgress = 0;
             
             // Очищаем предыдущие интервалы если есть
-            if (loadingInterval) clearInterval(loadingInterval);
-            if (messageInterval) clearInterval(messageInterval);
-            if (particleInterval) clearInterval(particleInterval);
-            
-            console.log('🚀 Запуск загрузки...');
+            if (loadingInterval) {
+                clearInterval(loadingInterval);
+                loadingInterval = null;
+            }
+            if (messageInterval) {
+                clearInterval(messageInterval);
+                messageInterval = null;
+            }
+            if (particleInterval) {
+                clearInterval(particleInterval);
+                particleInterval = null;
+            }
             
             // Создаем частицы для фона
             createLoadingParticles();
@@ -5477,6 +5486,8 @@
             
             // Запускаем создание частиц
             particleInterval = setInterval(createLoadingParticles, 500);
+            
+            console.log('✅ Все компоненты загрузки инициализированы');
         }
 
         function createLoadingParticles() {
@@ -5503,6 +5514,9 @@
         function startMessageAnimation() {
             const messageElement = document.getElementById('currentMessage');
             
+            // Сбрасываем индекс сообщений
+            currentMessageIndex = 0;
+            
             function showNextMessage() {
                 if (currentMessageIndex < loadingMessages.length) {
                     messageElement.textContent = loadingMessages[currentMessageIndex];
@@ -5516,31 +5530,40 @@
                 }
             }
             
+            // Показываем первое сообщение сразу
             showNextMessage();
-            messageInterval = setInterval(showNextMessage, 1500);
+            
+            // Запускаем интервал для остальных сообщений
+            messageInterval = setInterval(showNextMessage, 1200);
         }
 
         function startProgressAnimation() {
             const progressFill = document.getElementById('progressFill');
             const progressText = document.getElementById('progressText');
             
-            // Более предсказуемая загрузка с фиксированными шагами
-            const totalSteps = 20;
-            const stepDuration = 300; // 300ms на каждый шаг
-            const stepSize = 100 / totalSteps;
+            // Сбрасываем прогресс
+            loadingProgress = 0;
+            progressFill.style.width = '0%';
+            progressText.textContent = '0%';
             
-            let currentStep = 0;
+            console.log('🚀 Начинаем анимацию прогресса...');
             
+            // Простая и надежная логика прогресса
             loadingInterval = setInterval(() => {
-                if (currentStep < totalSteps) {
-                    currentStep++;
-                    loadingProgress = Math.min(100, currentStep * stepSize);
+                if (loadingProgress < 100) {
+                    // Увеличиваем прогресс на 2% каждые 150ms
+                    loadingProgress += 2;
+                    
+                    // Ограничиваем до 100%
+                    if (loadingProgress > 100) {
+                        loadingProgress = 100;
+                    }
                     
                     progressFill.style.width = loadingProgress + '%';
                     progressText.textContent = Math.floor(loadingProgress) + '%';
                     
                     // Логируем каждые 20%
-                    if (currentStep % 4 === 0) {
+                    if (Math.floor(loadingProgress) % 20 === 0) {
                         console.log(`📊 Прогресс: ${Math.floor(loadingProgress)}%`);
                     }
                     
@@ -5552,11 +5575,12 @@
                         finishLoading();
                     }
                 }
-            }, stepDuration);
+            }, 150);
             
-            // Принудительно завершаем загрузку через 8 секунд (вместо 15)
+            // Принудительно завершаем загрузку через 8 секунд
             setTimeout(() => {
                 if (loadingProgress < 100) {
+                    console.log('⏰ Принудительное завершение загрузки');
                     loadingProgress = 100;
                     progressFill.style.width = '100%';
                     progressText.textContent = '100%';
