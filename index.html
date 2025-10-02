@@ -857,6 +857,22 @@
             box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
         }
 
+        .send-button.sending {
+            animation: sendPulse 0.3s ease;
+            transform: scale(0.95);
+        }
+
+        @keyframes sendPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.9); box-shadow: 0 0 25px rgba(0, 255, 255, 0.8); }
+            100% { transform: scale(0.95); }
+        }
+
+        .chat-input.typing {
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            border-color: rgba(0, 255, 255, 0.8);
+        }
+
         .typing-indicator {
             color: rgba(0, 255, 255, 0.7);
             transition: all 0.3s ease;
@@ -1291,6 +1307,67 @@
             
             oscillator.start(audioContext.currentTime);
             oscillator.stop(audioContext.currentTime + 0.3);
+        }
+
+        // Звук набора текста
+        function playTypingSound() {
+            if (!soundEnabled) return;
+            
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            // Короткий щелчок клавиши
+            oscillator.frequency.setValueAtTime(400 + Math.random() * 200, audioContext.currentTime);
+            oscillator.type = 'square';
+            
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.01);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.05);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.05);
+        }
+
+        // Звук отправки сообщения
+        function playSendSound() {
+            if (!soundEnabled) return;
+            
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // Визуальный эффект для кнопки отправки
+            const sendButton = document.getElementById('sendButton');
+            if (sendButton) {
+                sendButton.classList.add('sending');
+                setTimeout(() => {
+                    sendButton.classList.remove('sending');
+                }, 300);
+            }
+            
+            // Создаем последовательность звуков для эффекта "свист"
+            for (let i = 0; i < 3; i++) {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                const startFreq = 600 + i * 100;
+                const endFreq = startFreq + 200;
+                
+                oscillator.frequency.setValueAtTime(startFreq, audioContext.currentTime + i * 0.05);
+                oscillator.frequency.linearRampToValueAtTime(endFreq, audioContext.currentTime + i * 0.05 + 0.1);
+                
+                gainNode.gain.setValueAtTime(0, audioContext.currentTime + i * 0.05);
+                gainNode.gain.linearRampToValueAtTime(0.2, audioContext.currentTime + i * 0.05 + 0.02);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + i * 0.05 + 0.15);
+                
+                oscillator.start(audioContext.currentTime + i * 0.05);
+                oscillator.stop(audioContext.currentTime + i * 0.05 + 0.15);
+            }
         }
 
         // Виброотклик для мобильных устройств
@@ -1750,6 +1827,11 @@
                 aiSettings.maxTokens = Math.max(100, Math.min(2000, parseInt(newTokens)));
             }
             
+            // Настройка звуков
+            const currentSound = localStorage.getItem('ai-tap-sound') !== 'false';
+            const soundChoice = confirm('Включить звуковые эффекты? (Сейчас: ' + (currentSound ? 'включены' : 'выключены') + ')');
+            localStorage.setItem('ai-tap-sound', soundChoice.toString());
+            
             localStorage.setItem('ai-tap-settings', JSON.stringify(aiSettings));
             updateConnectionStatus('🟢', 'Настройки обновлены');
         }
@@ -1836,6 +1918,9 @@
             const message = input.value.trim();
             
             if (!message) return;
+            
+            // Воспроизводим звук отправки
+            playSendSound();
             
             // Добавляем сообщение пользователя в интерфейс и получаем время
             const userTime = addMessage(message, true);
@@ -1931,7 +2016,27 @@
             const chatInput = document.getElementById('chatInput');
             
             if (chatInput) {
+                // Звук набора текста
+                let typingTimer = null;
+                let typingEffectTimer = null;
+                
                 chatInput.addEventListener('keydown', function(e) {
+                    // Воспроизводим звук набора (с ограничением частоты)
+                    if (!typingTimer) {
+                        playTypingSound();
+                        
+                        // Визуальный эффект набора
+                        this.classList.add('typing');
+                        clearTimeout(typingEffectTimer);
+                        typingEffectTimer = setTimeout(() => {
+                            this.classList.remove('typing');
+                        }, 200);
+                        
+                        typingTimer = setTimeout(() => {
+                            typingTimer = null;
+                        }, 100); // Ограничиваем до 10 звуков в секунду
+                    }
+                    
                     if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
                         sendMessage();
