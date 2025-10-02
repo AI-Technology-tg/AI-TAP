@@ -2019,6 +2019,148 @@
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
         }
 
+        /* Стили для модального окна статьи */
+        .article-content {
+            padding: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .article-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .article-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .article-source {
+            background: rgba(0, 255, 255, 0.2);
+            color: rgba(0, 255, 255, 0.9);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .article-date {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+        }
+
+        .article-category {
+            background: rgba(255, 215, 0, 0.2);
+            color: rgba(255, 215, 0, 0.9);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .article-main-title {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: 15px;
+        }
+
+        .article-image {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .article-description {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .article-body {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 25px;
+        }
+
+        .article-actions {
+            display: flex;
+            gap: 15px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .article-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .article-btn.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .article-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .article-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .article-loading {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .article-error {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .article-error-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .article-error-message {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .article-error-desc {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
         /* Селектор режимов ИИ */
         .mode-selector {
             display: grid;
@@ -2613,6 +2755,19 @@
         </div>
     </div>
 
+    <!-- Модальное окно статьи -->
+    <div id="articleModal" class="chat-modal" style="display: none;">
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="chat-title" id="articleTitle">📰 Статья</div>
+                <span class="chat-close" onclick="closeArticleModal()">&times;</span>
+            </div>
+            <div id="articleContent" class="article-content">
+                <!-- Содержимое статьи загружается динамически -->
+            </div>
+        </div>
+    </div>
+
     <!-- Уведомления -->
     <div id="notification" class="notification"></div>
 
@@ -2699,6 +2854,9 @@
         // Конфигурация Groq AI API
         const GROQ_API_KEY = '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';
         const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+        
+        // Хранилище текущих новостей
+        let currentNewsData = [];
         
         // Память для чата
         let chatHistory = JSON.parse(localStorage.getItem('ai-tap-chat-history') || '[]');
@@ -2962,6 +3120,7 @@
             const mainSettingsModal = document.getElementById('mainSettingsModal');
             const weatherModal = document.getElementById('weatherModal');
             const newsModal = document.getElementById('newsModal');
+            const articleModal = document.getElementById('articleModal');
             const adminModal = document.getElementById('adminModal');
             const usersModal = document.getElementById('usersModal');
             const userDetailsModal = document.getElementById('userDetailsModal');
@@ -2984,6 +3143,9 @@
             }
             if (event.target === newsModal) {
                 newsModal.style.display = 'none';
+            }
+            if (event.target === articleModal) {
+                articleModal.style.display = 'none';
             }
             if (event.target === adminModal) {
                 adminModal.style.display = 'none';
@@ -3937,14 +4099,17 @@
                 return;
             }
 
+            // Сохраняем текущие новости для открытия статей
+            currentNewsData = newsData;
+
             const newsHTML = `
                 <div class="news-header">
                     <div class="news-title">📰 Новости: ${location}</div>
                     <div class="news-count">${newsData.length} статей</div>
                 </div>
                 <div class="news-list">
-                    ${newsData.map(article => `
-                        <div class="news-item" onclick="openNewsArticle('${article.url}', '${article.title}')">
+                    ${newsData.map((article, index) => `
+                        <div class="news-item" onclick="openNewsArticle(${index})">
                             <div class="news-item-header">
                                 <div class="news-item-image">
                                     ${article.urlToImage ? 
@@ -3989,14 +4154,147 @@
             }
         }
 
-        function openNewsArticle(url, title) {
-            if (url.startsWith('#')) {
-                showNotification(`Открытие статьи: "${title}"`);
+        function openNewsArticle(articleIndex) {
+            if (!currentNewsData || !currentNewsData[articleIndex]) {
+                showNotification('❌ Статья не найдена');
                 return;
             }
+
+            const article = currentNewsData[articleIndex];
+            document.getElementById('articleModal').style.display = 'block';
+            document.getElementById('articleTitle').textContent = `📰 ${article.source}`;
             
-            // Открываем статью в новой вкладке
-            window.open(url, '_blank');
+            loadArticleContent(article);
+        }
+
+        function closeArticleModal() {
+            document.getElementById('articleModal').style.display = 'none';
+        }
+
+        function loadArticleContent(article) {
+            const articleContent = document.getElementById('articleContent');
+            
+            // Показываем загрузку
+            articleContent.innerHTML = `
+                <div class="article-loading">
+                    <div class="loading-spinner"></div>
+                    <div class="weather-message">Загружаем статью...</div>
+                </div>
+            `;
+
+            // Имитируем загрузку контента (в реальности здесь был бы запрос к API для получения полного текста)
+            setTimeout(() => {
+                displayArticleContent(article);
+            }, 800);
+        }
+
+        function displayArticleContent(article) {
+            const articleContent = document.getElementById('articleContent');
+            
+            // Генерируем расширенный контент статьи
+            const fullContent = generateFullArticleContent(article);
+            
+            const articleHTML = `
+                <div class="article-header">
+                    <div class="article-meta">
+                        <div class="article-source">${article.source}</div>
+                        <div class="article-date">${formatNewsTime(article.publishedAt)}</div>
+                        <div class="article-category">${article.category}</div>
+                    </div>
+                    <h1 class="article-main-title">${article.title}</h1>
+                </div>
+
+                ${article.urlToImage ? `<img src="${article.urlToImage}" alt="Изображение статьи" class="article-image" onerror="this.style.display='none';">` : ''}
+
+                <div class="article-description">
+                    ${article.description}
+                </div>
+
+                <div class="article-body">
+                    ${fullContent}
+                </div>
+
+                <div class="article-actions">
+                    ${article.url && !article.url.startsWith('#') ? 
+                        `<a href="${article.url}" target="_blank" class="article-btn primary">
+                            🔗 Читать оригинал
+                        </a>` : 
+                        `<button class="article-btn primary" onclick="showNotification('Оригинал статьи недоступен')">
+                            🔗 Читать оригинал
+                        </button>`
+                    }
+                    <button class="article-btn secondary" onclick="shareArticle('${article.title}', '${article.url}')">
+                        📤 Поделиться
+                    </button>
+                </div>
+            `;
+
+            articleContent.innerHTML = articleHTML;
+        }
+
+        function generateFullArticleContent(article) {
+            // Генерируем расширенный контент на основе описания и категории
+            const templates = {
+                'Экономика': [
+                    'Экономические эксперты отмечают значительные изменения в данном секторе.',
+                    'Аналитики прогнозируют дальнейшее развитие ситуации в ближайшие месяцы.',
+                    'Данные события могут повлиять на общую экономическую ситуацию в регионе.',
+                    'Министерство экономики планирует принять дополнительные меры поддержки.',
+                    'Инвесторы внимательно следят за развитием событий и корректируют свои стратегии.'
+                ],
+                'Политика': [
+                    'Политические аналитики высоко оценивают значимость данного события.',
+                    'Представители различных партий выразили свое мнение по данному вопросу.',
+                    'Общественность активно обсуждает возможные последствия принятых решений.',
+                    'Международные наблюдатели следят за развитием политической ситуации.',
+                    'Эксперты прогнозируют возможные изменения в политическом курсе.'
+                ],
+                'Технологии': [
+                    'Технологические инновации продолжают менять привычный уклад жизни.',
+                    'Разработчики работают над улучшением функциональности и безопасности.',
+                    'IT-сообщество активно обсуждает перспективы новых технологий.',
+                    'Компании инвестируют значительные средства в исследования и разработки.',
+                    'Пользователи отмечают удобство и эффективность новых решений.'
+                ],
+                'Спорт': [
+                    'Спортивные болельщики с нетерпением ожидают предстоящих соревнований.',
+                    'Тренеры и спортсмены интенсивно готовятся к важным стартам.',
+                    'Спортивные эксперты анализируют шансы различных команд и спортсменов.',
+                    'Организаторы обеспечивают высокий уровень проведения спортивных мероприятий.',
+                    'Результаты соревнований могут повлиять на рейтинги и будущие выступления.'
+                ],
+                'Культура': [
+                    'Культурные деятели отмечают важность сохранения традиций и наследия.',
+                    'Мероприятие привлекло внимание широкой общественности и критиков.',
+                    'Организаторы планируют расширить программу в следующем году.',
+                    'Посетители высоко оценили качество и разнообразие представленных работ.',
+                    'Культурная инициатива получила поддержку местных властей и спонсоров.'
+                ]
+            };
+
+            const categoryTemplates = templates[article.category] || templates['Экономика'];
+            const selectedTemplates = categoryTemplates.slice(0, 3 + Math.floor(Math.random() * 3));
+            
+            return selectedTemplates.map(template => `<p>${template}</p>`).join('\n\n');
+        }
+
+        function shareArticle(title, url) {
+            if (navigator.share) {
+                navigator.share({
+                    title: title,
+                    url: url
+                }).catch(err => console.log('Ошибка при попытке поделиться:', err));
+            } else {
+                // Fallback для браузеров без поддержки Web Share API
+                const shareText = `${title} - ${url}`;
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(shareText).then(() => {
+                        showNotification('📋 Ссылка скопирована в буфер обмена');
+                    });
+                } else {
+                    showNotification('📤 Поделиться: ' + title);
+                }
+            }
         }
 
         // Добавляем поддержку Enter в поле поиска новостей
