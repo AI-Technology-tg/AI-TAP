@@ -759,49 +759,184 @@
             margin: 0 5px;
         }
 
-        /* Стили для шаблонов */
-        .templates-content {
+        /* Стили для настроек */
+        .settings-content {
             padding: 20px;
-            max-height: 400px;
+            max-height: 500px;
             overflow-y: auto;
         }
 
-        .template-category {
-            margin-bottom: 20px;
+        .settings-section {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 10px;
         }
 
-        .template-category h3 {
+        .settings-section h3 {
             color: #00ffff;
-            margin-bottom: 10px;
+            margin: 0 0 15px 0;
             font-size: 16px;
         }
 
-        .template-item {
-            background: rgba(0, 255, 255, 0.05);
-            border: 1px solid rgba(0, 255, 255, 0.2);
-            border-radius: 8px;
-            padding: 12px;
+        .setting-item {
+            margin-bottom: 15px;
+        }
+
+        .setting-item label {
+            display: block;
+            color: #e0e0e0;
             margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 5px;
+        }
+
+        .slider-container input[type="range"] {
+            flex: 1;
+            height: 6px;
+            background: rgba(0, 255, 255, 0.2);
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider-container input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #00ffff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        .slider-container span {
+            color: #00ffff;
+            font-weight: bold;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .setting-item small {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+        }
+
+        /* Toggle switch */
+        .toggle-label {
+            display: flex !important;
+            align-items: center;
+            cursor: pointer;
+            gap: 10px;
+        }
+
+        .toggle-label input[type="checkbox"] {
+            display: none;
+        }
+
+        .toggle-slider {
+            width: 50px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-label input[type="checkbox"]:checked + .toggle-slider {
+            background: #00ffff;
+        }
+
+        .toggle-label input[type="checkbox"]:checked + .toggle-slider::before {
+            transform: translateX(26px);
+        }
+
+        /* Статистика */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: rgba(0, 255, 255, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00ffff;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Кнопки настроек */
+        .settings-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .settings-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
         }
 
-        .template-item:hover {
-            background: rgba(0, 255, 255, 0.1);
-            border-color: rgba(0, 255, 255, 0.4);
-            transform: translateX(5px);
-        }
-
-        .template-title {
-            font-weight: bold;
+        .settings-btn.primary {
+            background: rgba(0, 255, 255, 0.2);
             color: #00ffff;
-            margin-bottom: 4px;
+            border: 2px solid rgba(0, 255, 255, 0.4);
         }
 
-        .template-description {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.7);
+        .settings-btn.primary:hover {
+            background: rgba(0, 255, 255, 0.3);
+            border-color: rgba(0, 255, 255, 0.6);
         }
+
+        .settings-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e0e0e0;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .settings-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
 
         .chat-title {
             color: #00ffff;
@@ -1098,7 +1233,6 @@
             <div class="chat-header">
                 <div class="chat-title">Основной ИИ</div>
                 <div class="chat-controls">
-                    <button class="chat-control-btn" onclick="showPromptTemplates()" title="Шаблоны запросов">📝</button>
                     <button class="chat-control-btn" onclick="toggleLocation()" title="Геолокация" id="locationBtn">📍</button>
                     <button class="chat-control-btn" onclick="clearChatHistory()" title="Очистить историю">🗑️</button>
                     <button class="chat-control-btn" onclick="toggleAISettings()" title="Настройки ИИ">⚙️</button>
@@ -1147,15 +1281,69 @@
         </div>
     </div>
 
-    <!-- Модальное окно шаблонов -->
-    <div id="templatesModal" class="chat-modal" style="display: none;">
+
+    <!-- Модальное окно настроек -->
+    <div id="settingsModal" class="chat-modal" style="display: none;">
         <div class="chat-container">
             <div class="chat-header">
-                <div class="chat-title">📝 Шаблоны запросов</div>
-                <span class="chat-close" onclick="closeTemplates()">&times;</span>
+                <div class="chat-title">⚙️ Настройки ИИ</div>
+                <span class="chat-close" onclick="closeSettings()">&times;</span>
             </div>
-            <div class="templates-content" id="templatesContent">
-                <!-- Шаблоны будут добавлены динамически -->
+            <div class="settings-content" id="settingsContent">
+                <div class="settings-section">
+                    <h3>🤖 Параметры ИИ</h3>
+                    <div class="setting-item">
+                        <label>Температура (креативность):</label>
+                        <div class="slider-container">
+                            <input type="range" id="temperatureSlider" min="0.1" max="2.0" step="0.1" value="0.7">
+                            <span id="temperatureValue">0.7</span>
+                        </div>
+                        <small>Низкая = точные ответы, Высокая = креативные ответы</small>
+                    </div>
+                    <div class="setting-item">
+                        <label>Длина ответов (токены):</label>
+                        <div class="slider-container">
+                            <input type="range" id="tokensSlider" min="100" max="2000" step="100" value="1000">
+                            <span id="tokensValue">1000</span>
+                        </div>
+                        <small>Больше токенов = более подробные ответы</small>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h3>🔊 Звуковые эффекты</h3>
+                    <div class="setting-item">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="soundToggle" checked>
+                            <span class="toggle-slider"></span>
+                            Включить звуки
+                        </label>
+                        <small>Звуки отправки и получения сообщений</small>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h3>📊 Статистика</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-number" id="statMessages">0</div>
+                            <div class="stat-label">Сообщений</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="statDays">0</div>
+                            <div class="stat-label">Дней общения</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="statFacts">0</div>
+                            <div class="stat-label">Фактов запомнено</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="settings-actions">
+                    <button class="settings-btn primary" onclick="saveSettings()">💾 Сохранить</button>
+                    <button class="settings-btn secondary" onclick="resetSettings()">🔄 Сбросить</button>
+                </div>
             </div>
         </div>
     </div>
@@ -1325,86 +1513,84 @@
         // Звуковые уведомления
         const soundEnabled = localStorage.getItem('ai-tap-sound') !== 'false';
         
+        // Оптимизированный звук получения сообщения
         function playNotificationSound() {
             if (!soundEnabled) return;
             
-            // Создаем звук программно (Web Audio API)
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-            oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.1);
-            
-            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-            gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.01);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-            
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.3);
-        }
-
-        // Звук набора текста
-        function playTypingSound() {
-            if (!soundEnabled) return;
-            
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            // Короткий щелчок клавиши
-            oscillator.frequency.setValueAtTime(400 + Math.random() * 200, audioContext.currentTime);
-            oscillator.type = 'square';
-            
-            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-            gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.01);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.05);
-            
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.05);
-        }
-
-        // Звук отправки сообщения
-        function playSendSound() {
-            if (!soundEnabled) return;
-            
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            
-            // Визуальный эффект для кнопки отправки
-            const sendButton = document.getElementById('sendButton');
-            if (sendButton) {
-                sendButton.classList.add('sending');
-                setTimeout(() => {
-                    sendButton.classList.remove('sending');
-                }, 300);
-            }
-            
-            // Создаем последовательность звуков для эффекта "свист"
-            for (let i = 0; i < 3; i++) {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Убеждаемся что контекст активен
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
+                
                 const oscillator = audioContext.createOscillator();
                 const gainNode = audioContext.createGain();
                 
                 oscillator.connect(gainNode);
                 gainNode.connect(audioContext.destination);
                 
-                const startFreq = 600 + i * 100;
-                const endFreq = startFreq + 200;
+                // Более приятный звук уведомления
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(880, audioContext.currentTime); // A5
+                oscillator.frequency.setValueAtTime(1108, audioContext.currentTime + 0.1); // C#6
+                oscillator.frequency.setValueAtTime(1319, audioContext.currentTime + 0.2); // E6
                 
-                oscillator.frequency.setValueAtTime(startFreq, audioContext.currentTime + i * 0.05);
-                oscillator.frequency.linearRampToValueAtTime(endFreq, audioContext.currentTime + i * 0.05 + 0.1);
+                gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.2, audioContext.currentTime + 0.05);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.4);
                 
-                gainNode.gain.setValueAtTime(0, audioContext.currentTime + i * 0.05);
-                gainNode.gain.linearRampToValueAtTime(0.2, audioContext.currentTime + i * 0.05 + 0.02);
-                gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + i * 0.05 + 0.15);
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.4);
                 
-                oscillator.start(audioContext.currentTime + i * 0.05);
-                oscillator.stop(audioContext.currentTime + i * 0.05 + 0.15);
+            } catch (error) {
+                console.log('Звук недоступен:', error);
+            }
+        }
+
+
+        // Оптимизированный звук отправки сообщения
+        function playSendSound() {
+            if (!soundEnabled) return;
+            
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Убеждаемся что контекст активен
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
+                
+                // Визуальный эффект для кнопки отправки
+                const sendButton = document.getElementById('sendButton');
+                if (sendButton) {
+                    sendButton.classList.add('sending');
+                    setTimeout(() => {
+                        sendButton.classList.remove('sending');
+                    }, 300);
+                }
+                
+                // Простой и надежный звук отправки
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.type = 'triangle';
+                oscillator.frequency.setValueAtTime(523, audioContext.currentTime); // C5
+                oscillator.frequency.linearRampToValueAtTime(784, audioContext.currentTime + 0.1); // G5
+                
+                gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.15, audioContext.currentTime + 0.02);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.2);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.2);
+                
+            } catch (error) {
+                console.log('Звук отправки недоступен:', error);
             }
         }
 
@@ -2057,102 +2243,89 @@
             });
         }
 
-        // Шаблоны запросов
-        const promptTemplates = {
-            'Общение': [
-                { title: 'Дружеская беседа', prompt: 'Давай поговорим как друзья. Расскажи что-нибудь интересное!', description: 'Неформальное общение' },
-                { title: 'Совет по проблеме', prompt: 'У меня есть проблема, помоги найти решение: [опиши проблему]', description: 'Получить совет' },
-                { title: 'Мотивация', prompt: 'Мне нужна мотивация и поддержка. Подбодри меня!', description: 'Поднять настроение' }
-            ],
-            'Обучение': [
-                { title: 'Объяснить тему', prompt: 'Объясни мне простыми словами: [тема]', description: 'Понятное объяснение' },
-                { title: 'Создать план изучения', prompt: 'Создай план изучения темы: [тема] на [время]', description: 'Структурированное обучение' },
-                { title: 'Проверить знания', prompt: 'Задай мне вопросы по теме: [тема]', description: 'Тестирование знаний' }
-            ],
-            'Творчество': [
-                { title: 'Написать стихотворение', prompt: 'Напиши стихотворение на тему: [тема]', description: 'Поэтическое творчество' },
-                { title: 'Придумать историю', prompt: 'Придумай интересную историю про: [персонаж/ситуация]', description: 'Создание рассказа' },
-                { title: 'Идеи для проекта', prompt: 'Предложи креативные идеи для проекта: [описание]', description: 'Мозговой штурм' }
-            ],
-            'Работа': [
-                { title: 'Написать email', prompt: 'Помоги написать профессиональный email на тему: [тема]', description: 'Деловая переписка' },
-                { title: 'Анализ задачи', prompt: 'Помоги проанализировать рабочую задачу: [описание]', description: 'Решение задач' },
-                { title: 'Планирование', prompt: 'Создай план работы над проектом: [описание проекта]', description: 'Организация работы' }
-            ]
-        };
-
-        function showPromptTemplates() {
-            document.getElementById('templatesModal').style.display = 'block';
-            renderTemplates();
-        }
-
-        function closeTemplates() {
-            document.getElementById('templatesModal').style.display = 'none';
-        }
-
-        function renderTemplates() {
-            const container = document.getElementById('templatesContent');
-            container.innerHTML = '';
-
-            Object.keys(promptTemplates).forEach(category => {
-                const categoryDiv = document.createElement('div');
-                categoryDiv.className = 'template-category';
-                
-                const categoryTitle = document.createElement('h3');
-                categoryTitle.textContent = category;
-                categoryDiv.appendChild(categoryTitle);
-
-                promptTemplates[category].forEach(template => {
-                    const templateDiv = document.createElement('div');
-                    templateDiv.className = 'template-item';
-                    templateDiv.onclick = () => useTemplate(template.prompt);
-                    
-                    templateDiv.innerHTML = `
-                        <div class="template-title">${template.title}</div>
-                        <div class="template-description">${template.description}</div>
-                    `;
-                    
-                    categoryDiv.appendChild(templateDiv);
-                });
-
-                container.appendChild(categoryDiv);
-            });
-        }
-
-        function useTemplate(prompt) {
-            document.getElementById('chatInput').value = prompt;
-            closeTemplates();
-            document.getElementById('chatInput').focus();
-            
-            // Добавляем в любимые темы если это новая тема
-            const topic = prompt.split(':')[0];
-            if (topic && !aiMemory.favoriteTopics.includes(topic)) {
-                aiMemory.favoriteTopics.push(topic);
-                if (aiMemory.favoriteTopics.length > 10) {
-                    aiMemory.favoriteTopics.shift();
-                }
-                updateAIMemory('favoriteTopics', aiMemory.favoriteTopics);
-            }
-        }
-        
+        // Новый красивый интерфейс настроек
         function toggleAISettings() {
-            const newTemp = prompt('Температура ИИ (0.1-2.0, текущая: ' + aiSettings.temperature + '):', aiSettings.temperature);
-            if (newTemp !== null && !isNaN(newTemp)) {
-                aiSettings.temperature = Math.max(0.1, Math.min(2.0, parseFloat(newTemp)));
+            document.getElementById('settingsModal').style.display = 'block';
+            loadSettingsUI();
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsModal').style.display = 'none';
+        }
+
+        function loadSettingsUI() {
+            // Загружаем текущие настройки в интерфейс
+            document.getElementById('temperatureSlider').value = aiSettings.temperature;
+            document.getElementById('temperatureValue').textContent = aiSettings.temperature;
+            
+            document.getElementById('tokensSlider').value = aiSettings.maxTokens;
+            document.getElementById('tokensValue').textContent = aiSettings.maxTokens;
+            
+            const soundEnabled = localStorage.getItem('ai-tap-sound') !== 'false';
+            document.getElementById('soundToggle').checked = soundEnabled;
+            
+            // Обновляем статистику
+            updateStatistics();
+            
+            // Добавляем обработчики слайдеров
+            const tempSlider = document.getElementById('temperatureSlider');
+            const tokensSlider = document.getElementById('tokensSlider');
+            
+            tempSlider.oninput = function() {
+                document.getElementById('temperatureValue').textContent = this.value;
+            };
+            
+            tokensSlider.oninput = function() {
+                document.getElementById('tokensValue').textContent = this.value;
+            };
+        }
+
+        function updateStatistics() {
+            // Обновляем статистику
+            document.getElementById('statMessages').textContent = aiMemory.interactionCount || 0;
+            document.getElementById('statFacts').textContent = (aiMemory.rememberedFacts || []).length;
+            
+            // Вычисляем дни общения
+            if (aiMemory.lastInteraction) {
+                const firstInteraction = new Date(aiMemory.lastInteraction);
+                const now = new Date();
+                const daysDiff = Math.ceil((now - firstInteraction) / (1000 * 60 * 60 * 24));
+                document.getElementById('statDays').textContent = Math.max(1, daysDiff);
+            } else {
+                document.getElementById('statDays').textContent = 0;
             }
-            
-            const newTokens = prompt('Максимум токенов (100-2000, текущий: ' + aiSettings.maxTokens + '):', aiSettings.maxTokens);
-            if (newTokens !== null && !isNaN(newTokens)) {
-                aiSettings.maxTokens = Math.max(100, Math.min(2000, parseInt(newTokens)));
-            }
-            
-            // Настройка звуков
-            const currentSound = localStorage.getItem('ai-tap-sound') !== 'false';
-            const soundChoice = confirm('Включить звуковые эффекты? (Сейчас: ' + (currentSound ? 'включены' : 'выключены') + ')');
-            localStorage.setItem('ai-tap-sound', soundChoice.toString());
-            
+        }
+
+        function saveSettings() {
+            // Сохраняем настройки ИИ
+            aiSettings.temperature = parseFloat(document.getElementById('temperatureSlider').value);
+            aiSettings.maxTokens = parseInt(document.getElementById('tokensSlider').value);
             localStorage.setItem('ai-tap-settings', JSON.stringify(aiSettings));
-            updateConnectionStatus('🟢', 'Настройки обновлены');
+            
+            // Сохраняем настройки звука
+            const soundEnabled = document.getElementById('soundToggle').checked;
+            localStorage.setItem('ai-tap-sound', soundEnabled.toString());
+            
+            closeSettings();
+            updateConnectionStatus('🟢', 'Настройки сохранены');
+            showNotification('✅ Настройки сохранены');
+            playNotificationSound();
+        }
+
+        function resetSettings() {
+            if (confirm('Сбросить все настройки к значениям по умолчанию?')) {
+                // Сбрасываем настройки ИИ
+                aiSettings = { temperature: 0.7, maxTokens: 1000 };
+                localStorage.setItem('ai-tap-settings', JSON.stringify(aiSettings));
+                
+                // Сбрасываем звуки
+                localStorage.setItem('ai-tap-sound', 'true');
+                
+                // Обновляем интерфейс
+                loadSettingsUI();
+                
+                showNotification('🔄 Настройки сброшены');
+            }
         }
 
         // Статус подключения
@@ -2338,27 +2511,7 @@
             const chatInput = document.getElementById('chatInput');
             
             if (chatInput) {
-                // Звук набора текста
-                let typingTimer = null;
-                let typingEffectTimer = null;
-                
                 chatInput.addEventListener('keydown', function(e) {
-                    // Воспроизводим звук набора (с ограничением частоты)
-                    if (!typingTimer) {
-                        playTypingSound();
-                        
-                        // Визуальный эффект набора
-                        this.classList.add('typing');
-                        clearTimeout(typingEffectTimer);
-                        typingEffectTimer = setTimeout(() => {
-                            this.classList.remove('typing');
-                        }, 200);
-                        
-                        typingTimer = setTimeout(() => {
-                            typingTimer = null;
-                        }, 100); // Ограничиваем до 10 звуков в секунду
-                    }
-                    
                     if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
                         sendMessage();
