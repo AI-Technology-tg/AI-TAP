@@ -1927,7 +1927,7 @@
         }
 
         .refresh-users-btn:disabled {
-            opacity: 0.6;
+            opacity: 0.7;
             cursor: not-allowed;
             transform: none;
         }
@@ -1936,39 +1936,6 @@
             animation: spin 1s linear infinite;
         }
 
-        .users-status {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 12px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            font-size: 12px;
-        }
-
-        .status-indicator {
-            font-size: 14px;
-            animation: pulse 2s infinite;
-        }
-
-        .status-indicator.updating {
-            animation: spin 1s linear infinite;
-        }
-
-        .status-indicator.online {
-            color: #4CAF50;
-            animation: none;
-        }
-
-        .status-text {
-            color: rgba(255, 255, 255, 0.9);
-            font-weight: 500;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
 
         .users-search-section {
             padding: 15px 20px;
@@ -2996,10 +2963,9 @@
             <div class="chat-header">
                 <div class="chat-title">👥 Управление пользователями</div>
                 <div class="chat-controls">
-                    <div class="users-status" id="usersStatus">
-                        <span class="status-indicator" id="statusIndicator">🔄</span>
-                        <span class="status-text" id="statusText">Обновление...</span>
-                    </div>
+                    <button id="refreshUsersBtn" class="refresh-users-btn" onclick="refreshUsersList()" title="Обновить список пользователей">
+                        <span class="refresh-icon">🔄</span>
+                    </button>
                 </div>
                 <button class="back-btn" onclick="backToAdmin()">← Назад</button>
                 <span class="chat-close" onclick="closeUsersModal()">&times;</span>
@@ -3588,10 +3554,8 @@
         let cachedNews = JSON.parse(localStorage.getItem('ai-tap-cached-news') || 'null');
         let lastNewsUpdate = localStorage.getItem('ai-tap-last-news-update') ? new Date(localStorage.getItem('ai-tap-last-news-update')) : null;
         
-        // Кэширование пользователей
-        let lastUsersUpdate = localStorage.getItem('ai-tap-last-users-update') ? new Date(localStorage.getItem('ai-tap-last-users-update')) : null;
-        let usersUpdateInterval = null;
-        let allUsers = []; // Кэш всех пользователей для поиска
+        // Кэш всех пользователей для поиска
+        let allUsers = [];
         
         
         // Инициализация памяти ИИ
@@ -5515,14 +5479,12 @@
             document.getElementById('adminModal').style.display = 'none';
             document.getElementById('usersModal').style.display = 'block';
             
-            // Загружаем пользователей и запускаем автообновление
+            // Загружаем пользователей
             loadUsersList();
-            startUsersAutoUpdate();
         }
 
         function closeUsersModal() {
             document.getElementById('usersModal').style.display = 'none';
-            stopUsersAutoUpdate();
         }
 
         function backToAdmin() {
@@ -5530,36 +5492,15 @@
             document.getElementById('adminModal').style.display = 'block';
         }
 
-        // Автоматическое обновление пользователей каждые 2 минуты
-        function startUsersAutoUpdate() {
-            // Останавливаем предыдущий интервал если есть
-            stopUsersAutoUpdate();
+        // Обновление списка пользователей
+        function refreshUsersList() {
+            const refreshBtn = document.getElementById('refreshUsersBtn');
             
-            // Обновляем статус
-            updateUsersStatus('updating', 'Обновление данных...');
+            // Блокируем кнопку и запускаем анимацию
+            refreshBtn.disabled = true;
+            refreshBtn.classList.add('loading');
             
-            // Запускаем автообновление каждые 2 минуты (120000 мс)
-            usersUpdateInterval = setInterval(() => {
-                updateUsersData();
-            }, 120000); // 2 минуты
-            
-            // Первое обновление через 2 секунды после открытия
-            setTimeout(() => {
-                updateUsersData();
-            }, 2000);
-        }
-
-        function stopUsersAutoUpdate() {
-            if (usersUpdateInterval) {
-                clearInterval(usersUpdateInterval);
-                usersUpdateInterval = null;
-            }
-        }
-
-        function updateUsersData() {
-            updateUsersStatus('updating', 'Обновление данных...');
-            
-            // Имитируем обновление данных (в реальности здесь был бы запрос к серверу)
+            // Имитируем поиск и обновление данных пользователей
             setTimeout(() => {
                 // Обновляем время последнего входа для демо-пользователя
                 const users = JSON.parse(localStorage.getItem('ai-tap-users') || '[]');
@@ -5574,39 +5515,18 @@
                 });
                 
                 localStorage.setItem('ai-tap-users', JSON.stringify(updatedUsers));
-                lastUsersUpdate = new Date();
-                localStorage.setItem('ai-tap-last-users-update', lastUsersUpdate.toISOString());
                 
                 // Перезагружаем список с учетом поиска
                 const searchQuery = document.getElementById('usersSearchInput').value;
                 loadUsersList(searchQuery);
                 
-                updateUsersStatus('online', 'Данные обновлены');
+                // Останавливаем анимацию и разблокируем кнопку
+                refreshBtn.disabled = false;
+                refreshBtn.classList.remove('loading');
                 
-                // Через 3 секунды меняем статус на обычный
-                setTimeout(() => {
-                    updateUsersStatus('online', 'Автообновление активно');
-                }, 3000);
+                showNotification('✅ Список пользователей обновлен');
                 
-            }, 1000);
-        }
-
-        function updateUsersStatus(type, text) {
-            const indicator = document.getElementById('statusIndicator');
-            const statusText = document.getElementById('statusText');
-            
-            // Убираем все классы
-            indicator.className = 'status-indicator';
-            
-            if (type === 'updating') {
-                indicator.textContent = '🔄';
-                indicator.classList.add('updating');
-            } else if (type === 'online') {
-                indicator.textContent = '🟢';
-                indicator.classList.add('online');
-            }
-            
-            statusText.textContent = text;
+            }, 2000); // 2 секунды имитации поиска
         }
 
         // Функции поиска пользователей
