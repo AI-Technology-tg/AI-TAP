@@ -5158,11 +5158,19 @@
         let selectedUserId = null;
 
         // Инициализация пользователя
+        console.log('🔍 Начинаем инициализацию Telegram Web App...');
+        
         const tg = window.Telegram.WebApp;
+        console.log('📱 Telegram WebApp объект:', tg);
+        
         tg.ready();
+        console.log('✅ Telegram WebApp готов');
 
         const user = tg.initDataUnsafe.user;
+        console.log('👤 Данные пользователя из Telegram:', user);
+        
         if (user) {
+            console.log('✅ Пользователь найден, регистрируем...');
             currentUser = user;
             
             // Полная инициализация интерфейса пользователя
@@ -5200,20 +5208,28 @@
             localStorage.setItem('ai-tap-user', JSON.stringify(user));
             
             // Регистрируем пользователя в системе
+            console.log('🚀 Вызываем registerUser...');
             registerUser(user);
             
             // Проверяем статус бана
+            console.log('🔍 Проверяем статус бана...');
             checkBanStatus(user.id);
         } else {
-            console.log('Данные пользователя недоступны');
+            console.log('❌ Данные пользователя недоступны - возможно, открыто не через Telegram');
+            console.log('🌐 Текущий URL:', window.location.href);
+            console.log('📱 User Agent:', navigator.userAgent);
         }
 
         // Функция регистрации пользователя
         function registerUser(userData) {
+            console.log('📝 Регистрируем пользователя:', userData);
+            
             let users = JSON.parse(localStorage.getItem('ai-tap-users') || '[]');
+            console.log('👥 Текущие пользователи в localStorage:', users);
             
             // Проверяем, есть ли уже такой пользователь
             const existingUserIndex = users.findIndex(u => u.id === userData.id);
+            console.log('🔍 Индекс существующего пользователя:', existingUserIndex);
             
             const userRecord = {
                 id: userData.id,
@@ -5232,6 +5248,8 @@
             }
             
             localStorage.setItem('ai-tap-users', JSON.stringify(users));
+            console.log('💾 Пользователи сохранены в localStorage:', users);
+            console.log('✅ Регистрация пользователя завершена!');
         }
 
         // Проверка статуса бана
@@ -5394,6 +5412,14 @@
                         <div style="margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.1); border-radius: 10px; font-size: 13px;">
                             💡 <strong>Как это работает:</strong><br>
                             Когда пользователь открывает ваше веб-приложение в Telegram, его данные автоматически сохраняются в системе и появляются здесь.
+                        </div>
+                        <div style="margin-top: 15px;">
+                            <button onclick="debugUserRegistration()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                                🔍 Проверить регистрацию
+                            </button>
+                            <button onclick="clearUserData()" style="padding: 10px 20px; background: #e74c3c; color: white; border: none; border-radius: 8px; cursor: pointer; margin-left: 10px;">
+                                🗑️ Очистить данные
+                            </button>
                         </div>
                     </div>
                 `;
@@ -5596,6 +5622,40 @@
 
         function openAppSettings() {
             showNotification('⚙️ Настройки веб-приложения - в разработке');
+        }
+
+        // Функции отладки для админ панели
+        function debugUserRegistration() {
+            console.log('🔍 === ОТЛАДКА РЕГИСТРАЦИИ ПОЛЬЗОВАТЕЛЕЙ ===');
+            console.log('📱 Telegram WebApp:', window.Telegram?.WebApp);
+            console.log('👤 Текущий пользователь:', currentUser);
+            console.log('🔑 Является админом:', isAdmin);
+            console.log('💾 Данные в localStorage:');
+            console.log('  - Пользователи:', localStorage.getItem('ai-tap-users'));
+            console.log('  - Баны:', localStorage.getItem('ai-tap-bans'));
+            
+            // Проверяем Telegram Web App
+            if (window.Telegram?.WebApp) {
+                console.log('✅ Telegram WebApp доступен');
+                console.log('📊 initDataUnsafe:', window.Telegram.WebApp.initDataUnsafe);
+                console.log('👤 User data:', window.Telegram.WebApp.initDataUnsafe.user);
+            } else {
+                console.log('❌ Telegram WebApp недоступен - возможно, открыто не через Telegram');
+            }
+            
+            // Показываем уведомление
+            const users = JSON.parse(localStorage.getItem('ai-tap-users') || '[]');
+            showNotification(`🔍 Найдено пользователей: ${users.length}. Проверьте консоль браузера (F12)`);
+        }
+
+        function clearUserData() {
+            if (confirm('Очистить все данные пользователей? Это действие нельзя отменить.')) {
+                localStorage.removeItem('ai-tap-users');
+                localStorage.removeItem('ai-tap-bans');
+                console.log('🗑️ Данные пользователей очищены');
+                showNotification('🗑️ Данные пользователей очищены');
+                loadUsersList(); // Обновляем список
+            }
         }
 
         // Анимация появления кнопок
