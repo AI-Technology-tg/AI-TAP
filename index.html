@@ -2346,6 +2346,49 @@
             box-shadow: 0 0 10px #00d4ff;
         }
 
+        .status-container {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .status-icon {
+            font-size: 1.2rem;
+            margin-right: 15px;
+            min-width: 25px;
+        }
+
+        .status-text {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+        }
+
+        .status-item.success {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .status-item.error {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid rgba(244, 67, 54, 0.3);
+        }
+
+        .status-item.loading .status-icon {
+            animation: spin 1s linear infinite;
+        }
+
         /* Анимации */
         @keyframes logoGlow {
             0% { transform: scale(1); }
@@ -2387,6 +2430,11 @@
                 transform: translateY(-100px) rotate(360deg);
                 opacity: 0;
             }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         /* Адаптивность для мобильных */
@@ -2435,10 +2483,22 @@
                 <p>Общайтесь с ИИ, получайте новости и прогноз погоды</p>
             </div>
             
-            <button id="enterButton" class="enter-button" onclick="enterApp()">
+            <button id="enterButton" class="enter-button" onclick="handleEnterApp()">
                 <span class="enter-text">🚀 Войти в приложение</span>
                 <div class="enter-glow"></div>
             </button>
+            
+            <!-- Статус проверки -->
+            <div id="statusContainer" class="status-container" style="display: none;">
+                <div class="status-item" id="databaseStatus">
+                    <span class="status-icon">⏳</span>
+                    <span class="status-text">Проверка базы данных...</span>
+                </div>
+                <div class="status-item" id="appStatus">
+                    <span class="status-icon">⏳</span>
+                    <span class="status-text">Проверка веб-приложения...</span>
+                </div>
+            </div>
         </div>
         
         <div class="login-particles" id="loginParticles"></div>
@@ -5300,50 +5360,152 @@
             }
         }
 
+        // Глобальный обработчик для кнопки входа
+        function handleEnterApp() {
+            console.log('🔘 Кнопка входа нажата');
+            try {
+                enterApp().catch(error => {
+                    console.error('❌ Критическая ошибка в enterApp:', error);
+                    alert(`Критическая ошибка: ${error.message}`);
+                });
+            } catch (error) {
+                console.error('❌ Ошибка при вызове enterApp:', error);
+                alert(`Ошибка при запуске: ${error.message}`);
+            }
+        }
+
         async function enterApp() {
-            const loginScreen = document.getElementById('loginScreen');
-            const mainApp = document.getElementById('mainApp');
+            const enterButton = document.getElementById('enterButton');
+            const statusContainer = document.getElementById('statusContainer');
+            const databaseStatus = document.getElementById('databaseStatus');
+            const appStatus = document.getElementById('appStatus');
+            
+            console.log('Начинаем процесс входа в приложение...');
+            
+            // Блокируем кнопку и показываем статус
+            enterButton.disabled = true;
+            enterButton.style.opacity = '0.6';
+            statusContainer.style.display = 'block';
             
             try {
+                // Проверка 1: База данных
+                await updateStatus(databaseStatus, 'loading', '⏳', 'Проверка базы данных...');
+                
+                if (!database) {
+                    throw new Error('База данных не инициализирована');
+                }
+                
+                // Проверяем подключение к базе данных
+                if (!database.supabase) {
+                    throw new Error('Нет подключения к Supabase');
+                }
+                
                 // Сохраняем пользователя в базу данных
-                if (currentUser && database) {
+                if (currentUser) {
                     await database.saveUser(
                         currentUser.id,
                         currentUser.username || '',
                         currentUser.first_name || ''
                     );
                     console.log('Пользователь сохранен в базу данных');
+                } else {
+                    console.warn('Данные пользователя не найдены, но продолжаем...');
                 }
                 
-                // Анимация исчезновения экрана входа
-                loginScreen.style.transition = 'opacity 1s ease, transform 1s ease';
-                loginScreen.style.opacity = '0';
-                loginScreen.style.transform = 'scale(0.9)';
+                await updateStatus(databaseStatus, 'success', '✅', 'База данных подключена');
                 
-                setTimeout(() => {
-                    loginScreen.style.display = 'none';
-                    
-                    // Показываем основное приложение
-                    mainApp.style.position = 'relative';
-                    mainApp.style.zIndex = '1';
-                    mainApp.style.transition = 'opacity 1s ease, transform 1s ease';
-                    mainApp.style.transform = 'scale(1.1)';
-                    
-                    setTimeout(() => {
-                        mainApp.style.opacity = '1';
-                        mainApp.style.transform = 'scale(1)';
-                        
-                        // Запускаем анимацию кнопок после появления приложения
-                        setTimeout(() => {
-                            animateMainAppButtons();
-                        }, 500);
-                    }, 50);
-                }, 1000);
+                // Проверка 2: Веб-приложение
+                await updateStatus(appStatus, 'loading', '⏳', 'Проверка веб-приложения...');
+                
+                // Проверяем основные элементы приложения
+                const mainApp = document.getElementById('mainApp');
+                if (!mainApp) {
+                    throw new Error('Основное приложение не найдено');
+                }
+                
+                // Проверяем наличие ключевых элементов
+                const chatModal = document.getElementById('chatModal');
+                const userModal = document.getElementById('userModal');
+                
+                if (!chatModal || !userModal) {
+                    throw new Error('Критические элементы интерфейса не найдены');
+                }
+                
+                await updateStatus(appStatus, 'success', '✅', 'Веб-приложение готово');
+                
+                // Небольшая задержка для показа успешного статуса
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Запускаем основное приложение
+                await launchMainApp();
                 
             } catch (error) {
                 console.error('Ошибка при входе в приложение:', error);
-                showNotification('❌ Ошибка при входе в приложение');
+                
+                // Показываем ошибку в соответствующем статусе
+                if (error.message.includes('база данных') || error.message.includes('Supabase')) {
+                    await updateStatus(databaseStatus, 'error', '❌', `Ошибка БД: ${error.message}`);
+                } else {
+                    await updateStatus(appStatus, 'error', '❌', `Ошибка приложения: ${error.message}`);
+                }
+                
+                // Разблокируем кнопку для повторной попытки
+                enterButton.disabled = false;
+                enterButton.style.opacity = '1';
             }
+        }
+
+        async function updateStatus(statusElement, type, icon, text) {
+            const iconElement = statusElement.querySelector('.status-icon');
+            const textElement = statusElement.querySelector('.status-text');
+            
+            // Убираем все классы
+            statusElement.className = 'status-item';
+            
+            // Добавляем нужный класс
+            if (type !== 'loading') {
+                statusElement.classList.add(type);
+            } else {
+                statusElement.classList.add('loading');
+            }
+            
+            iconElement.textContent = icon;
+            textElement.textContent = text;
+            
+            // Небольшая задержка для визуального эффекта
+            await new Promise(resolve => setTimeout(resolve, 500));
+        }
+
+        async function launchMainApp() {
+            const loginScreen = document.getElementById('loginScreen');
+            const mainApp = document.getElementById('mainApp');
+            
+            console.log('Запускаем основное приложение...');
+            
+            // Анимация исчезновения экрана входа
+            loginScreen.style.transition = 'opacity 1s ease, transform 1s ease';
+            loginScreen.style.opacity = '0';
+            loginScreen.style.transform = 'scale(0.9)';
+            
+            setTimeout(() => {
+                loginScreen.style.display = 'none';
+                
+                // Показываем основное приложение
+                mainApp.style.position = 'relative';
+                mainApp.style.zIndex = '1';
+                mainApp.style.transition = 'opacity 1s ease, transform 1s ease';
+                mainApp.style.transform = 'scale(1.1)';
+                
+                setTimeout(() => {
+                    mainApp.style.opacity = '1';
+                    mainApp.style.transform = 'scale(1)';
+                    
+                    // Запускаем анимацию кнопок после появления приложения
+                    setTimeout(() => {
+                        animateMainAppButtons();
+                    }, 500);
+                }, 50);
+            }, 1000);
         }
 
         function initializeMainApp() {
@@ -5371,14 +5533,29 @@
 
         // Инициализация приложения
         document.addEventListener('DOMContentLoaded', async function() {
-            // Инициализируем базу данных
-            await initializeDatabase();
+            console.log('🚀 Начинаем инициализацию приложения...');
             
-            // Создаем частицы для экрана входа
-            createLoginParticles();
-            
-            // Инициализируем основное приложение в фоне
-            initializeMainApp();
+            try {
+                // Инициализируем базу данных
+                console.log('📊 Инициализируем базу данных...');
+                await initializeDatabase();
+                console.log('✅ База данных инициализирована');
+                
+                // Создаем частицы для экрана входа
+                console.log('✨ Создаем частицы...');
+                createLoginParticles();
+                console.log('✅ Частицы созданы');
+                
+                // Инициализируем основное приложение в фоне
+                console.log('🎯 Инициализируем основное приложение...');
+                initializeMainApp();
+                console.log('✅ Основное приложение инициализировано');
+                
+                console.log('🎉 Инициализация завершена успешно!');
+                
+            } catch (error) {
+                console.error('❌ Ошибка инициализации:', error);
+            }
         });
 
         // Функция инициализации настроек
