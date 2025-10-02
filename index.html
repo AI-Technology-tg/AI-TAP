@@ -1386,9 +1386,10 @@
             gap: 6px;
             backdrop-filter: blur(10px);
             box-shadow: 0 2px 10px rgba(0, 255, 255, 0.2);
-            z-index: 1000;
+            z-index: 9999;
             animation: onlinePanelSlide 0.5s ease-out;
             font-size: 10px;
+            pointer-events: none;
         }
 
         @keyframes onlinePanelSlide {
@@ -2728,9 +2729,38 @@
         }
 
         function updateOnlineUsers() {
-            // Симулируем количество онлайн пользователей
-            const onlineCount = Math.floor(Math.random() * 50) + 10;
-            document.getElementById('onlineUsersCount').textContent = onlineCount;
+            // Получаем реальное количество онлайн пользователей
+            let realOnlineCount = 0;
+            
+            if (user) {
+                // Обновляем время последней активности текущего пользователя
+                const onlineUsers = JSON.parse(localStorage.getItem('onlineUsers') || '{}');
+                onlineUsers[user.id] = Date.now();
+                
+                // Подсчитываем пользователей активных в последние 5 минут
+                const now = Date.now();
+                const fiveMinutesAgo = now - (5 * 60 * 1000);
+                
+                Object.values(onlineUsers).forEach(lastSeen => {
+                    if (lastSeen > fiveMinutesAgo) {
+                        realOnlineCount++;
+                    }
+                });
+                
+                // Очищаем старые записи
+                const cleanedOnlineUsers = {};
+                Object.entries(onlineUsers).forEach(([userId, lastSeen]) => {
+                    if (lastSeen > fiveMinutesAgo) {
+                        cleanedOnlineUsers[userId] = lastSeen;
+                    }
+                });
+                
+                localStorage.setItem('onlineUsers', JSON.stringify(cleanedOnlineUsers));
+            } else {
+                realOnlineCount = 1;
+            }
+            
+            document.getElementById('onlineUsersCount').textContent = realOnlineCount;
             
             // Добавляем анимацию обновления
             const countElement = document.getElementById('onlineUsersCount');
@@ -3850,9 +3880,24 @@
 
         function loadDailyUsageChart() {
             const chart = document.getElementById('dailyUsageChart');
-            const data = [15, 23, 18, 31, 27, 12, 8];
+            
+            // Получаем реальные данные из localStorage
+            const apiStats = JSON.parse(localStorage.getItem('ai-tap-api-stats') || '{}');
+            const dailyStats = apiStats.dailyStats || {};
+            
+            // Получаем данные за последние 7 дней
             const days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
-            const maxValue = Math.max(...data);
+            const today = new Date();
+            const data = [];
+            
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                const dateKey = date.toISOString().split('T')[0];
+                data.push(dailyStats[dateKey] || 0);
+            }
+            
+            const maxValue = Math.max(...data) || 1;
             
             chart.innerHTML = `
                 <div style="padding: 20px;">
@@ -3879,13 +3924,22 @@
 
         function loadGeoChart() {
             const chart = document.getElementById('geoChart');
-            const geoData = [
-                { country: '🇷🇺 Россия', percentage: 45, users: 234 },
-                { country: '🇺🇸 США', percentage: 23, users: 120 },
-                { country: '🇩🇪 Германия', percentage: 15, users: 78 },
-                { country: '🇫🇷 Франция', percentage: 12, users: 62 },
-                { country: '🌍 Другие', percentage: 5, users: 26 }
-            ];
+            
+            // Получаем реальные данные из localStorage
+            const apiStats = JSON.parse(localStorage.getItem('ai-tap-api-stats') || '{}');
+            const geoStats = apiStats.geoStats || {};
+            
+            // Преобразуем данные в нужный формат
+            const geoData = Object.entries(geoStats).map(([country, count]) => ({
+                country: country,
+                percentage: Math.round((count / (apiStats.totalRequests || 1)) * 100),
+                users: count
+            })).sort((a, b) => b.users - a.users).slice(0, 5);
+            
+            // Если нет данных, показываем заглушку
+            if (geoData.length === 0) {
+                geoData.push({ country: '🌍 Нет данных', percentage: 100, users: 0 });
+            }
             
             chart.innerHTML = `
                 <div style="padding: 20px;">
@@ -3993,13 +4047,30 @@
         }
 
         function getUserStats(telegramId) {
-            // Получаем статистику пользователя
+            // Получаем реальную статистику пользователя
+            const apiStats = JSON.parse(localStorage.getItem('ai-tap-api-stats') || '{}');
+            const userStats = apiStats.userStats || {};
+            const userData = userStats[telegramId] || {};
+            
+            // Получаем данные за сегодня
+            const today = new Date().toISOString().split('T')[0];
+            const todayRequests = userData.dailyStats ? userData.dailyStats[today] || 0 : 0;
+            
+            // Получаем последнюю активность
+            const lastActivity = userData.lastActivity ? new Date(userData.lastActivity).toLocaleDateString('ru-RU') : 'Неизвестно';
+            
+            // Вычисляем среднее количество запросов в день
+            const totalRequests = userData.totalRequests || 0;
+            const daysSinceFirstRequest = userData.firstRequest ? 
+                Math.ceil((Date.now() - new Date(userData.firstRequest).getTime()) / (1000 * 60 * 60 * 24)) : 1;
+            const avgPerDay = Math.round(totalRequests / Math.max(daysSinceFirstRequest, 1));
+            
             return {
-                requests: Math.floor(Math.random() * 50) + 10,
-                lastActivity: new Date().toLocaleDateString('ru-RU'),
-                status: 'Активен',
-                todayRequests: Math.floor(Math.random() * 10) + 1,
-                avgPerDay: Math.floor(Math.random() * 5) + 2
+                requests: totalRequests,
+                lastActivity: lastActivity,
+                status: totalRequests > 0 ? 'Активен' : 'Неактивен',
+                todayRequests: todayRequests,
+                avgPerDay: avgPerDay
             };
         }
 
@@ -5070,6 +5141,39 @@
                 }, index * 100);
             });
         });
+        
+        // Функция сохранения статистики пользователя
+        function saveUserStats(telegramId) {
+            const apiStats = JSON.parse(localStorage.getItem('ai-tap-api-stats') || '{}');
+            const userStats = apiStats.userStats || {};
+            const userData = userStats[telegramId] || {};
+            
+            // Обновляем общую статистику
+            apiStats.totalRequests = (apiStats.totalRequests || 0) + 1;
+            
+            // Обновляем статистику пользователя
+            userData.totalRequests = (userData.totalRequests || 0) + 1;
+            userData.lastActivity = Date.now();
+            
+            // Устанавливаем дату первого запроса если её нет
+            if (!userData.firstRequest) {
+                userData.firstRequest = Date.now();
+            }
+            
+            // Обновляем дневную статистику
+            const today = new Date().toISOString().split('T')[0];
+            userData.dailyStats = userData.dailyStats || {};
+            userData.dailyStats[today] = (userData.dailyStats[today] || 0) + 1;
+            
+            // Обновляем общую дневную статистику
+            apiStats.dailyStats = apiStats.dailyStats || {};
+            apiStats.dailyStats[today] = (apiStats.dailyStats[today] || 0) + 1;
+            
+            // Сохраняем обновленные данные
+            userStats[telegramId] = userData;
+            apiStats.userStats = userStats;
+            localStorage.setItem('ai-tap-api-stats', JSON.stringify(apiStats));
+        }
     </script>
 </body>
 </html>
