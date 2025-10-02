@@ -1144,77 +1144,77 @@
             }
         }
 
-        /* Стили для умных предложений */
-        .suggestions-content {
-            padding: 20px;
-            max-height: 70vh;
-            overflow-y: auto;
+        .location-display {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 8px;
+            padding: 10px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            margin-top: 10px;
         }
 
-        .suggestions-section {
-            margin-bottom: 25px;
-        }
-
-        .suggestions-section h3 {
-            color: rgba(0, 255, 255, 0.9);
-            margin-bottom: 15px;
-            font-size: 16px;
+        /* Стили для кнопки файлов */
+        .file-button {
+            background: rgba(0, 255, 255, 0.2);
+            border: 2px solid rgba(0, 255, 255, 0.4);
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: center;
         }
 
-        .suggestions-list {
+        .file-button:hover {
+            background: rgba(0, 255, 255, 0.3);
+            border-color: rgba(0, 255, 255, 0.6);
+            transform: scale(1.05);
+        }
+
+        .file-button:active {
+            transform: scale(0.95);
+        }
+
+        /* Стили для файловых сообщений */
+        .file-message {
             display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .suggestion-item {
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
             background: rgba(0, 255, 255, 0.1);
             border: 1px solid rgba(0, 255, 255, 0.3);
             border-radius: 12px;
-            padding: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            max-width: 300px;
         }
 
-        .suggestion-item:hover {
-            background: rgba(0, 255, 255, 0.2);
-            border-color: rgba(0, 255, 255, 0.5);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.2);
+        .file-icon {
+            font-size: 24px;
+            flex-shrink: 0;
         }
 
-        .suggestion-item:active {
-            transform: translateY(0);
+        .file-info {
+            flex: 1;
+            min-width: 0;
         }
 
-        .suggestion-text {
+        .file-name {
             color: white;
+            font-weight: 500;
             font-size: 14px;
-            line-height: 1.4;
-            margin-bottom: 8px;
+            word-break: break-word;
+            margin-bottom: 4px;
         }
 
-        .suggestion-context {
-            color: rgba(255, 255, 255, 0.6);
+        .file-details {
+            color: rgba(255, 255, 255, 0.7);
             font-size: 12px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
         }
 
-        .suggestions-actions {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(0, 255, 255, 0.2);
-        }
     </style>
 </head>
 <body>
@@ -1305,8 +1305,6 @@
             <div class="chat-header">
                 <div class="chat-title">Основной ИИ</div>
                 <div class="chat-controls">
-                    <button class="chat-control-btn" onclick="toggleLocation()" title="Геолокация" id="locationBtn">📍</button>
-                    <button class="chat-control-btn" onclick="showSmartSuggestions()" title="Умные предложения" id="suggestionsBtn">💡</button>
                     <button class="chat-control-btn" onclick="clearChatHistory()" title="Очистить историю">🗑️</button>
                     <button class="chat-control-btn" onclick="toggleAISettings()" title="Настройки ИИ">⚙️</button>
                     <span class="connection-status" id="connectionStatus" title="Статус подключения">🟢</span>
@@ -1339,7 +1337,7 @@
             
             <div class="chat-input-container">
                 <div class="chat-input-wrapper">
-                    <button id="voiceButton" class="voice-button" onclick="toggleVoiceRecording()" title="Голосовое сообщение">🎤</button>
+                    <button id="fileButton" class="file-button" onclick="handleFileUpload()" title="Загрузить файл">📎</button>
                     <textarea 
                         id="chatInput" 
                         class="chat-input" 
@@ -1396,6 +1394,23 @@
                 </div>
                 
                 <div class="settings-section">
+                    <h3>📍 Геолокация</h3>
+                    <div class="setting-item">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="locationToggle">
+                            <span class="toggle-slider"></span>
+                            Включить геолокацию
+                        </label>
+                        <small>ИИ будет знать ваше местоположение и погоду</small>
+                    </div>
+                    <div class="setting-item" id="locationInfo" style="display: none;">
+                        <div class="location-display">
+                            <span id="currentLocation">Местоположение не определено</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
                     <h3>📊 Статистика</h3>
                     <div class="stats-grid">
                         <div class="stat-item">
@@ -1416,27 +1431,6 @@
                 <div class="settings-actions">
                     <button class="settings-btn primary" onclick="saveSettings()">💾 Сохранить</button>
                     <button class="settings-btn secondary" onclick="resetSettings()">🔄 Сбросить</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Модальное окно умных предложений -->
-    <div id="suggestionsModal" class="chat-modal" style="display: none;">
-        <div class="chat-container">
-            <div class="chat-header">
-                <div class="chat-title">💡 Умные предложения</div>
-                <span class="chat-close" onclick="closeSuggestions()">&times;</span>
-            </div>
-            <div class="suggestions-content" id="suggestionsContent">
-                <div class="suggestions-section">
-                    <h3>🎯 Предложения для разговора</h3>
-                    <div class="suggestions-list" id="suggestionsList">
-                        <!-- Предложения будут добавлены динамически -->
-                    </div>
-                </div>
-                <div class="suggestions-actions">
-                    <button class="settings-btn primary" onclick="refreshSuggestions()">🔄 Обновить</button>
                 </div>
             </div>
         </div>
@@ -1860,7 +1854,6 @@
             const userModal = document.getElementById('userModal');
             const chatModal = document.getElementById('chatModal');
             const settingsModal = document.getElementById('settingsModal');
-            const suggestionsModal = document.getElementById('suggestionsModal');
             
             if (event.target === userModal) {
                 userModal.style.display = 'none';
@@ -1870,9 +1863,6 @@
             }
             if (event.target === settingsModal) {
                 settingsModal.style.display = 'none';
-            }
-            if (event.target === suggestionsModal) {
-                suggestionsModal.style.display = 'none';
             }
         }
 
@@ -2018,11 +2008,6 @@
         let currentWeather = null;
         let lastWeatherUpdate = null;
         
-        // Голосовые сообщения
-        let mediaRecorder = null;
-        let audioChunks = [];
-        let isRecording = false;
-        let recognition = null;
         
         // Инициализация памяти ИИ
         if (!aiMemory.userPreferences) {
@@ -2285,158 +2270,82 @@
             }
         }
 
-        // Функции голосовых сообщений
-        async function toggleVoiceRecording() {
-            if (isRecording) {
-                stopRecording();
-            } else {
-                startRecording();
-            }
-        }
 
-        async function startRecording() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                
-                mediaRecorder = new MediaRecorder(stream);
-                audioChunks = [];
-                
-                mediaRecorder.ondataavailable = (event) => {
-                    audioChunks.push(event.data);
-                };
-                
-                mediaRecorder.onstop = () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                    processVoiceMessage(audioBlob);
-                    
-                    // Останавливаем поток
-                    stream.getTracks().forEach(track => track.stop());
-                };
-                
-                mediaRecorder.start();
-                isRecording = true;
-                
-                // Обновляем UI
-                const voiceBtn = document.getElementById('voiceButton');
-                voiceBtn.classList.add('recording');
-                voiceBtn.textContent = '⏹️';
-                voiceBtn.title = 'Остановить запись';
-                
-                showNotification('Запись началась... Говорите!');
-                triggerVibration();
-                
-                // Инициализируем распознавание речи
-                initSpeechRecognition();
-                
-            } catch (error) {
-                console.error('Ошибка доступа к микрофону:', error);
-                showNotification('Ошибка доступа к микрофону');
-            }
-        }
-
-        function stopRecording() {
-            if (mediaRecorder && isRecording) {
-                mediaRecorder.stop();
-                isRecording = false;
-                
-                // Обновляем UI
-                const voiceBtn = document.getElementById('voiceButton');
-                voiceBtn.classList.remove('recording');
-                voiceBtn.textContent = '🎤';
-                voiceBtn.title = 'Голосовое сообщение';
-                
-                showNotification('Запись остановлена');
-                
-                // Останавливаем распознавание речи
-                if (recognition) {
-                    recognition.stop();
+        // Функции для работы с файлами
+        function handleFileUpload() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*,video/*,audio/*,.pdf,.doc,.docx,.txt';
+            input.multiple = true;
+            
+            input.onchange = function(event) {
+                const files = event.target.files;
+                if (files.length > 0) {
+                    for (let file of files) {
+                        addFileMessage(file);
+                    }
+                    showNotification(`Загружено файлов: ${files.length}`);
+                    playNotificationSound();
                 }
-            }
-        }
-
-        function initSpeechRecognition() {
-            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-                recognition = new SpeechRecognition();
-                
-                recognition.continuous = true;
-                recognition.interimResults = true;
-                recognition.lang = currentLanguage === 'ru' ? 'ru-RU' : 
-                                 currentLanguage === 'en' ? 'en-US' : 
-                                 currentLanguage === 'es' ? 'es-ES' : 
-                                 currentLanguage === 'fr' ? 'fr-FR' : 
-                                 currentLanguage === 'de' ? 'de-DE' : 
-                                 currentLanguage === 'zh' ? 'zh-CN' : 'ru-RU';
-                
-                recognition.onresult = (event) => {
-                    let transcript = '';
-                    for (let i = event.resultIndex; i < event.results.length; i++) {
-                        if (event.results[i].isFinal) {
-                            transcript += event.results[i][0].transcript;
-                        }
-                    }
-                    
-                    if (transcript.trim()) {
-                        document.getElementById('chatInput').value = transcript;
-                    }
-                };
-                
-                recognition.onerror = (event) => {
-                    console.error('Ошибка распознавания речи:', event.error);
-                };
-                
-                recognition.start();
-            }
-        }
-
-        function processVoiceMessage(audioBlob) {
-            // Создаем URL для аудио
-            const audioUrl = URL.createObjectURL(audioBlob);
+            };
             
-            // Добавляем голосовое сообщение в чат
-            addVoiceMessage(audioUrl, true);
-            
-            // Если есть текст из распознавания, отправляем его
-            const transcribedText = document.getElementById('chatInput').value.trim();
-            if (transcribedText) {
-                // Очищаем поле ввода и отправляем как обычное сообщение
-                setTimeout(() => {
-                    sendMessage();
-                }, 500);
-            } else {
-                showNotification('Голосовое сообщение записано, но текст не распознан');
-            }
+            input.click();
         }
 
-        function addVoiceMessage(audioUrl, isUser = false) {
-            const messagesContainer = document.getElementById('chatMessages');
+        function addFileMessage(file) {
+            const chatMessages = document.getElementById('chatMessages');
             const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${isUser ? 'user' : 'ai'}`;
+            messageDiv.className = 'message user';
             
             const currentTime = getCurrentTime();
+            const fileSize = formatFileSize(file.size);
+            const fileType = getFileType(file.type);
             
             messageDiv.innerHTML = `
                 <div class="message-content">
-                    <div class="voice-message">
-                        <button class="play-voice-btn" onclick="playVoiceMessage('${audioUrl}')">▶️</button>
-                        <span class="voice-duration">Голосовое сообщение</span>
+                    <div class="file-message">
+                        <div class="file-icon">${getFileIcon(file.type)}</div>
+                        <div class="file-info">
+                            <div class="file-name">${file.name}</div>
+                            <div class="file-details">${fileType} • ${fileSize}</div>
+                        </div>
                     </div>
                 </div>
                 <div class="message-time">${currentTime}</div>
             `;
             
-            messagesContainer.appendChild(messageDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
             
             return currentTime;
         }
 
-        function playVoiceMessage(audioUrl) {
-            const audio = new Audio(audioUrl);
-            audio.play().catch(error => {
-                console.error('Ошибка воспроизведения:', error);
-                showNotification('Ошибка воспроизведения аудио');
-            });
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function getFileType(mimeType) {
+            if (mimeType.startsWith('image/')) return 'Изображение';
+            if (mimeType.startsWith('video/')) return 'Видео';
+            if (mimeType.startsWith('audio/')) return 'Аудио';
+            if (mimeType.includes('pdf')) return 'PDF';
+            if (mimeType.includes('document') || mimeType.includes('word')) return 'Документ';
+            if (mimeType.includes('text')) return 'Текст';
+            return 'Файл';
+        }
+
+        function getFileIcon(mimeType) {
+            if (mimeType.startsWith('image/')) return '🖼️';
+            if (mimeType.startsWith('video/')) return '🎬';
+            if (mimeType.startsWith('audio/')) return '🎵';
+            if (mimeType.includes('pdf')) return '📄';
+            if (mimeType.includes('document') || mimeType.includes('word')) return '📝';
+            if (mimeType.includes('text')) return '📋';
+            return '📎';
         }
 
         // Анализ настроения пользователя
@@ -2535,136 +2444,6 @@
             };
         }
 
-        // Умные предложения тем для разговора
-        function generateSmartSuggestions() {
-            const suggestions = [];
-            const now = new Date();
-            const hour = now.getHours();
-            
-            // Предложения в зависимости от времени
-            if (hour >= 6 && hour < 12) {
-                suggestions.push('Как планируешь провести день?', 'Что на завтрак?', 'Какие планы на утро?');
-            } else if (hour >= 12 && hour < 18) {
-                suggestions.push('Как дела на работе/учебе?', 'Что интересного сегодня?', 'Нужна помощь с чем-то?');
-            } else if (hour >= 18 && hour < 23) {
-                suggestions.push('Как прошел день?', 'Что планируешь на вечер?', 'Хочешь поговорить о чем-то?');
-            } else {
-                suggestions.push('Не спится?', 'Что думаешь перед сном?', 'Хочешь расслабляющую беседу?');
-            }
-            
-            // Предложения на основе настроения
-            if (aiMemory.userMood === 'positive') {
-                suggestions.push('Расскажи что-то хорошее!', 'Поделись радостью!');
-            } else if (aiMemory.userMood === 'negative') {
-                suggestions.push('Хочешь поговорить о проблемах?', 'Нужна поддержка?');
-            } else if (aiMemory.userMood === 'curious') {
-                suggestions.push('Есть интересные вопросы?', 'Что хочешь узнать?');
-            }
-            
-            // Предложения на основе погоды
-            if (currentWeather) {
-                if (currentWeather.temp > 20) {
-                    suggestions.push('Хорошая погода для прогулки!');
-                } else if (currentWeather.temp < 5) {
-                    suggestions.push('Холодно на улице, как согреваешься?');
-                }
-                
-                if (currentWeather.description.includes('дождь')) {
-                    suggestions.push('Дождь за окном, что делаешь дома?');
-                }
-            }
-            
-            // Возвращаем случайные 3 предложения
-            return suggestions.sort(() => 0.5 - Math.random()).slice(0, 3);
-        }
-
-        // Функции умных предложений
-        function showSmartSuggestions() {
-            document.getElementById('suggestionsModal').style.display = 'block';
-            renderSuggestions();
-        }
-
-        function closeSuggestions() {
-            document.getElementById('suggestionsModal').style.display = 'none';
-        }
-
-        function renderSuggestions() {
-            const suggestions = generateSmartSuggestions();
-            const suggestionsList = document.getElementById('suggestionsList');
-            
-            suggestionsList.innerHTML = '';
-            
-            suggestions.forEach((suggestion, index) => {
-                const suggestionItem = document.createElement('div');
-                suggestionItem.className = 'suggestion-item';
-                suggestionItem.onclick = () => useSuggestion(suggestion);
-                
-                // Определяем контекст предложения
-                let context = '';
-                const hour = new Date().getHours();
-                
-                if (hour >= 6 && hour < 12) {
-                    context = '🌅 Утро';
-                } else if (hour >= 12 && hour < 18) {
-                    context = '☀️ День';
-                } else if (hour >= 18 && hour < 23) {
-                    context = '🌆 Вечер';
-                } else {
-                    context = '🌙 Ночь';
-                }
-                
-                // Добавляем контекст настроения
-                if (aiMemory.userMood === 'positive') {
-                    context += ' • 😊 Хорошее настроение';
-                } else if (aiMemory.userMood === 'negative') {
-                    context += ' • 😔 Грустное настроение';
-                } else if (aiMemory.userMood === 'curious') {
-                    context += ' • 🤔 Любопытство';
-                }
-                
-                // Добавляем погодный контекст
-                if (currentWeather) {
-                    if (currentWeather.temp > 20) {
-                        context += ' • 🌡️ Тепло';
-                    } else if (currentWeather.temp < 5) {
-                        context += ' • ❄️ Холодно';
-                    }
-                }
-                
-                suggestionItem.innerHTML = `
-                    <div class="suggestion-text">${suggestion}</div>
-                    <div class="suggestion-context">${context}</div>
-                `;
-                
-                suggestionsList.appendChild(suggestionItem);
-            });
-        }
-
-        function useSuggestion(suggestion) {
-            const chatInput = document.getElementById('chatInput');
-            chatInput.value = suggestion;
-            chatInput.focus();
-            
-            // Автоматически изменяем высоту textarea
-            chatInput.style.height = 'auto';
-            chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
-            
-            closeSuggestions();
-            
-            // Добавляем в избранные темы
-            if (aiMemory.favoriteTopics && !aiMemory.favoriteTopics.includes(suggestion)) {
-                aiMemory.favoriteTopics.push(suggestion);
-                if (aiMemory.favoriteTopics.length > 10) {
-                    aiMemory.favoriteTopics.shift();
-                }
-                updateAIMemory('favoriteTopics', aiMemory.favoriteTopics);
-            }
-        }
-
-        function refreshSuggestions() {
-            renderSuggestions();
-            showNotification('Предложения обновлены!');
-        }
 
         // Новый красивый интерфейс настроек
         function toggleAISettings() {
@@ -2687,6 +2466,18 @@
             const soundEnabled = localStorage.getItem('ai-tap-sound') !== 'false';
             document.getElementById('soundToggle').checked = soundEnabled;
             
+            // Загружаем настройки геолокации
+            document.getElementById('locationToggle').checked = locationEnabled;
+            
+            // Показываем информацию о местоположении если включено
+            if (locationEnabled && userLocation) {
+                document.getElementById('locationInfo').style.display = 'block';
+                document.getElementById('currentLocation').textContent = 
+                    `${userLocation.city || 'Неизвестный город'}, ${userLocation.country || 'Неизвестная страна'}`;
+            } else {
+                document.getElementById('locationInfo').style.display = 'none';
+            }
+            
             // Обновляем статистику
             updateStatistics();
             
@@ -2700,6 +2491,18 @@
             
             tokensSlider.oninput = function() {
                 document.getElementById('tokensValue').textContent = this.value;
+            };
+            
+            // Обработчик для геолокации
+            document.getElementById('locationToggle').onchange = function() {
+                if (this.checked) {
+                    requestLocation();
+                } else {
+                    locationEnabled = false;
+                    localStorage.setItem('ai-tap-location-enabled', 'false');
+                    document.getElementById('locationInfo').style.display = 'none';
+                    showNotification('Геолокация отключена');
+                }
             };
         }
 
