@@ -179,6 +179,28 @@
             opacity: 0.8;
         }
 
+        .main-settings-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .main-settings-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(0, 255, 255, 0.5);
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.3);
+        }
+
         .language-selector {
             margin-left: 15px;
             position: relative;
@@ -1179,6 +1201,57 @@
             color: rgba(255, 255, 255, 0.9);
             font-size: 14px;
             margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .retry-location-btn {
+            background: rgba(0, 255, 255, 0.2);
+            border: 1px solid rgba(0, 255, 255, 0.4);
+            border-radius: 6px;
+            padding: 6px 10px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: 10px;
+        }
+
+        .retry-location-btn:hover {
+            background: rgba(0, 255, 255, 0.3);
+            border-color: rgba(0, 255, 255, 0.6);
+            transform: scale(1.05);
+        }
+
+        /* Стили для разрешений */
+        .permission-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .permission-item:last-child {
+            border-bottom: none;
+        }
+
+        .permission-info {
+            flex: 1;
+        }
+
+        .permission-title {
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .permission-desc {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+            line-height: 1.3;
         }
 
         /* Селектор режимов ИИ */
@@ -1366,6 +1439,7 @@
             <div id="userName" class="user-name">Загрузка...</div>
             <div id="userId" class="user-id">ID: ...</div>
         </div>
+        <button class="main-settings-btn" onclick="openMainSettings()" title="Настройки приложения">⚙️</button>
     </div>
 
     <!-- Модальное окно с данными пользователя -->
@@ -1467,10 +1541,6 @@
                 <div class="chat-input-wrapper">
                     <button id="attachButton" class="attach-button" onclick="toggleAttachMenu()" title="Прикрепить">📎</button>
                     <div id="attachMenu" class="attach-menu" style="display: none;">
-                        <div class="attach-option" onclick="handleMediaUpload()">
-                            <span class="attach-icon">🖼️</span>
-                            <span class="attach-text">Отправить медиа</span>
-                        </div>
                         <div class="attach-option" onclick="openMiniGames()">
                             <span class="attach-icon">🎮</span>
                             <span class="attach-text">Мини игры</span>
@@ -1531,23 +1601,6 @@
                 </div>
                 
                 <div class="settings-section">
-                    <h3>📍 Геолокация</h3>
-                    <div class="setting-item">
-                        <label class="toggle-label">
-                            <input type="checkbox" id="locationToggle">
-                            <span class="toggle-slider"></span>
-                            Включить геолокацию
-                        </label>
-                        <small>ИИ будет знать ваше местоположение и погоду</small>
-                    </div>
-                    <div class="setting-item" id="locationInfo" style="display: none;">
-                        <div class="location-display">
-                            <span id="currentLocation">Местоположение не определено</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="settings-section">
                     <h3>📊 Статистика</h3>
                     <div class="stats-grid">
                         <div class="stat-item">
@@ -1568,6 +1621,90 @@
                 <div class="settings-actions">
                     <button class="settings-btn primary" onclick="saveSettings()">💾 Сохранить</button>
                     <button class="settings-btn secondary" onclick="resetSettings()">🔄 Сбросить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Главные настройки приложения -->
+    <div id="mainSettingsModal" class="chat-modal" style="display: none;">
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="chat-title">⚙️ Настройки приложения</div>
+                <span class="chat-close" onclick="closeMainSettings()">&times;</span>
+            </div>
+            <div class="settings-content" id="mainSettingsContent">
+                <div class="settings-section">
+                    <h3>📍 Геолокация</h3>
+                    <div class="permission-item">
+                        <div class="permission-info">
+                            <div class="permission-title">Местоположение</div>
+                            <div class="permission-desc">Для показа погоды и локальной информации</div>
+                        </div>
+                        <label class="toggle-label">
+                            <input type="checkbox" id="mainLocationToggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item" id="mainLocationInfo" style="display: none;">
+                        <div class="location-display">
+                            <span id="mainCurrentLocation">Местоположение не определено</span>
+                            <button class="retry-location-btn" onclick="retryLocation()" title="Обновить местоположение">🔄</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h3>📱 Мультимедиа</h3>
+                    <div class="permission-item">
+                        <div class="permission-info">
+                            <div class="permission-title">Камера</div>
+                            <div class="permission-desc">Для отправки фото и видео</div>
+                        </div>
+                        <label class="toggle-label">
+                            <input type="checkbox" id="cameraToggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="permission-item">
+                        <div class="permission-info">
+                            <div class="permission-title">Микрофон</div>
+                            <div class="permission-desc">Для голосовых сообщений</div>
+                        </div>
+                        <label class="toggle-label">
+                            <input type="checkbox" id="microphoneToggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="permission-item">
+                        <div class="permission-info">
+                            <div class="permission-title">Файлы</div>
+                            <div class="permission-desc">Для отправки документов и медиа</div>
+                        </div>
+                        <label class="toggle-label">
+                            <input type="checkbox" id="filesToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h3>🔊 Звуковые эффекты</h3>
+                    <div class="permission-item">
+                        <div class="permission-info">
+                            <div class="permission-title">Звуки уведомлений</div>
+                            <div class="permission-desc">Звуки отправки и получения сообщений</div>
+                        </div>
+                        <label class="toggle-label">
+                            <input type="checkbox" id="mainSoundToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="settings-actions">
+                    <button class="settings-btn primary" onclick="saveMainSettings()">💾 Сохранить</button>
+                    <button class="settings-btn secondary" onclick="resetMainSettings()">🔄 Сбросить</button>
                 </div>
             </div>
         </div>
@@ -1919,6 +2056,7 @@
             const userModal = document.getElementById('userModal');
             const chatModal = document.getElementById('chatModal');
             const settingsModal = document.getElementById('settingsModal');
+            const mainSettingsModal = document.getElementById('mainSettingsModal');
             
             if (event.target === userModal) {
                 userModal.style.display = 'none';
@@ -1928,6 +2066,9 @@
             }
             if (event.target === settingsModal) {
                 settingsModal.style.display = 'none';
+            }
+            if (event.target === mainSettingsModal) {
+                mainSettingsModal.style.display = 'none';
             }
         }
 
@@ -1971,7 +2112,8 @@
             // Виброотклик при открытии
             triggerVibration();
             
-            // Проверяем актуальность погоды
+            // Проверяем актуальность погоды и местоположения
+            checkLocationUpdate();
             checkWeatherUpdate();
         }
         
@@ -2194,9 +2336,17 @@
 
         function requestLocation() {
             if (!navigator.geolocation) {
-                showNotification('Геолокация не поддерживается');
+                showNotification('Геолокация не поддерживается браузером');
+                locationEnabled = false;
+                localStorage.setItem('ai-tap-location-enabled', 'false');
+                updateLocationSettings();
                 return;
             }
+
+            // Сначала устанавливаем флаг, что пользователь хочет включить геолокацию
+            locationEnabled = true;
+            localStorage.setItem('ai-tap-location-enabled', 'true');
+            updateLocationSettings();
 
             showNotification('Запрашиваем местоположение...');
             
@@ -2219,12 +2369,9 @@
                             timestamp: new Date().toISOString()
                         };
                         
-                        locationEnabled = true;
                         localStorage.setItem('ai-tap-location', JSON.stringify(userLocation));
-                        localStorage.setItem('ai-tap-location-enabled', 'true');
-                        
-                        updateLocationButton();
-                        showNotification(`Местоположение: ${userLocation.city}, ${userLocation.country}`);
+                        updateLocationSettings();
+                        showNotification(`✅ Местоположение: ${userLocation.city}, ${userLocation.country}`);
                         
                         // Получаем погоду для этого местоположения
                         getWeatherData(lat, lon);
@@ -2239,36 +2386,43 @@
                             timestamp: new Date().toISOString()
                         };
                         
-                        locationEnabled = true;
                         localStorage.setItem('ai-tap-location', JSON.stringify(userLocation));
-                        localStorage.setItem('ai-tap-location-enabled', 'true');
-                        
-                        updateLocationButton();
-                        showNotification('Местоположение получено');
+                        updateLocationSettings();
+                        showNotification('✅ Местоположение получено (координаты)');
                     }
                 },
                 (error) => {
                     console.error('Ошибка геолокации:', error);
                     let errorMessage = 'Ошибка получения местоположения';
+                    let shouldDisable = false;
                     
                     switch(error.code) {
                         case error.PERMISSION_DENIED:
-                            errorMessage = 'Доступ к геолокации запрещен';
+                            errorMessage = '❌ Доступ к геолокации запрещен. Разрешите доступ в браузере.';
+                            shouldDisable = true;
                             break;
                         case error.POSITION_UNAVAILABLE:
-                            errorMessage = 'Местоположение недоступно';
+                            errorMessage = '⚠️ Местоположение недоступно. Попробуйте позже.';
                             break;
                         case error.TIMEOUT:
-                            errorMessage = 'Таймаут запроса геолокации';
+                            errorMessage = '⏱️ Таймаут запроса. Геолокация остается включенной, попробуйте позже.';
+                            // НЕ отключаем геолокацию при таймауте
                             break;
                     }
                     
                     showNotification(errorMessage);
+                    
+                    // Отключаем только при отказе в доступе
+                    if (shouldDisable) {
+                        locationEnabled = false;
+                        localStorage.setItem('ai-tap-location-enabled', 'false');
+                        updateLocationSettings();
+                    }
                 },
                 {
-                    enableHighAccuracy: true,
-                    timeout: 10000,
-                    maximumAge: 300000 // 5 минут
+                    enableHighAccuracy: false, // Менее точно, но быстрее
+                    timeout: 15000, // Увеличиваем таймаут до 15 секунд
+                    maximumAge: 600000 // 10 минут кэш
                 }
             );
         }
@@ -2286,6 +2440,44 @@
                     btn.title = 'Включить геолокацию';
                 }
             }
+        }
+
+        function updateLocationSettings() {
+            // Обновляем переключатель в настройках чата (если есть)
+            const locationToggle = document.getElementById('locationToggle');
+            if (locationToggle) {
+                locationToggle.checked = locationEnabled;
+            }
+            
+            // Обновляем переключатель в главных настройках
+            const mainLocationToggle = document.getElementById('mainLocationToggle');
+            if (mainLocationToggle) {
+                mainLocationToggle.checked = locationEnabled;
+            }
+            
+            // Обновляем информацию о местоположении в настройках чата
+            const locationInfo = document.getElementById('locationInfo');
+            const currentLocation = document.getElementById('currentLocation');
+            
+            if (locationEnabled && userLocation) {
+                if (locationInfo) locationInfo.style.display = 'block';
+                if (currentLocation) {
+                    currentLocation.textContent = `${userLocation.city || 'Неизвестный город'}, ${userLocation.country || 'Неизвестная страна'}`;
+                }
+            } else if (locationEnabled && !userLocation) {
+                if (locationInfo) locationInfo.style.display = 'block';
+                if (currentLocation) {
+                    currentLocation.textContent = 'Получение местоположения...';
+                }
+            } else {
+                if (locationInfo) locationInfo.style.display = 'none';
+            }
+            
+            // Обновляем главные настройки
+            updateMainLocationDisplay();
+            
+            // Обновляем кнопку геолокации
+            updateLocationButton();
         }
 
         // Функция получения погоды
@@ -2332,6 +2524,29 @@
             if (locationEnabled && userLocation && (!lastWeatherUpdate || 
                 (new Date() - lastWeatherUpdate) > 3600000)) { // 1 час
                 getWeatherData(userLocation.latitude, userLocation.longitude);
+            }
+        }
+
+        // Функция для повторной попытки получения геолокации
+        function retryLocation() {
+            if (locationEnabled) {
+                showNotification('Повторная попытка получения местоположения...');
+                requestLocation();
+            }
+        }
+
+        // Проверяем актуальность местоположения (обновляем если старше 1 часа)
+        function checkLocationUpdate() {
+            if (locationEnabled && userLocation) {
+                const locationAge = new Date() - new Date(userLocation.timestamp);
+                if (locationAge > 3600000) { // 1 час
+                    console.log('Местоположение устарело, обновляем...');
+                    requestLocation();
+                }
+            } else if (locationEnabled && !userLocation) {
+                // Если геолокация включена, но данных нет - пробуем получить
+                console.log('Геолокация включена, но данных нет, получаем...');
+                requestLocation();
             }
         }
 
@@ -2385,6 +2600,146 @@
 
         function showNews() {
             showNotification('Новости - в разработке');
+        }
+
+        // Функции главных настроек
+        function openMainSettings() {
+            document.getElementById('mainSettingsModal').style.display = 'block';
+            loadMainSettings();
+        }
+
+        function closeMainSettings() {
+            document.getElementById('mainSettingsModal').style.display = 'none';
+        }
+
+        function loadMainSettings() {
+            // Загружаем настройки геолокации
+            document.getElementById('mainLocationToggle').checked = locationEnabled;
+            updateMainLocationDisplay();
+            
+            // Загружаем настройки разрешений
+            const permissions = JSON.parse(localStorage.getItem('ai-tap-permissions') || '{}');
+            document.getElementById('cameraToggle').checked = permissions.camera || false;
+            document.getElementById('microphoneToggle').checked = permissions.microphone || false;
+            document.getElementById('filesToggle').checked = permissions.files !== false; // по умолчанию true
+            
+            // Загружаем настройки звука
+            const soundEnabled = localStorage.getItem('ai-tap-sound') !== 'false';
+            document.getElementById('mainSoundToggle').checked = soundEnabled;
+            
+            // Обработчики для переключателей
+            document.getElementById('mainLocationToggle').onchange = function() {
+                if (this.checked) {
+                    requestLocation();
+                } else {
+                    locationEnabled = false;
+                    localStorage.setItem('ai-tap-location-enabled', 'false');
+                    updateMainLocationDisplay();
+                    showNotification('Геолокация отключена');
+                }
+            };
+            
+            document.getElementById('cameraToggle').onchange = function() {
+                requestCameraPermission(this.checked);
+            };
+            
+            document.getElementById('microphoneToggle').onchange = function() {
+                requestMicrophonePermission(this.checked);
+            };
+        }
+
+        function updateMainLocationDisplay() {
+            const locationInfo = document.getElementById('mainLocationInfo');
+            const currentLocation = document.getElementById('mainCurrentLocation');
+            
+            if (locationEnabled && userLocation) {
+                locationInfo.style.display = 'block';
+                currentLocation.textContent = `${userLocation.city || 'Неизвестный город'}, ${userLocation.country || 'Неизвестная страна'}`;
+            } else if (locationEnabled && !userLocation) {
+                locationInfo.style.display = 'block';
+                currentLocation.textContent = 'Получение местоположения...';
+            } else {
+                locationInfo.style.display = 'none';
+            }
+        }
+
+        async function requestCameraPermission(enable) {
+            if (enable) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    stream.getTracks().forEach(track => track.stop()); // Останавливаем поток
+                    
+                    const permissions = JSON.parse(localStorage.getItem('ai-tap-permissions') || '{}');
+                    permissions.camera = true;
+                    localStorage.setItem('ai-tap-permissions', JSON.stringify(permissions));
+                    
+                    showNotification('✅ Доступ к камере разрешен');
+                } catch (error) {
+                    console.error('Ошибка доступа к камере:', error);
+                    document.getElementById('cameraToggle').checked = false;
+                    showNotification('❌ Доступ к камере запрещен');
+                }
+            } else {
+                const permissions = JSON.parse(localStorage.getItem('ai-tap-permissions') || '{}');
+                permissions.camera = false;
+                localStorage.setItem('ai-tap-permissions', JSON.stringify(permissions));
+                showNotification('Доступ к камере отключен');
+            }
+        }
+
+        async function requestMicrophonePermission(enable) {
+            if (enable) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    stream.getTracks().forEach(track => track.stop()); // Останавливаем поток
+                    
+                    const permissions = JSON.parse(localStorage.getItem('ai-tap-permissions') || '{}');
+                    permissions.microphone = true;
+                    localStorage.setItem('ai-tap-permissions', JSON.stringify(permissions));
+                    
+                    showNotification('✅ Доступ к микрофону разрешен');
+                } catch (error) {
+                    console.error('Ошибка доступа к микрофону:', error);
+                    document.getElementById('microphoneToggle').checked = false;
+                    showNotification('❌ Доступ к микрофону запрещен');
+                }
+            } else {
+                const permissions = JSON.parse(localStorage.getItem('ai-tap-permissions') || '{}');
+                permissions.microphone = false;
+                localStorage.setItem('ai-tap-permissions', JSON.stringify(permissions));
+                showNotification('Доступ к микрофону отключен');
+            }
+        }
+
+        function saveMainSettings() {
+            // Сохраняем настройки звука
+            const soundEnabled = document.getElementById('mainSoundToggle').checked;
+            localStorage.setItem('ai-tap-sound', soundEnabled ? 'true' : 'false');
+            
+            // Сохраняем настройки файлов
+            const permissions = JSON.parse(localStorage.getItem('ai-tap-permissions') || '{}');
+            permissions.files = document.getElementById('filesToggle').checked;
+            localStorage.setItem('ai-tap-permissions', JSON.stringify(permissions));
+            
+            showNotification('✅ Настройки сохранены');
+            closeMainSettings();
+        }
+
+        function resetMainSettings() {
+            if (confirm('Сбросить все настройки к значениям по умолчанию?')) {
+                // Сбрасываем разрешения
+                localStorage.removeItem('ai-tap-permissions');
+                
+                // Сбрасываем геолокацию
+                locationEnabled = false;
+                localStorage.setItem('ai-tap-location-enabled', 'false');
+                
+                // Сбрасываем звук
+                localStorage.setItem('ai-tap-sound', 'true');
+                
+                showNotification('🔄 Настройки сброшены');
+                loadMainSettings();
+            }
         }
 
         function addFileMessage(file) {
@@ -2565,32 +2920,8 @@
             const soundEnabled = localStorage.getItem('ai-tap-sound') !== 'false';
             document.getElementById('soundToggle').checked = soundEnabled;
             
-            // Загружаем настройки геолокации
-            document.getElementById('locationToggle').checked = locationEnabled;
-            
-            // Показываем информацию о местоположении если включено
-            if (locationEnabled && userLocation) {
-                document.getElementById('locationInfo').style.display = 'block';
-                document.getElementById('currentLocation').textContent = 
-                    `${userLocation.city || 'Неизвестный город'}, ${userLocation.country || 'Неизвестная страна'}`;
-            } else {
-                document.getElementById('locationInfo').style.display = 'none';
-            }
-            
             // Обновляем статистику
             updateStatistics();
-            
-            // Обработчик для геолокации
-            document.getElementById('locationToggle').onchange = function() {
-                if (this.checked) {
-                    requestLocation();
-                } else {
-                    locationEnabled = false;
-                    localStorage.setItem('ai-tap-location-enabled', 'false');
-                    document.getElementById('locationInfo').style.display = 'none';
-                    showNotification('Геолокация отключена');
-                }
-            };
         }
 
         function selectMode(mode) {
