@@ -1952,7 +1952,10 @@
                                 role: 'system',
                                 content: getPersonalizedSystemPrompt()
                             },
-                            ...chatHistory
+                            ...chatHistory.map(msg => ({
+                                role: msg.role,
+                                content: msg.content
+                            }))
                         ],
                         max_tokens: aiSettings.maxTokens,
                         temperature: aiSettings.temperature
