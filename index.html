@@ -1913,6 +1913,351 @@
 
         /* Все CSS стили управления пользователями удалены */
 
+        /* Стили для экрана загрузки */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            overflow: hidden;
+        }
+
+        .loading-container {
+            text-align: center;
+            z-index: 10001;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+        }
+
+        .loading-header {
+            margin-bottom: 40px;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .loading-logo {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: robotPulse 2s infinite;
+            filter: drop-shadow(0 0 20px rgba(0, 255, 255, 0.5));
+        }
+
+        .loading-title {
+            font-size: 48px;
+            font-weight: 700;
+            color: #00ffff;
+            margin: 0 0 10px 0;
+            text-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
+            letter-spacing: 3px;
+        }
+
+        .loading-subtitle {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.8);
+            margin: 0;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .loading-progress {
+            margin: 40px 0;
+            animation: fadeInUp 1s ease-out 0.5s both;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ffff 0%, #0080ff 50%, #8000ff 100%);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.3s ease;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+            animation: progressShine 2s infinite;
+        }
+
+        .progress-text {
+            margin-top: 15px;
+            font-size: 16px;
+            color: #00ffff;
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        .loading-messages {
+            margin: 40px 0;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeInUp 1s ease-out 1s both;
+        }
+
+        .message-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .loading-message {
+            position: absolute;
+            width: 100%;
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 400;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: messageSlide 3s infinite;
+            line-height: 1.4;
+        }
+
+        .tech-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .tech-circle {
+            position: absolute;
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: techRotate 10s linear infinite;
+        }
+
+        .tech-circle-1 {
+            width: 200px;
+            height: 200px;
+            top: 10%;
+            left: -100px;
+            border-style: dashed;
+        }
+
+        .tech-circle-2 {
+            width: 150px;
+            height: 150px;
+            bottom: 10%;
+            right: -75px;
+            border-style: dotted;
+            animation-direction: reverse;
+        }
+
+        .tech-circle-3 {
+            width: 100px;
+            height: 100px;
+            top: 50%;
+            right: 10%;
+            border-style: solid;
+            animation-duration: 15s;
+        }
+
+        .data-stream {
+            position: absolute;
+            top: 50%;
+            left: -50px;
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent 0%, #00ffff 50%, transparent 100%);
+            animation: dataFlow 3s infinite;
+        }
+
+        .data-bit {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #00ffff;
+            border-radius: 50%;
+            animation: dataBitMove 2s infinite;
+        }
+
+        .data-bit:nth-child(1) { animation-delay: 0s; }
+        .data-bit:nth-child(2) { animation-delay: 0.4s; }
+        .data-bit:nth-child(3) { animation-delay: 0.8s; }
+        .data-bit:nth-child(4) { animation-delay: 1.2s; }
+        .data-bit:nth-child(5) { animation-delay: 1.6s; }
+
+        .enter-section {
+            margin-top: 40px;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .enter-button {
+            background: linear-gradient(135deg, #00ffff 0%, #0080ff 50%, #8000ff 100%);
+            border: none;
+            border-radius: 50px;
+            padding: 18px 40px;
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0 auto;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 30px rgba(0, 255, 255, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .enter-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+            transition: left 0.5s ease;
+        }
+
+        .enter-button:hover::before {
+            left: 100%;
+        }
+
+        .enter-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0, 255, 255, 0.6);
+        }
+
+        .enter-icon {
+            font-size: 20px;
+            animation: rocketBounce 2s infinite;
+        }
+
+        .loading-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 10000;
+        }
+
+        .loading-particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #00ffff;
+            border-radius: 50%;
+            animation: particleFloat 4s infinite linear;
+            opacity: 0.7;
+        }
+
+        /* Анимации для экрана загрузки */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes robotPulse {
+            0%, 100% {
+                transform: scale(1);
+                filter: drop-shadow(0 0 20px rgba(0, 255, 255, 0.5));
+            }
+            50% {
+                transform: scale(1.1);
+                filter: drop-shadow(0 0 30px rgba(0, 255, 255, 0.8));
+            }
+        }
+
+        @keyframes progressShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        @keyframes messageSlide {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            10%, 90% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        }
+
+        @keyframes techRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes dataFlow {
+            0% { transform: translateX(0); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateX(calc(100vw + 100px)); opacity: 0; }
+        }
+
+        @keyframes dataBitMove {
+            0% { transform: translateX(0) scale(0); opacity: 0; }
+            10% { opacity: 1; transform: scale(1); }
+            90% { opacity: 1; }
+            100% { transform: translateX(calc(100vw + 100px)) scale(0); opacity: 0; }
+        }
+
+        @keyframes rocketBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) translateX(0) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(100px) scale(0);
+                opacity: 0;
+            }
+        }
+
         /* Стили для модального окна статьи */
         .article-content {
             padding: 20px;
@@ -2222,6 +2567,58 @@
     </style>
 </head>
 <body>
+    <!-- Экран загрузки -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-container">
+            <!-- Логотип и название -->
+            <div class="loading-header">
+                <div class="loading-logo">🤖</div>
+                <h1 class="loading-title">AI-TAP</h1>
+                <p class="loading-subtitle">Искусственный Интеллект Портал</p>
+            </div>
+            
+            <!-- Прогресс бар -->
+            <div class="loading-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">0%</div>
+            </div>
+            
+            <!-- Анимированные тексты про ИИ -->
+            <div class="loading-messages">
+                <div class="message-container" id="messageContainer">
+                    <div class="loading-message" id="currentMessage">Инициализация нейронных сетей...</div>
+                </div>
+            </div>
+            
+            <!-- Технологические элементы -->
+            <div class="tech-elements">
+                <div class="tech-circle tech-circle-1"></div>
+                <div class="tech-circle tech-circle-2"></div>
+                <div class="tech-circle tech-circle-3"></div>
+                <div class="data-stream">
+                    <div class="data-bit"></div>
+                    <div class="data-bit"></div>
+                    <div class="data-bit"></div>
+                    <div class="data-bit"></div>
+                    <div class="data-bit"></div>
+                </div>
+            </div>
+            
+            <!-- Кнопка входа (появляется после загрузки) -->
+            <div class="enter-section" id="enterSection" style="display: none;">
+                <button class="enter-button" id="enterButton" onclick="enterApplication()">
+                    <span class="enter-icon">🚀</span>
+                    <span class="enter-text">Войти в AI-TAP</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Фоновые частицы для загрузки -->
+        <div class="loading-particles" id="loadingParticles"></div>
+    </div>
+
     <!-- Анимированный фон с частицами -->
     <div class="particles-container" id="particlesContainer"></div>
     
@@ -2571,7 +2968,7 @@
             </div>
             <div id="adminContent" class="admin-content">
                 <div class="admin-menu">
-                    <div class="admin-menu-item" onclick="showNotification('👥 Пользователи - в разработке')">
+                    <div class="admin-menu-item" onclick="openUsersManagement()">
                         <div class="admin-menu-icon">👥</div>
                         <div class="admin-menu-text">
                             <div class="admin-menu-title">Пользователи</div>
@@ -4674,6 +5071,10 @@
             // Добавляем сообщение пользователя в историю с временем
             chatHistory.push({ role: 'user', content: message, timestamp: userTime });
             localStorage.setItem('ai-tap-chat-history', JSON.stringify(chatHistory));
+            
+            // Обновляем статистику пользователя
+            updateUserChatStats(userMessage, aiResponse);
+            
             input.value = '';
             input.style.height = 'auto';
             
@@ -5030,26 +5431,352 @@
 
         // Все функции управления пользователями удалены
 
-        // Анимация появления кнопок
-        document.addEventListener('DOMContentLoaded', function() {
+        // Система загрузки приложения
+        let loadingMessages = [
+            "Инициализация нейронных сетей...",
+            "Загрузка алгоритмов машинного обучения...",
+            "Подключение к облачным серверам ИИ...",
+            "Калибровка языковых моделей...",
+            "Настройка системы распознавания...",
+            "Оптимизация производительности...",
+            "Синхронизация с базой знаний...",
+            "Активация модулей обработки данных...",
+            "Проверка безопасности соединения...",
+            "Загрузка пользовательских настроек...",
+            "Инициализация интерфейса ИИ...",
+            "Подготовка системы к работе...",
+            "Финальная оптимизация...",
+            "Система готова к запуску!"
+        ];
+
+        let currentMessageIndex = 0;
+        let loadingProgress = 0;
+        let loadingInterval;
+        let messageInterval;
+        let particleInterval;
+
+        function startLoadingSequence() {
+            // Создаем частицы для фона
+            createLoadingParticles();
+            
+            // Запускаем анимацию сообщений
+            startMessageAnimation();
+            
+            // Запускаем прогресс бар
+            startProgressAnimation();
+            
+            // Запускаем создание частиц
+            particleInterval = setInterval(createLoadingParticles, 500);
+        }
+
+        function createLoadingParticles() {
+            const container = document.getElementById('loadingParticles');
+            if (!container) return;
+            
+            for (let i = 0; i < 3; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'loading-particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                particle.style.animationDelay = Math.random() * 2 + 's';
+                container.appendChild(particle);
+                
+                // Удаляем частицу после анимации
+                setTimeout(() => {
+                    if (particle.parentNode) {
+                        particle.parentNode.removeChild(particle);
+                    }
+                }, 6000);
+            }
+        }
+
+        function startMessageAnimation() {
+            const messageElement = document.getElementById('currentMessage');
+            
+            function showNextMessage() {
+                if (currentMessageIndex < loadingMessages.length) {
+                    messageElement.textContent = loadingMessages[currentMessageIndex];
+                    messageElement.style.animation = 'none';
+                    messageElement.offsetHeight; // Trigger reflow
+                    messageElement.style.animation = 'messageSlide 3s infinite';
+                    currentMessageIndex++;
+                } else {
+                    clearInterval(messageInterval);
+                }
+            }
+            
+            showNextMessage();
+            messageInterval = setInterval(showNextMessage, 2000);
+        }
+
+        function startProgressAnimation() {
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            
+            loadingInterval = setInterval(() => {
+                if (loadingProgress < 100) {
+                    // Случайное увеличение прогресса
+                    const increment = Math.random() * 8 + 2;
+                    loadingProgress = Math.min(100, loadingProgress + increment);
+                    
+                    progressFill.style.width = loadingProgress + '%';
+                    progressText.textContent = Math.floor(loadingProgress) + '%';
+                    
+                    if (loadingProgress >= 100) {
+                        finishLoading();
+                    }
+                } else {
+                    clearInterval(loadingInterval);
+                }
+            }, 200);
+        }
+
+        function finishLoading() {
+            clearInterval(loadingInterval);
+            clearInterval(messageInterval);
+            clearInterval(particleInterval);
+            
+            // Показываем кнопку входа
+            setTimeout(() => {
+                const enterSection = document.getElementById('enterSection');
+                const messageElement = document.getElementById('currentMessage');
+                
+                messageElement.textContent = "Система готова к запуску!";
+                messageElement.style.color = '#00ffff';
+                messageElement.style.fontWeight = '600';
+                
+                enterSection.style.display = 'block';
+                enterSection.style.animation = 'fadeInUp 1s ease-out';
+            }, 1000);
+        }
+
+        function enterApplication() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            
+            // Анимация исчезновения экрана загрузки
+            loadingScreen.style.transition = 'opacity 1s ease-out, transform 1s ease-out';
+            loadingScreen.style.opacity = '0';
+            loadingScreen.style.transform = 'scale(0.9)';
+            
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+                
+                // Регистрируем пользователя в системе
+                registerUserInSystem();
+                
+                // Показываем основное приложение
+                showMainApplication();
+            }, 1000);
+        }
+
+        function registerUserInSystem() {
+            // Получаем данные пользователя из Telegram
+            const tg = window.Telegram.WebApp;
+            const user = tg.initDataUnsafe.user;
+            
+            if (user) {
+                const userData = {
+                    id: user.id,
+                    first_name: user.first_name,
+                    last_name: user.last_name || '',
+                    username: user.username || '',
+                    photo_url: user.photo_url || '',
+                    registered: new Date().toISOString(),
+                    last_seen: new Date().toISOString(),
+                    chat_history: [],
+                    total_messages: 0,
+                    session_count: 1
+                };
+                
+                // Получаем существующих пользователей
+                const existingUsers = JSON.parse(localStorage.getItem('ai-tap-users') || '[]');
+                const existingUserIndex = existingUsers.findIndex(u => u.id === user.id);
+                
+                if (existingUserIndex !== -1) {
+                    // Обновляем данные существующего пользователя
+                    existingUsers[existingUserIndex] = {
+                        ...existingUsers[existingUserIndex],
+                        last_seen: new Date().toISOString(),
+                        session_count: (existingUsers[existingUserIndex].session_count || 0) + 1,
+                        first_name: user.first_name,
+                        last_name: user.last_name || '',
+                        username: user.username || '',
+                        photo_url: user.photo_url || ''
+                    };
+                } else {
+                    // Добавляем нового пользователя
+                    existingUsers.push(userData);
+                }
+                
+                // Сохраняем в localStorage
+                localStorage.setItem('ai-tap-users', JSON.stringify(existingUsers));
+                
+                // Устанавливаем текущего пользователя
+                window.currentUser = userData;
+                
+                console.log('Пользователь зарегистрирован/обновлен:', userData);
+            }
+        }
+
+        function showMainApplication() {
+            // Показываем основной интерфейс
+            const mainContent = document.querySelector('.header');
+            if (mainContent) {
+                mainContent.style.opacity = '0';
+                mainContent.style.display = 'block';
+                mainContent.style.animation = 'fadeInUp 1s ease-out';
+                
+                setTimeout(() => {
+                    mainContent.style.opacity = '1';
+                }, 100);
+            }
+            
+            // Инициализируем приложение
+            initializeApplication();
+        }
+
+        function initializeApplication() {
             // Создаем частицы
             createParticles();
             
             // Инициализируем настройки
             initializeSettings();
             
-            // Анимация кнопок
-            const buttons = document.querySelectorAll('.ai-button');
-            buttons.forEach((button, index) => {
-                button.style.opacity = '0';
-                button.style.transform = 'translateY(30px)';
+            // Обновляем интерфейс
+            updateInterface();
+            
+            // Показываем уведомление о входе
+            setTimeout(() => {
+                showNotification('🚀 Добро пожаловать в AI-TAP!');
+            }, 1500);
+        }
+
+        // Функция обновления статистики чата пользователя
+        function updateUserChatStats(userMessage, aiResponse) {
+            if (!window.currentUser) return;
+            
+            const users = JSON.parse(localStorage.getItem('ai-tap-users') || '[]');
+            const userIndex = users.findIndex(u => u.id === window.currentUser.id);
+            
+            if (userIndex !== -1) {
+                // Обновляем статистику
+                users[userIndex].total_messages = (users[userIndex].total_messages || 0) + 1;
+                users[userIndex].last_seen = new Date().toISOString();
                 
-                setTimeout(() => {
-                    button.style.transition = 'all 0.5s ease';
-                    button.style.opacity = '1';
-                    button.style.transform = 'translateY(0)';
-                }, index * 100);
+                // Сохраняем последние сообщения (максимум 50)
+                if (!users[userIndex].chat_history) {
+                    users[userIndex].chat_history = [];
+                }
+                
+                users[userIndex].chat_history.push({
+                    user_message: userMessage,
+                    ai_response: aiResponse,
+                    timestamp: new Date().toISOString()
+                });
+                
+                // Ограничиваем историю 50 сообщениями
+                if (users[userIndex].chat_history.length > 50) {
+                    users[userIndex].chat_history = users[userIndex].chat_history.slice(-50);
+                }
+                
+                // Сохраняем обновленные данные
+                localStorage.setItem('ai-tap-users', JSON.stringify(users));
+                
+                // Обновляем текущего пользователя
+                window.currentUser = users[userIndex];
+            }
+        }
+
+        // Восстанавливаем функцию просмотра пользователей для админа
+        function openUsersManagement() {
+            const users = JSON.parse(localStorage.getItem('ai-tap-users') || '[]');
+            
+            if (users.length === 0) {
+                showNotification('👥 Список пользователей пуст');
+                return;
+            }
+            
+            let usersList = '📊 Зарегистрированные пользователи:\n\n';
+            users.forEach((user, index) => {
+                usersList += `${index + 1}. ${user.first_name} ${user.last_name}\n`;
+                usersList += `   ID: ${user.id}\n`;
+                usersList += `   Username: ${user.username ? '@' + user.username : 'Не указан'}\n`;
+                usersList += `   Последний вход: ${new Date(user.last_seen).toLocaleString('ru-RU')}\n`;
+                usersList += `   Сессий: ${user.session_count || 1}\n`;
+                usersList += `   Сообщений с ИИ: ${user.total_messages || 0}\n`;
+                
+                // Показываем последние 3 сообщения если есть
+                if (user.chat_history && user.chat_history.length > 0) {
+                    usersList += `   📝 Последние сообщения:\n`;
+                    const recentMessages = user.chat_history.slice(-3);
+                    recentMessages.forEach((msg, msgIndex) => {
+                        const time = new Date(msg.timestamp).toLocaleString('ru-RU');
+                        usersList += `      ${msgIndex + 1}. [${time}]\n`;
+                        usersList += `         👤: ${msg.user_message.substring(0, 50)}${msg.user_message.length > 50 ? '...' : ''}\n`;
+                        usersList += `         🤖: ${msg.ai_response.substring(0, 50)}${msg.ai_response.length > 50 ? '...' : ''}\n`;
+                    });
+                }
+                usersList += '\n';
             });
+            
+            // Создаем простое модальное окно для просмотра
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+            `;
+            
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+                border-radius: 15px;
+                padding: 30px;
+                max-width: 600px;
+                max-height: 80vh;
+                overflow-y: auto;
+                color: white;
+                border: 1px solid rgba(0, 255, 255, 0.3);
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            `;
+            
+            content.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="margin: 0; color: #00ffff;">👥 Управление пользователями</h2>
+                    <button onclick="this.closest('.modal').remove()" style="background: none; border: none; color: white; font-size: 24px; cursor: pointer;">×</button>
+                </div>
+                <pre style="white-space: pre-wrap; font-family: 'Segoe UI', sans-serif; line-height: 1.6; font-size: 14px;">${usersList}</pre>
+            `;
+            
+            modal.className = 'modal';
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+            
+            // Закрытие по клику вне модального окна
+            modal.onclick = (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            };
+        }
+
+        // Инициализация приложения при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            // Скрываем основной контент
+            const mainContent = document.querySelector('.header');
+            if (mainContent) {
+                mainContent.style.display = 'none';
+            }
+            
+            // Запускаем экран загрузки
+            startLoadingSequence();
         });
 
         // Функция инициализации настроек
