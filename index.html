@@ -883,6 +883,7 @@
             border-radius: 3px;
             outline: none;
             -webkit-appearance: none;
+            appearance: none;
         }
 
         .slider-container input[type="range"]::-webkit-slider-thumb {
@@ -1555,6 +1556,7 @@
             margin-bottom: 5px;
             display: -webkit-box;
             -webkit-line-clamp: 2;
+            line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
@@ -1749,6 +1751,7 @@
             margin-bottom: 5px;
             display: -webkit-box;
             -webkit-line-clamp: 2;
+            line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
@@ -1766,6 +1769,7 @@
             margin-top: 8px;
             display: -webkit-box;
             -webkit-line-clamp: 2;
+            line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
@@ -2511,7 +2515,7 @@
     </div>
 
     <!-- Основное приложение (скрыто при загрузке) -->
-    <div id="mainApp" style="display: none;">
+    <div id="mainApp" style="opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
         <!-- Анимированный фон с частицами -->
         <div class="particles-container" id="particlesContainer"></div>
         
@@ -3385,8 +3389,7 @@
         let cachedNews = JSON.parse(localStorage.getItem('ai-tap-cached-news') || 'null');
         let lastNewsUpdate = localStorage.getItem('ai-tap-last-news-update') ? new Date(localStorage.getItem('ai-tap-last-news-update')) : null;
         
-        // Кэш всех пользователей для поиска
-        let allUsers = [];
+        // Неиспользуемые переменные удалены
         
         
         // Инициализация памяти ИИ
@@ -5099,8 +5102,6 @@
         const ADMIN_ID = 1485058648; // ID админа Андрея
         let isAdmin = false;
         let currentUser = null;
-        let selectedBanTime = 0;
-        let selectedUserId = null;
 
         // Инициализация пользователя
         const tg = window.Telegram.WebApp;
@@ -5410,19 +5411,21 @@
             
             setTimeout(() => {
                 loadingScreen.style.display = 'none';
-                mainApp.style.display = 'block';
                 
-                // Анимация появления основного приложения
-                mainApp.style.opacity = '0';
-                mainApp.style.transform = 'scale(1.1)';
+                // Показываем основное приложение
+                mainApp.style.position = 'relative';
+                mainApp.style.zIndex = '1';
                 mainApp.style.transition = 'opacity 1s ease, transform 1s ease';
+                mainApp.style.transform = 'scale(1.1)';
                 
                 setTimeout(() => {
                     mainApp.style.opacity = '1';
                     mainApp.style.transform = 'scale(1)';
                     
-                    // Инициализируем основное приложение
-                    initializeMainApp();
+                    // Запускаем анимацию кнопок после появления приложения
+                    setTimeout(() => {
+                        animateMainAppButtons();
+                    }, 500);
                 }, 50);
             }, 1000);
         }
@@ -5433,8 +5436,10 @@
             
             // Инициализируем настройки
             initializeSettings();
-            
-            // Анимация кнопок
+        }
+
+        function animateMainAppButtons() {
+            // Анимация кнопок при входе в приложение
             const buttons = document.querySelectorAll('.ai-button');
             buttons.forEach((button, index) => {
                 button.style.opacity = '0';
@@ -5450,7 +5455,10 @@
 
         // Инициализация приложения
         document.addEventListener('DOMContentLoaded', function() {
-            // Запускаем загрузку
+            // Сначала инициализируем основное приложение в фоне
+            initializeMainApp();
+            
+            // Затем запускаем загрузку
             startLoading();
         });
 
@@ -5474,7 +5482,7 @@
                 console.log('Инициализированы настройки звука по умолчанию');
             }
             
-            // Демонстрационный пользователь удален
+            // Инициализация завершена
             
             
             console.log('Настройки инициализированы:', {
@@ -5485,29 +5493,7 @@
             });
         }
 
-        // Функция инициализации демонстрационного пользователя
-        function initializeDemoUser() {
-            const existingUsers = JSON.parse(localStorage.getItem('ai-tap-users') || '[]');
-            
-            // Если пользователей нет (кроме возможного админа), добавляем демо-пользователя
-            if (existingUsers.length === 0 || (existingUsers.length === 1 && existingUsers[0].id === ADMIN_ID)) {
-                const demoUser = {
-                    id: 999888777,
-                    first_name: 'Демо',
-                    last_name: 'Пользователь',
-                    username: 'demo_user',
-                    photo_url: 'https://via.placeholder.com/100x100/4CAF50/ffffff?text=DEMO',
-                    last_seen: new Date(Date.now() - 15 * 60 * 1000).toISOString(), // 15 минут назад
-                    registered: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() // 2 дня назад
-                };
-
-                // Добавляем демо-пользователя
-                const allUsers = [...existingUsers, demoUser];
-                localStorage.setItem('ai-tap-users', JSON.stringify(allUsers));
-                
-                console.log('Добавлен демонстрационный пользователь для показа функционала админ панели');
-            }
-        }
+        // Лишние функции удалены
 
     </script>
     </div> <!-- Закрытие mainApp -->
