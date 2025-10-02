@@ -392,68 +392,95 @@
             margin-bottom: 50px;
         }
 
-        /* Панель с кнопками ИИ */
-        .ai-panel {
+        /* Новый дизайн главного меню */
+        .main-ai-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: 1fr 1fr;
             gap: 20px;
+            max-width: 400px;
             width: 100%;
-            max-width: 800px;
+            margin-bottom: 30px;
         }
 
-        .ai-button {
+        .main-ai-card {
             background: rgba(255, 255, 255, 0.1);
             border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 15px;
-            padding: 25px;
-            color: white;
-            text-decoration: none;
+            border-radius: 20px;
+            padding: 30px 20px;
             text-align: center;
-            transition: all 0.3s ease;
             cursor: pointer;
+            transition: all 0.3s ease;
             backdrop-filter: blur(10px);
             position: relative;
             overflow: hidden;
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
-        .ai-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .ai-button:hover::before {
-            left: 100%;
-        }
-
-        .ai-button:hover {
-            transform: translateY(-5px);
-            border-color: rgba(255, 255, 255, 0.5);
+        .main-ai-card:hover {
             background: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-color: rgba(0, 255, 255, 0.5);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);
         }
 
-        .ai-icon {
+        .main-ai-card:active {
+            transform: translateY(-2px);
+        }
+
+        .ai-card-icon {
             font-size: 48px;
             margin-bottom: 15px;
-            display: block;
         }
 
-        .ai-title {
-            font-size: 20px;
+        .ai-card-title {
+            font-size: 16px;
             font-weight: 600;
-            margin-bottom: 10px;
+            color: white;
+            text-align: center;
         }
 
-        .ai-description {
+        /* Дополнительные функции */
+        .additional-functions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .function-button {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 25px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
             font-size: 14px;
-            opacity: 0.8;
-            line-height: 1.4;
+            font-weight: 500;
+        }
+
+        .function-button:hover {
+            background: rgba(0, 255, 255, 0.2);
+            border-color: rgba(0, 255, 255, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.2);
+        }
+
+        .function-icon {
+            font-size: 18px;
+        }
+
+        .function-text {
+            white-space: nowrap;
         }
 
         /* Уведомления */
@@ -1154,8 +1181,56 @@
             margin-top: 10px;
         }
 
-        /* Стили для кнопки файлов */
-        .file-button {
+        /* Селектор режимов ИИ */
+        .mode-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .mode-option {
+            background: rgba(0, 255, 255, 0.1);
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .mode-option:hover {
+            background: rgba(0, 255, 255, 0.2);
+            border-color: rgba(0, 255, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .mode-option.active {
+            background: rgba(0, 255, 255, 0.3);
+            border-color: rgba(0, 255, 255, 0.7);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        }
+
+        .mode-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .mode-name {
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .mode-desc {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            line-height: 1.3;
+        }
+
+        /* Стили для кнопки прикрепления */
+        .attach-button {
             background: rgba(0, 255, 255, 0.2);
             border: 2px solid rgba(0, 255, 255, 0.4);
             border-radius: 50%;
@@ -1168,16 +1243,71 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
         }
 
-        .file-button:hover {
+        .attach-button:hover {
             background: rgba(0, 255, 255, 0.3);
             border-color: rgba(0, 255, 255, 0.6);
             transform: scale(1.05);
         }
 
-        .file-button:active {
+        .attach-button:active {
             transform: scale(0.95);
+        }
+
+        /* Панель прикрепления */
+        .attach-menu {
+            position: absolute;
+            bottom: 60px;
+            left: 0;
+            background: rgba(15, 15, 35, 0.95);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 8px;
+            min-width: 180px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .attach-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: white;
+        }
+
+        .attach-option:hover {
+            background: rgba(0, 255, 255, 0.1);
+            transform: translateX(4px);
+        }
+
+        .attach-icon {
+            font-size: 20px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .attach-text {
+            font-size: 14px;
+            font-weight: 500;
         }
 
         /* Стили для файловых сообщений */
@@ -1258,21 +1388,9 @@
                         <span>🇺🇸</span>
                         <span>English</span>
                     </div>
-                    <div class="language-option" onclick="changeLanguage('es')">
-                        <span>🇪🇸</span>
-                        <span>Español</span>
-                    </div>
-                    <div class="language-option" onclick="changeLanguage('fr')">
-                        <span>🇫🇷</span>
-                        <span>Français</span>
-                    </div>
                     <div class="language-option" onclick="changeLanguage('de')">
                         <span>🇩🇪</span>
                         <span>Deutsch</span>
-                    </div>
-                    <div class="language-option" onclick="changeLanguage('zh')">
-                        <span>🇨🇳</span>
-                        <span>中文</span>
                     </div>
                 </div>
             </div>
@@ -1281,20 +1399,30 @@
 
     <!-- Основной контент -->
     <div class="main-content">
-        <h1 class="title">AI Portal</h1>
+        <h1 class="title">AI-TAP</h1>
         <p class="subtitle">Выберите ИИ для ваших задач</p>
         
-        <div class="ai-panel">
-            <div class="ai-button" onclick="openMainAI()">
-                <span class="ai-icon">🤖</span>
-                <div class="ai-title">Основной ИИ</div>
-                <div class="ai-description">Универсальный помощник для любых задач</div>
+        <!-- Основные функции ИИ -->
+        <div class="main-ai-grid">
+            <div class="main-ai-card" onclick="openMainAI()">
+                <div class="ai-card-icon">🤖</div>
+                <div class="ai-card-title">Основной ИИ</div>
             </div>
+            <div class="main-ai-card" onclick="showNotification(t('imageGenNotification'))">
+                <div class="ai-card-icon">🎨</div>
+                <div class="ai-card-title">Генератор изображений</div>
+            </div>
+        </div>
 
-            <div class="ai-button" onclick="showNotification(t('imageGenNotification'))">
-                <span class="ai-icon">🎨</span>
-                <div class="ai-title">Генератор изображений</div>
-                <div class="ai-description">Создание уникальных изображений по описанию</div>
+        <!-- Дополнительные функции -->
+        <div class="additional-functions">
+            <div class="function-button" onclick="showWeather()">
+                <span class="function-icon">🌤️</span>
+                <span class="function-text">Погода</span>
+            </div>
+            <div class="function-button" onclick="showNews()">
+                <span class="function-icon">📰</span>
+                <span class="function-text">Новости</span>
             </div>
         </div>
     </div>
@@ -1337,7 +1465,17 @@
             
             <div class="chat-input-container">
                 <div class="chat-input-wrapper">
-                    <button id="fileButton" class="file-button" onclick="handleFileUpload()" title="Загрузить файл">📎</button>
+                    <button id="attachButton" class="attach-button" onclick="toggleAttachMenu()" title="Прикрепить">📎</button>
+                    <div id="attachMenu" class="attach-menu" style="display: none;">
+                        <div class="attach-option" onclick="handleMediaUpload()">
+                            <span class="attach-icon">🖼️</span>
+                            <span class="attach-text">Отправить медиа</span>
+                        </div>
+                        <div class="attach-option" onclick="openMiniGames()">
+                            <span class="attach-icon">🎮</span>
+                            <span class="attach-text">Мини игры</span>
+                        </div>
+                    </div>
                     <textarea 
                         id="chatInput" 
                         class="chat-input" 
@@ -1364,20 +1502,19 @@
                 <div class="settings-section">
                     <h3>🤖 Параметры ИИ</h3>
                     <div class="setting-item">
-                        <label>Температура (креативность):</label>
-                        <div class="slider-container">
-                            <input type="range" id="temperatureSlider" min="0.1" max="2.0" step="0.1" value="0.7">
-                            <span id="temperatureValue">0.7</span>
+                        <label>Режим ответов:</label>
+                        <div class="mode-selector">
+                            <div class="mode-option" data-mode="precise" onclick="selectMode('precise')">
+                                <div class="mode-icon">🎯</div>
+                                <div class="mode-name">Точный</div>
+                                <div class="mode-desc">Краткие и точные ответы</div>
+                            </div>
+                            <div class="mode-option active" data-mode="smart" onclick="selectMode('smart')">
+                                <div class="mode-icon">🧠</div>
+                                <div class="mode-name">Умный</div>
+                                <div class="mode-desc">Сбалансированные ответы</div>
+                            </div>
                         </div>
-                        <small>Низкая = точные ответы, Высокая = креативные ответы</small>
-                    </div>
-                    <div class="setting-item">
-                        <label>Длина ответов (токены):</label>
-                        <div class="slider-container">
-                            <input type="range" id="tokensSlider" min="100" max="2000" step="100" value="1000">
-                            <span id="tokensValue">1000</span>
-                        </div>
-                        <small>Больше токенов = более подробные ответы</small>
                     </div>
                 </div>
                 
@@ -1490,54 +1627,6 @@
                 error: 'Sorry, an error occurred while processing your message. Please try again.',
                 close: 'Close'
             },
-            es: {
-                loading: 'Cargando...',
-                userId: 'ID: ...',
-                welcome: '¡Bienvenido!',
-                aiPortal: 'Portal IA',
-                selectAi: 'Elige IA para tus tareas',
-                mainAi: 'IA Principal',
-                mainDescription: 'Asistente universal para cualquier tarea',
-                imageGen: 'Generador de Imágenes',
-                imageDescription: 'Creando imágenes únicas desde descripciones',
-                inDevelopment: 'en desarrollo',
-                mainAiNotification: 'IA Principal - en desarrollo',
-                imageGenNotification: 'Generador de Imágenes - en desarrollo',
-                chatWelcome: '¡Hola! Soy IA Principal. Desafortunadamente, estoy en desarrollo, pero pronto estaré listo para ayudar!',
-                chatPlaceholder: 'Escribe un mensaje...',
-                chatTyping: 'IA está escribiendo',
-                chatResponse: 'Lo siento, estoy en desarrollo. ¡Pronto estaré listo para ayudarte!',
-                chatTitle: 'Asistente IA',
-                chatWelcome: '¡Hola! Soy tu asistente IA. ¿Cómo puedo ayudar?',
-                typing: 'IA está escribiendo',
-                placeholder: 'Escribe un mensaje...',
-                error: 'Lo siento, ocurrió un error al procesar tu mensaje. Inténtalo de nuevo.',
-                close: 'Cerrar'
-            },
-            fr: {
-                loading: 'Chargement...',
-                userId: 'ID: ...',
-                welcome: 'Bienvenue!',
-                aiPortal: 'Portail IA',
-                selectAi: 'Choisissez IA pour vos tâches',
-                mainAi: 'IA Principal',
-                mainDescription: 'Assistant universel pour toute tâche',
-                imageGen: 'Générateur d\'Images',
-                imageDescription: 'Création d\'images uniques à partir de descriptions',
-                inDevelopment: 'en développement',
-                mainAiNotification: 'IA Principal - en développement',
-                imageGenNotification: 'Générateur d\'Images - en développement',
-                chatWelcome: 'Bonjour! Je suis IA Principal. Malheureusement, je suis en développement, mais je serai bientôt prêt à aider!',
-                chatPlaceholder: 'Écrivez un message...',
-                chatTyping: 'IA tape',
-                chatResponse: 'Désolé, je suis en développement. Je serai bientôt prêt à vous aider!',
-                chatTitle: 'Assistant IA',
-                chatWelcome: 'Bonjour! Je suis votre assistant IA. Comment puis-je aider?',
-                typing: 'IA tape',
-                placeholder: 'Écrivez un message...',
-                error: 'Désolé, une erreur s\'est produite lors du traitement de votre message. Réessayez.',
-                close: 'Fermer'
-            },
             de: {
                 loading: 'Laden...',
                 userId: 'ID: ...',
@@ -1561,30 +1650,6 @@
                 placeholder: 'Nachricht schreiben...',
                 error: 'Entschuldigung, ein Fehler ist beim Verarbeiten Ihrer Nachricht aufgetreten. Versuchen Sie es erneut.',
                 close: 'Schließen'
-            },
-            zh: {
-                loading: '加载中...',
-                userId: 'ID: ...',
-                welcome: '欢迎！',
-                aiPortal: 'AI 门户',
-                selectAi: '为您的任务选择AI',
-                mainAi: '主要AI',
-                mainDescription: '任何任务的通用助手',
-                imageGen: '图像生成器',
-                imageDescription: '根据描述创建独特图像',
-                inDevelopment: '开发中',
-                mainAiNotification: '主要AI - 开发中',
-                imageGenNotification: '图像生成器 - 开发中',
-                chatWelcome: '你好！我是主要AI。很遗憾，我还在开发中，但我很快就会准备好帮助！',
-                chatPlaceholder: '写消息...',
-                chatTyping: 'AI正在输入',
-                chatResponse: '抱歉，我还在开发中。我很快就会准备好帮助您！',
-                chatTitle: 'AI助手',
-                chatWelcome: '你好！我是你的AI助手。我能如何帮助？',
-                typing: 'AI正在输入',
-                placeholder: '写消息...',
-                error: '抱歉，处理您的消息时发生错误。请重试。',
-                close: '关闭'
             }
         };
 
@@ -1995,7 +2060,7 @@
         }
 
         // Настройки ИИ
-        let aiSettings = JSON.parse(localStorage.getItem('ai-tap-settings') || '{"temperature": 0.7, "maxTokens": 1000}');
+        let aiSettings = JSON.parse(localStorage.getItem('ai-tap-settings') || '{"mode": "smart", "maxTokens": 300}');
         
         // Память персонажа ИИ
         let aiMemory = JSON.parse(localStorage.getItem('ai-tap-memory') || '{}');
@@ -2271,8 +2336,19 @@
         }
 
 
-        // Функции для работы с файлами
-        function handleFileUpload() {
+        // Функции для панели прикрепления
+        function toggleAttachMenu() {
+            const menu = document.getElementById('attachMenu');
+            const isVisible = menu.style.display === 'block';
+            
+            if (isVisible) {
+                menu.style.display = 'none';
+            } else {
+                menu.style.display = 'block';
+            }
+        }
+
+        function handleMediaUpload() {
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = 'image/*,video/*,audio/*,.pdf,.doc,.docx,.txt';
@@ -2290,6 +2366,25 @@
             };
             
             input.click();
+            document.getElementById('attachMenu').style.display = 'none';
+        }
+
+        function openMiniGames() {
+            showNotification('Мини игры - в разработке');
+            document.getElementById('attachMenu').style.display = 'none';
+        }
+
+        // Функции для дополнительных кнопок
+        function showWeather() {
+            if (locationEnabled && currentWeather) {
+                showNotification(`🌤️ ${currentWeather.temp}°C, ${currentWeather.description} в ${userLocation.city || 'вашем городе'}`);
+            } else {
+                showNotification('Включите геолокацию в настройках для просмотра погоды');
+            }
+        }
+
+        function showNews() {
+            showNotification('Новости - в разработке');
         }
 
         function addFileMessage(file) {
@@ -2457,11 +2552,15 @@
 
         function loadSettingsUI() {
             // Загружаем текущие настройки в интерфейс
-            document.getElementById('temperatureSlider').value = aiSettings.temperature;
-            document.getElementById('temperatureValue').textContent = aiSettings.temperature;
+            const currentMode = aiSettings.mode || 'smart';
             
-            document.getElementById('tokensSlider').value = aiSettings.maxTokens;
-            document.getElementById('tokensValue').textContent = aiSettings.maxTokens;
+            // Устанавливаем активный режим
+            document.querySelectorAll('.mode-option').forEach(option => {
+                option.classList.remove('active');
+                if (option.dataset.mode === currentMode) {
+                    option.classList.add('active');
+                }
+            });
             
             const soundEnabled = localStorage.getItem('ai-tap-sound') !== 'false';
             document.getElementById('soundToggle').checked = soundEnabled;
@@ -2481,18 +2580,6 @@
             // Обновляем статистику
             updateStatistics();
             
-            // Добавляем обработчики слайдеров
-            const tempSlider = document.getElementById('temperatureSlider');
-            const tokensSlider = document.getElementById('tokensSlider');
-            
-            tempSlider.oninput = function() {
-                document.getElementById('temperatureValue').textContent = this.value;
-            };
-            
-            tokensSlider.oninput = function() {
-                document.getElementById('tokensValue').textContent = this.value;
-            };
-            
             // Обработчик для геолокации
             document.getElementById('locationToggle').onchange = function() {
                 if (this.checked) {
@@ -2504,6 +2591,28 @@
                     showNotification('Геолокация отключена');
                 }
             };
+        }
+
+        function selectMode(mode) {
+            // Убираем активный класс со всех опций
+            document.querySelectorAll('.mode-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            
+            // Добавляем активный класс к выбранной опции
+            document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
+            
+            // Устанавливаем температуру в зависимости от режима
+            if (mode === 'precise') {
+                aiSettings.temperature = 0.3;
+                showNotification('Режим: Точный (температура 0.3)');
+            } else if (mode === 'smart') {
+                aiSettings.temperature = 0.7;
+                showNotification('Режим: Умный (температура 0.7)');
+            }
+            
+            aiSettings.mode = mode;
+            localStorage.setItem('ai-tap-settings', JSON.stringify(aiSettings));
         }
 
         function updateStatistics() {
@@ -2664,6 +2773,9 @@
                 console.log('Отправляем запрос к Groq API...');
                 updateConnectionStatus('🟡', 'Отправка запроса...');
                 
+                // Задержка 2 секунды перед отправкой запроса
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
                 const response = await fetch(GROQ_API_URL, {
                     method: 'POST',
                     headers: {
@@ -2682,8 +2794,8 @@
                                 content: msg.content
                             }))
                         ],
-                        max_tokens: aiSettings.maxTokens,
-                        temperature: aiSettings.temperature
+                        max_tokens: aiSettings.maxTokens || 300,
+                        temperature: aiSettings.temperature || 0.7
                     })
                 });
                 
