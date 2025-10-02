@@ -2614,12 +2614,6 @@
                 </button>
             </div>
             
-            <!-- Кнопка пропуска загрузки (для отладки) -->
-            <div class="skip-section" style="position: absolute; bottom: 20px; right: 20px;">
-                <button onclick="skipLoading()" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 16px; border-radius: 20px; font-size: 12px; cursor: pointer;">
-                    Пропустить загрузку
-                </button>
-            </div>
         </div>
         
         <!-- Фоновые частицы для загрузки -->
@@ -5441,7 +5435,6 @@
         // Система загрузки приложения
         let loadingMessages = [
             "Инициализация нейронных сетей...",
-            "Загрузка алгоритмов машинного обучения...",
             "Подключение к облачным серверам ИИ...",
             "Калибровка языковых моделей...",
             "Настройка системы распознавания...",
@@ -5452,8 +5445,7 @@
             "Загрузка пользовательских настроек...",
             "Инициализация интерфейса ИИ...",
             "Подготовка системы к работе...",
-            "Финальная оптимизация...",
-            "Система готова к запуску!"
+            "Финальная оптимизация..."
         ];
 
         let currentMessageIndex = 0;
@@ -5517,11 +5509,10 @@
                     console.log(`💬 Сообщение ${currentMessageIndex + 1}: ${loadingMessages[currentMessageIndex]}`);
                     currentMessageIndex++;
                 } else {
-                    // Перезапускаем с начала если дошли до конца
-                    currentMessageIndex = 0;
-                    messageElement.textContent = loadingMessages[currentMessageIndex];
-                    console.log(`🔄 Перезапуск сообщений: ${loadingMessages[currentMessageIndex]}`);
-                    currentMessageIndex++;
+                    // Останавливаем анимацию сообщений когда дошли до конца
+                    clearInterval(messageInterval);
+                    messageElement.textContent = "Загрузка завершается...";
+                    console.log('🛑 Анимация сообщений завершена');
                 }
             }
             
@@ -5533,27 +5524,23 @@
             const progressFill = document.getElementById('progressFill');
             const progressText = document.getElementById('progressText');
             
+            // Более предсказуемая загрузка с фиксированными шагами
+            const totalSteps = 20;
+            const stepDuration = 300; // 300ms на каждый шаг
+            const stepSize = 100 / totalSteps;
+            
+            let currentStep = 0;
+            
             loadingInterval = setInterval(() => {
-                if (loadingProgress < 100) {
-                    // Увеличиваем прогресс более предсказуемо
-                    let increment;
-                    if (loadingProgress < 30) {
-                        increment = Math.random() * 3 + 2; // Быстрый старт
-                    } else if (loadingProgress < 70) {
-                        increment = Math.random() * 2 + 1; // Средняя скорость
-                    } else if (loadingProgress < 95) {
-                        increment = Math.random() * 1 + 0.5; // Замедляемся
-                    } else {
-                        increment = 0.2; // Очень медленно к концу
-                    }
-                    
-                    loadingProgress = Math.min(100, loadingProgress + increment);
+                if (currentStep < totalSteps) {
+                    currentStep++;
+                    loadingProgress = Math.min(100, currentStep * stepSize);
                     
                     progressFill.style.width = loadingProgress + '%';
                     progressText.textContent = Math.floor(loadingProgress) + '%';
                     
-                    // Логируем каждые 10%
-                    if (Math.floor(loadingProgress) % 10 === 0 && Math.floor(loadingProgress) !== Math.floor(loadingProgress - increment)) {
+                    // Логируем каждые 20%
+                    if (currentStep % 4 === 0) {
                         console.log(`📊 Прогресс: ${Math.floor(loadingProgress)}%`);
                     }
                     
@@ -5565,9 +5552,9 @@
                         finishLoading();
                     }
                 }
-            }, 150);
+            }, stepDuration);
             
-            // Принудительно завершаем загрузку через 15 секунд
+            // Принудительно завершаем загрузку через 8 секунд (вместо 15)
             setTimeout(() => {
                 if (loadingProgress < 100) {
                     loadingProgress = 100;
@@ -5576,7 +5563,7 @@
                     clearInterval(loadingInterval);
                     finishLoading();
                 }
-            }, 15000);
+            }, 8000);
         }
 
         function finishLoading() {
@@ -5602,15 +5589,6 @@
             }, 1000);
         }
 
-        function skipLoading() {
-            console.log('⏩ Пропуск загрузки');
-            loadingProgress = 100;
-            const progressFill = document.getElementById('progressFill');
-            const progressText = document.getElementById('progressText');
-            progressFill.style.width = '100%';
-            progressText.textContent = '100%';
-            finishLoading();
-        }
 
         function enterApplication() {
             const loadingScreen = document.getElementById('loadingScreen');
