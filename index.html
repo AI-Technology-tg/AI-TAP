@@ -14,10 +14,104 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
             min-height: 100vh;
             overflow-x: hidden;
             position: relative;
+            color: white;
+        }
+
+        /* Контейнер для частиц */
+        .particles-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(0, 255, 255, 0.6);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 8s infinite linear;
+        }
+
+        .particle.small {
+            width: 2px;
+            height: 2px;
+            box-shadow: 0 0 6px rgba(0, 255, 255, 0.8);
+        }
+
+        .particle.medium {
+            width: 4px;
+            height: 4px;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
+        }
+
+        .particle.large {
+            width: 6px;
+            height: 6px;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) translateX(0px) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Геометрические фигуры */
+        .geometric-shape {
+            position: absolute;
+            animation: geometricFloat 15s infinite ease-in-out;
+            opacity: 0.1;
+        }
+
+        .geometric-shape.triangle {
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-bottom: 26px solid rgba(0, 255, 255, 0.3);
+        }
+
+        .geometric-shape.square {
+            width: 20px;
+            height: 20px;
+            background: rgba(0, 255, 255, 0.2);
+            border: 1px solid rgba(0, 255, 255, 0.4);
+        }
+
+        .geometric-shape.circle {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            border: 2px solid rgba(0, 255, 255, 0.3);
+        }
+
+        @keyframes geometricFloat {
+            0%, 100% { 
+                transform: translateY(0px) rotate(0deg);
+            }
+            50% { 
+                transform: translateY(-20px) rotate(180deg);
+            }
         }
 
         /* Анимированный фон */
@@ -665,6 +759,50 @@
             margin: 0 5px;
         }
 
+        /* Стили для шаблонов */
+        .templates-content {
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .template-category {
+            margin-bottom: 20px;
+        }
+
+        .template-category h3 {
+            color: #00ffff;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .template-item {
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .template-item:hover {
+            background: rgba(0, 255, 255, 0.1);
+            border-color: rgba(0, 255, 255, 0.4);
+            transform: translateX(5px);
+        }
+
+        .template-title {
+            font-weight: bold;
+            color: #00ffff;
+            margin-bottom: 4px;
+        }
+
+        .template-description {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
         .chat-title {
             color: #00ffff;
             text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
@@ -821,6 +959,17 @@
     </style>
 </head>
 <body>
+    <!-- Анимированный фон с частицами -->
+    <div class="particles-container" id="particlesContainer"></div>
+    
+    <!-- Геометрические фигуры -->
+    <div class="geometric-shape triangle" style="top: 10%; left: 10%; animation-delay: 0s;"></div>
+    <div class="geometric-shape square" style="top: 20%; right: 15%; animation-delay: 2s;"></div>
+    <div class="geometric-shape circle" style="bottom: 30%; left: 20%; animation-delay: 4s;"></div>
+    <div class="geometric-shape triangle" style="bottom: 10%; right: 10%; animation-delay: 6s;"></div>
+    <div class="geometric-shape square" style="top: 60%; left: 80%; animation-delay: 8s;"></div>
+    <div class="geometric-shape circle" style="top: 80%; right: 70%; animation-delay: 10s;"></div>
+
     <!-- Заголовок с аватаром -->
     <div class="header">
         <img id="userAvatar" class="user-avatar" src="" alt="Avatar" onclick="showUserInfo()">
@@ -897,6 +1046,7 @@
             <div class="chat-header">
                 <div class="chat-title">Основной ИИ</div>
                 <div class="chat-controls">
+                    <button class="chat-control-btn" onclick="showPromptTemplates()" title="Шаблоны запросов">📝</button>
                     <button class="chat-control-btn" onclick="clearChatHistory()" title="Очистить историю">🗑️</button>
                     <button class="chat-control-btn" onclick="toggleAISettings()" title="Настройки ИИ">⚙️</button>
                     <span class="connection-status" id="connectionStatus" title="Статус подключения">🟢</span>
@@ -939,6 +1089,19 @@
                         ➤
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно шаблонов -->
+    <div id="templatesModal" class="chat-modal" style="display: none;">
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="chat-title">📝 Шаблоны запросов</div>
+                <span class="chat-close" onclick="closeTemplates()">&times;</span>
+            </div>
+            <div class="templates-content" id="templatesContent">
+                <!-- Шаблоны будут добавлены динамически -->
             </div>
         </div>
     </div>
@@ -1435,6 +1598,147 @@
         // Настройки ИИ
         let aiSettings = JSON.parse(localStorage.getItem('ai-tap-settings') || '{"temperature": 0.7, "maxTokens": 1000}');
         
+        // Память персонажа ИИ
+        let aiMemory = JSON.parse(localStorage.getItem('ai-tap-memory') || '{}');
+        
+        // Инициализация памяти ИИ
+        if (!aiMemory.userPreferences) {
+            aiMemory = {
+                userPreferences: {},
+                conversationStyle: 'friendly',
+                rememberedFacts: [],
+                interactionCount: 0,
+                lastInteraction: null,
+                favoriteTopics: [],
+                userMood: 'neutral'
+            };
+        }
+        
+        function updateAIMemory(key, value) {
+            aiMemory[key] = value;
+            localStorage.setItem('ai-tap-memory', JSON.stringify(aiMemory));
+        }
+        
+        function addRememberedFact(fact) {
+            if (!aiMemory.rememberedFacts.includes(fact)) {
+                aiMemory.rememberedFacts.push(fact);
+                if (aiMemory.rememberedFacts.length > 20) {
+                    aiMemory.rememberedFacts.shift(); // Ограничиваем до 20 фактов
+                }
+                updateAIMemory('rememberedFacts', aiMemory.rememberedFacts);
+            }
+        }
+        
+        function getPersonalizedSystemPrompt() {
+            const language = currentLanguage === 'ru' ? 'русском' : currentLanguage === 'en' ? 'английском' : currentLanguage === 'es' ? 'испанском' : currentLanguage === 'fr' ? 'французском' : currentLanguage === 'de' ? 'немецком' : currentLanguage === 'zh' ? 'китайском' : 'русском';
+            
+            let prompt = `Ты полезный AI ассистент. Отвечай на языке: ${language}. `;
+            
+            // Добавляем информацию о стиле общения
+            if (aiMemory.conversationStyle === 'formal') {
+                prompt += 'Общайся формально и профессионально. ';
+            } else if (aiMemory.conversationStyle === 'casual') {
+                prompt += 'Общайся неформально и дружелюбно. ';
+            } else {
+                prompt += 'Будь дружелюбным и полезным. ';
+            }
+            
+            // Добавляем запомненные факты
+            if (aiMemory.rememberedFacts.length > 0) {
+                prompt += `Помни эти факты о пользователе: ${aiMemory.rememberedFacts.join(', ')}. `;
+            }
+            
+            // Добавляем любимые темы
+            if (aiMemory.favoriteTopics.length > 0) {
+                prompt += `Пользователь интересуется: ${aiMemory.favoriteTopics.join(', ')}. `;
+            }
+            
+            // Учитываем количество взаимодействий
+            if (aiMemory.interactionCount > 10) {
+                prompt += 'Мы уже хорошо знакомы, можешь быть более неформальным. ';
+            }
+            
+            return prompt;
+        }
+
+        // Шаблоны запросов
+        const promptTemplates = {
+            'Общение': [
+                { title: 'Дружеская беседа', prompt: 'Давай поговорим как друзья. Расскажи что-нибудь интересное!', description: 'Неформальное общение' },
+                { title: 'Совет по проблеме', prompt: 'У меня есть проблема, помоги найти решение: [опиши проблему]', description: 'Получить совет' },
+                { title: 'Мотивация', prompt: 'Мне нужна мотивация и поддержка. Подбодри меня!', description: 'Поднять настроение' }
+            ],
+            'Обучение': [
+                { title: 'Объяснить тему', prompt: 'Объясни мне простыми словами: [тема]', description: 'Понятное объяснение' },
+                { title: 'Создать план изучения', prompt: 'Создай план изучения темы: [тема] на [время]', description: 'Структурированное обучение' },
+                { title: 'Проверить знания', prompt: 'Задай мне вопросы по теме: [тема]', description: 'Тестирование знаний' }
+            ],
+            'Творчество': [
+                { title: 'Написать стихотворение', prompt: 'Напиши стихотворение на тему: [тема]', description: 'Поэтическое творчество' },
+                { title: 'Придумать историю', prompt: 'Придумай интересную историю про: [персонаж/ситуация]', description: 'Создание рассказа' },
+                { title: 'Идеи для проекта', prompt: 'Предложи креативные идеи для проекта: [описание]', description: 'Мозговой штурм' }
+            ],
+            'Работа': [
+                { title: 'Написать email', prompt: 'Помоги написать профессиональный email на тему: [тема]', description: 'Деловая переписка' },
+                { title: 'Анализ задачи', prompt: 'Помоги проанализировать рабочую задачу: [описание]', description: 'Решение задач' },
+                { title: 'Планирование', prompt: 'Создай план работы над проектом: [описание проекта]', description: 'Организация работы' }
+            ]
+        };
+
+        function showPromptTemplates() {
+            document.getElementById('templatesModal').style.display = 'block';
+            renderTemplates();
+        }
+
+        function closeTemplates() {
+            document.getElementById('templatesModal').style.display = 'none';
+        }
+
+        function renderTemplates() {
+            const container = document.getElementById('templatesContent');
+            container.innerHTML = '';
+
+            Object.keys(promptTemplates).forEach(category => {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'template-category';
+                
+                const categoryTitle = document.createElement('h3');
+                categoryTitle.textContent = category;
+                categoryDiv.appendChild(categoryTitle);
+
+                promptTemplates[category].forEach(template => {
+                    const templateDiv = document.createElement('div');
+                    templateDiv.className = 'template-item';
+                    templateDiv.onclick = () => useTemplate(template.prompt);
+                    
+                    templateDiv.innerHTML = `
+                        <div class="template-title">${template.title}</div>
+                        <div class="template-description">${template.description}</div>
+                    `;
+                    
+                    categoryDiv.appendChild(templateDiv);
+                });
+
+                container.appendChild(categoryDiv);
+            });
+        }
+
+        function useTemplate(prompt) {
+            document.getElementById('chatInput').value = prompt;
+            closeTemplates();
+            document.getElementById('chatInput').focus();
+            
+            // Добавляем в любимые темы если это новая тема
+            const topic = prompt.split(':')[0];
+            if (topic && !aiMemory.favoriteTopics.includes(topic)) {
+                aiMemory.favoriteTopics.push(topic);
+                if (aiMemory.favoriteTopics.length > 10) {
+                    aiMemory.favoriteTopics.shift();
+                }
+                updateAIMemory('favoriteTopics', aiMemory.favoriteTopics);
+            }
+        }
+        
         function toggleAISettings() {
             const newTemp = prompt('Температура ИИ (0.1-2.0, текущая: ' + aiSettings.temperature + '):', aiSettings.temperature);
             if (newTemp !== null && !isNaN(newTemp)) {
@@ -1561,7 +1865,7 @@
                         messages: [
                             {
                                 role: 'system',
-                                content: `Ты полезный AI ассистент. Отвечай на языке: ${currentLanguage === 'ru' ? 'русском' : currentLanguage === 'en' ? 'английском' : currentLanguage === 'es' ? 'испанском' : currentLanguage === 'fr' ? 'французском' : currentLanguage === 'de' ? 'немецком' : currentLanguage === 'zh' ? 'китайском' : 'русском'}. Будь дружелюбным и полезным.`
+                                content: getPersonalizedSystemPrompt()
                             },
                             ...chatHistory
                         ],
@@ -1599,6 +1903,12 @@
                     
                     // Обновляем статус подключения
                     updateConnectionStatus('🟢', 'Подключено');
+                    
+                    // Обновляем память ИИ
+                    aiMemory.interactionCount++;
+                    aiMemory.lastInteraction = new Date().toISOString();
+                    updateAIMemory('interactionCount', aiMemory.interactionCount);
+                    updateAIMemory('lastInteraction', aiMemory.lastInteraction);
                 } else {
                     console.error('Неожиданный формат ответа:', data);
                     throw new Error('ИИ не смог сформировать ответ');
@@ -1636,8 +1946,34 @@
             }
         });
 
+        // Система частиц
+        function createParticles() {
+            const container = document.getElementById('particlesContainer');
+            const particleCount = 50;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                // Случайный размер
+                const sizes = ['small', 'medium', 'large'];
+                particle.classList.add(sizes[Math.floor(Math.random() * sizes.length)]);
+                
+                // Случайная позиция
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                particle.style.animationDuration = (Math.random() * 4 + 6) + 's';
+                
+                container.appendChild(particle);
+            }
+        }
+
         // Анимация появления кнопок
         document.addEventListener('DOMContentLoaded', function() {
+            // Создаем частицы
+            createParticles();
+            
+            // Анимация кнопок
             const buttons = document.querySelectorAll('.ai-button');
             buttons.forEach((button, index) => {
                 button.style.opacity = '0';
