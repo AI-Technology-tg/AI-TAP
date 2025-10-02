@@ -632,6 +632,37 @@
         .chat-header {
             background: linear-gradient(90deg, rgba(0, 255, 255, 0.1) 0%, rgba(0, 255, 255, 0.05) 100%);
             border-bottom: 2px solid rgba(0, 255, 255, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-control-btn {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            color: #00ffff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .chat-control-btn:hover {
+            background: rgba(0, 255, 255, 0.2);
+            border-color: rgba(0, 255, 255, 0.5);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+
+        .connection-status {
+            font-size: 12px;
+            margin: 0 5px;
         }
 
         .chat-title {
@@ -690,6 +721,87 @@
 
         .typing-indicator {
             color: rgba(0, 255, 255, 0.7);
+            transition: all 0.3s ease;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Анимации загрузки - скелетоны */
+        .skeleton {
+            background: linear-gradient(90deg, rgba(0, 255, 255, 0.1) 25%, rgba(0, 255, 255, 0.2) 50%, rgba(0, 255, 255, 0.1) 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+            border-radius: 8px;
+        }
+
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .skeleton-message {
+            height: 20px;
+            margin: 5px 0;
+            width: 80%;
+        }
+
+        .skeleton-message.short {
+            width: 60%;
+        }
+
+        .skeleton-message.long {
+            width: 90%;
+        }
+
+        .loading-dots {
+            display: inline-flex;
+            gap: 4px;
+        }
+
+        .loading-dot {
+            width: 8px;
+            height: 8px;
+            background: rgba(0, 255, 255, 0.7);
+            border-radius: 50%;
+            animation: loading-bounce 1.4s infinite ease-in-out both;
+        }
+
+        .loading-dot:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dot:nth-child(2) { animation-delay: -0.16s; }
+        .loading-dot:nth-child(3) { animation-delay: 0s; }
+
+        @keyframes loading-bounce {
+            0%, 80%, 100% { 
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            40% { 
+                transform: scale(1.2);
+                opacity: 1;
+            }
+        }
+
+        /* Улучшенный индикатор печати */
+        .enhanced-typing {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 15px;
+            margin: 10px 0;
+        }
+
+        .typing-avatar {
+            width: 30px;
+            height: 30px;
+            background: rgba(0, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
         }
 
         /* Адаптивность */
@@ -784,7 +896,12 @@
         <div class="chat-container">
             <div class="chat-header">
                 <div class="chat-title">Основной ИИ</div>
-                <span class="chat-close" onclick="closeChat()">&times;</span>
+                <div class="chat-controls">
+                    <button class="chat-control-btn" onclick="clearChatHistory()" title="Очистить историю">🗑️</button>
+                    <button class="chat-control-btn" onclick="toggleAISettings()" title="Настройки ИИ">⚙️</button>
+                    <span class="connection-status" id="connectionStatus" title="Статус подключения">🟢</span>
+                    <span class="chat-close" onclick="closeChat()">&times;</span>
+                </div>
             </div>
             
             <div class="chat-messages" id="chatMessages">
@@ -796,8 +913,18 @@
                 </div>
             </div>
             
-            <div class="typing-indicator" id="typingIndicator">
-                ИИ печатает<span class="typing-dots"></span>
+            <div class="typing-indicator" id="typingIndicator" style="display: none;">
+                <div class="enhanced-typing">
+                    <div class="typing-avatar">🤖</div>
+                    <div>
+                        <span id="typingText">ИИ печатает</span>
+                        <div class="loading-dots">
+                            <div class="loading-dot"></div>
+                            <div class="loading-dot"></div>
+                            <div class="loading-dot"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <div class="chat-input-container">
@@ -977,6 +1104,94 @@
         
         // Память для чата
         let chatHistory = JSON.parse(localStorage.getItem('ai-tap-chat-history') || '[]');
+        
+        // Звуковые уведомления
+        const soundEnabled = localStorage.getItem('ai-tap-sound') !== 'false';
+        
+        function playNotificationSound() {
+            if (!soundEnabled) return;
+            
+            // Создаем звук программно (Web Audio API)
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+            oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.1);
+            
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.01);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.3);
+        }
+
+        // Виброотклик для мобильных устройств
+        function triggerVibration() {
+            if ('vibrate' in navigator) {
+                navigator.vibrate([100, 50, 100]); // Короткий-пауза-короткий
+            }
+        }
+
+        // Полноэкранный режим
+        function enableFullscreen() {
+            // Скрываем адресную строку на мобильных
+            if (window.innerHeight < window.innerWidth) return; // Не для ландшафта
+            
+            setTimeout(() => {
+                window.scrollTo(0, 1);
+            }, 100);
+            
+            // Добавляем мета-тег для полноэкранного режима
+            const viewport = document.querySelector('meta[name="viewport"]');
+            if (viewport) {
+                viewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
+            }
+        }
+
+        // Оптимизация клавиатуры
+        function optimizeKeyboard() {
+            const chatInput = document.getElementById('chatInput');
+            if (!chatInput) return;
+            
+            // Автофокус при открытии чата на мобильных
+            if (window.innerWidth <= 768) {
+                setTimeout(() => {
+                    chatInput.focus();
+                    // Прокручиваем к полю ввода
+                    chatInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
+            }
+            
+            // Обработка появления/скрытия клавиатуры
+            let initialViewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+            
+            function handleViewportChange() {
+                if (!window.visualViewport) return;
+                
+                const currentHeight = window.visualViewport.height;
+                const heightDifference = initialViewportHeight - currentHeight;
+                
+                // Если клавиатура открыта (высота уменьшилась значительно)
+                if (heightDifference > 150) {
+                    document.body.style.paddingBottom = heightDifference + 'px';
+                    // Прокручиваем к полю ввода
+                    setTimeout(() => {
+                        chatInput.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                    }, 100);
+                } else {
+                    document.body.style.paddingBottom = '0px';
+                }
+            }
+            
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', handleViewportChange);
+            }
+        }
 
         // Функция получения перевода
         function t(key) {
@@ -1118,13 +1333,19 @@
         // Функции для чата с Основным ИИ
         function openMainAI() {
             document.getElementById('chatModal').style.display = 'block';
-            document.getElementById('chatInput').focus();
             
             // Восстанавливаем чат из истории
             restoreChatHistory();
             
             // Обновляем интерфейс чата на текущем языке
             updateChatInterface();
+            
+            // Мобильные оптимизации
+            enableFullscreen();
+            optimizeKeyboard();
+            
+            // Виброотклик при открытии
+            triggerVibration();
         }
         
         // Функция восстановления истории чата
@@ -1183,10 +1404,59 @@
             document.getElementById('chatInput').placeholder = t('chatPlaceholder');
             
             // Обновляем индикатор печати
-            document.getElementById('typingIndicator').innerHTML = t('chatTyping') + '<span class="typing-dots"></span>';
+            document.getElementById('typingText').textContent = t('chatTyping');
             
             // Устанавливаем время приветственного сообщения
             document.getElementById('welcomeTime').textContent = getCurrentTime();
+        }
+
+        // Функция очистки истории чата
+        function clearChatHistory() {
+            if (confirm('Вы уверены, что хотите очистить всю историю чата?')) {
+                chatHistory = [];
+                localStorage.removeItem('ai-tap-chat-history');
+                
+                // Очищаем интерфейс чата
+                const chatMessages = document.getElementById('chatMessages');
+                chatMessages.innerHTML = `
+                    <div class="message ai">
+                        <div class="message-content">
+                            ${t('chatWelcome')}
+                        </div>
+                        <div class="message-time">${getCurrentTime()}</div>
+                    </div>
+                `;
+                
+                showNotification('История чата очищена');
+                playNotificationSound();
+            }
+        }
+
+        // Настройки ИИ
+        let aiSettings = JSON.parse(localStorage.getItem('ai-tap-settings') || '{"temperature": 0.7, "maxTokens": 1000}');
+        
+        function toggleAISettings() {
+            const newTemp = prompt('Температура ИИ (0.1-2.0, текущая: ' + aiSettings.temperature + '):', aiSettings.temperature);
+            if (newTemp !== null && !isNaN(newTemp)) {
+                aiSettings.temperature = Math.max(0.1, Math.min(2.0, parseFloat(newTemp)));
+            }
+            
+            const newTokens = prompt('Максимум токенов (100-2000, текущий: ' + aiSettings.maxTokens + '):', aiSettings.maxTokens);
+            if (newTokens !== null && !isNaN(newTokens)) {
+                aiSettings.maxTokens = Math.max(100, Math.min(2000, parseInt(newTokens)));
+            }
+            
+            localStorage.setItem('ai-tap-settings', JSON.stringify(aiSettings));
+            updateConnectionStatus('🟢', 'Настройки обновлены');
+        }
+
+        // Статус подключения
+        function updateConnectionStatus(status, message = '') {
+            const statusElement = document.getElementById('connectionStatus');
+            if (statusElement) {
+                statusElement.textContent = status;
+                statusElement.title = message || 'Статус подключения';
+            }
         }
 
         function getCurrentTime() {
@@ -1215,12 +1485,45 @@
             return currentTime;
         }
 
+        // Debounce для индикатора печати
+        let typingTimeout = null;
+        let isTypingVisible = false;
+
         function showTyping() {
-            document.getElementById('typingIndicator').style.display = 'flex';
+            // Очищаем предыдущий таймаут
+            if (typingTimeout) {
+                clearTimeout(typingTimeout);
+            }
+            
+            // Показываем индикатор с небольшой задержкой для избежания мерцания
+            if (!isTypingVisible) {
+                typingTimeout = setTimeout(() => {
+                    document.getElementById('typingIndicator').style.display = 'flex';
+                    isTypingVisible = true;
+                }, 200); // 200ms задержка
+            }
         }
 
         function hideTyping() {
-            document.getElementById('typingIndicator').style.display = 'none';
+            // Очищаем таймаут показа
+            if (typingTimeout) {
+                clearTimeout(typingTimeout);
+                typingTimeout = null;
+            }
+            
+            // Скрываем с плавной анимацией
+            const indicator = document.getElementById('typingIndicator');
+            if (isTypingVisible) {
+                indicator.style.opacity = '0';
+                indicator.style.transform = 'translateY(10px)';
+                
+                setTimeout(() => {
+                    indicator.style.display = 'none';
+                    indicator.style.opacity = '1';
+                    indicator.style.transform = 'translateY(0)';
+                    isTypingVisible = false;
+                }, 300);
+            }
         }
 
         async function sendMessage() {
@@ -1245,6 +1548,7 @@
             
             try {
                 console.log('Отправляем запрос к Groq API...');
+                updateConnectionStatus('🟡', 'Отправка запроса...');
                 
                 const response = await fetch(GROQ_API_URL, {
                     method: 'POST',
@@ -1261,8 +1565,8 @@
                             },
                             ...chatHistory
                         ],
-                        max_tokens: 1000,
-                        temperature: 0.7
+                        max_tokens: aiSettings.maxTokens,
+                        temperature: aiSettings.temperature
                     })
                 });
                 
@@ -1288,6 +1592,13 @@
                     localStorage.setItem('ai-tap-chat-history', JSON.stringify(chatHistory));
                     
                     hideTyping();
+                    
+                    // Звуковое уведомление и вибрация
+                    playNotificationSound();
+                    triggerVibration();
+                    
+                    // Обновляем статус подключения
+                    updateConnectionStatus('🟢', 'Подключено');
                 } else {
                     console.error('Неожиданный формат ответа:', data);
                     throw new Error('ИИ не смог сформировать ответ');
@@ -1297,6 +1608,7 @@
                 console.error('Ошибка при отправке сообщения:', error);
                 hideTyping();
                 addMessage(`Ошибка: ${error.message}. Попробуйте еще раз.`);
+                updateConnectionStatus('🔴', 'Ошибка подключения');
             } finally {
                 sendButton.disabled = false;
             }
