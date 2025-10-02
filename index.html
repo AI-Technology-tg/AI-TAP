@@ -1905,6 +1905,130 @@
             overflow-y: auto;
         }
 
+        .refresh-users-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .refresh-users-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .refresh-users-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .refresh-users-btn.loading .refresh-icon {
+            animation: spin 1s linear infinite;
+        }
+
+        .users-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            font-size: 12px;
+        }
+
+        .status-indicator {
+            font-size: 14px;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.updating {
+            animation: spin 1s linear infinite;
+        }
+
+        .status-indicator.online {
+            color: #4CAF50;
+            animation: none;
+        }
+
+        .status-text {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .users-search-section {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .search-input-container {
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .users-search-input {
+            width: 100%;
+            padding: 12px 16px;
+            padding-right: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            color: white;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .users-search-input:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(0, 255, 255, 0.5);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+        }
+
+        .users-search-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .clear-search-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .clear-search-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .users-count {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            text-align: center;
+        }
+
         .users-list {
             display: flex;
             flex-direction: column;
@@ -1965,6 +2089,12 @@
         .user-username {
             color: rgba(0, 255, 255, 0.8);
             font-size: 13px;
+        }
+
+        .user-last-seen {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 11px;
+            margin-top: 2px;
         }
 
         .user-status {
@@ -2865,9 +2995,24 @@
         <div class="chat-container">
             <div class="chat-header">
                 <div class="chat-title">👥 Управление пользователями</div>
+                <div class="chat-controls">
+                    <div class="users-status" id="usersStatus">
+                        <span class="status-indicator" id="statusIndicator">🔄</span>
+                        <span class="status-text" id="statusText">Обновление...</span>
+                    </div>
+                </div>
                 <button class="back-btn" onclick="backToAdmin()">← Назад</button>
                 <span class="chat-close" onclick="closeUsersModal()">&times;</span>
             </div>
+            
+            <div class="users-search-section">
+                <div class="search-input-container">
+                    <input type="text" id="usersSearchInput" class="users-search-input" placeholder="🔍 Поиск пользователей..." oninput="searchUsers()">
+                    <button class="clear-search-btn" id="clearSearchBtn" onclick="clearUsersSearch()" style="display: none;">✕</button>
+                </div>
+                <div class="users-count" id="usersCount">Найдено: 0 пользователей</div>
+            </div>
+            
             <div id="usersContent" class="users-content">
                 <!-- Список пользователей загружается динамически -->
             </div>
@@ -3442,6 +3587,11 @@
         // Новости и их кэширование
         let cachedNews = JSON.parse(localStorage.getItem('ai-tap-cached-news') || 'null');
         let lastNewsUpdate = localStorage.getItem('ai-tap-last-news-update') ? new Date(localStorage.getItem('ai-tap-last-news-update')) : null;
+        
+        // Кэширование пользователей
+        let lastUsersUpdate = localStorage.getItem('ai-tap-last-users-update') ? new Date(localStorage.getItem('ai-tap-last-users-update')) : null;
+        let usersUpdateInterval = null;
+        let allUsers = []; // Кэш всех пользователей для поиска
         
         
         // Инициализация памяти ИИ
@@ -5158,19 +5308,11 @@
         let selectedUserId = null;
 
         // Инициализация пользователя
-        console.log('🔍 Начинаем инициализацию Telegram Web App...');
-        
         const tg = window.Telegram.WebApp;
-        console.log('📱 Telegram WebApp объект:', tg);
-        
         tg.ready();
-        console.log('✅ Telegram WebApp готов');
 
         const user = tg.initDataUnsafe.user;
-        console.log('👤 Данные пользователя из Telegram:', user);
-        
         if (user) {
-            console.log('✅ Пользователь найден, регистрируем...');
             currentUser = user;
             
             // Полная инициализация интерфейса пользователя
@@ -5208,28 +5350,20 @@
             localStorage.setItem('ai-tap-user', JSON.stringify(user));
             
             // Регистрируем пользователя в системе
-            console.log('🚀 Вызываем registerUser...');
             registerUser(user);
             
             // Проверяем статус бана
-            console.log('🔍 Проверяем статус бана...');
             checkBanStatus(user.id);
         } else {
-            console.log('❌ Данные пользователя недоступны - возможно, открыто не через Telegram');
-            console.log('🌐 Текущий URL:', window.location.href);
-            console.log('📱 User Agent:', navigator.userAgent);
+            console.log('Данные пользователя недоступны');
         }
 
         // Функция регистрации пользователя
         function registerUser(userData) {
-            console.log('📝 Регистрируем пользователя:', userData);
-            
             let users = JSON.parse(localStorage.getItem('ai-tap-users') || '[]');
-            console.log('👥 Текущие пользователи в localStorage:', users);
             
             // Проверяем, есть ли уже такой пользователь
             const existingUserIndex = users.findIndex(u => u.id === userData.id);
-            console.log('🔍 Индекс существующего пользователя:', existingUserIndex);
             
             const userRecord = {
                 id: userData.id,
@@ -5248,8 +5382,6 @@
             }
             
             localStorage.setItem('ai-tap-users', JSON.stringify(users));
-            console.log('💾 Пользователи сохранены в localStorage:', users);
-            console.log('✅ Регистрация пользователя завершена!');
         }
 
         // Проверка статуса бана
@@ -5382,11 +5514,15 @@
         function openUsersManagement() {
             document.getElementById('adminModal').style.display = 'none';
             document.getElementById('usersModal').style.display = 'block';
+            
+            // Загружаем пользователей и запускаем автообновление
             loadUsersList();
+            startUsersAutoUpdate();
         }
 
         function closeUsersModal() {
             document.getElementById('usersModal').style.display = 'none';
+            stopUsersAutoUpdate();
         }
 
         function backToAdmin() {
@@ -5394,10 +5530,135 @@
             document.getElementById('adminModal').style.display = 'block';
         }
 
-        function loadUsersList() {
+        // Автоматическое обновление пользователей каждые 2 минуты
+        function startUsersAutoUpdate() {
+            // Останавливаем предыдущий интервал если есть
+            stopUsersAutoUpdate();
+            
+            // Обновляем статус
+            updateUsersStatus('updating', 'Обновление данных...');
+            
+            // Запускаем автообновление каждые 2 минуты (120000 мс)
+            usersUpdateInterval = setInterval(() => {
+                updateUsersData();
+            }, 120000); // 2 минуты
+            
+            // Первое обновление через 2 секунды после открытия
+            setTimeout(() => {
+                updateUsersData();
+            }, 2000);
+        }
+
+        function stopUsersAutoUpdate() {
+            if (usersUpdateInterval) {
+                clearInterval(usersUpdateInterval);
+                usersUpdateInterval = null;
+            }
+        }
+
+        function updateUsersData() {
+            updateUsersStatus('updating', 'Обновление данных...');
+            
+            // Имитируем обновление данных (в реальности здесь был бы запрос к серверу)
+            setTimeout(() => {
+                // Обновляем время последнего входа для демо-пользователя
+                const users = JSON.parse(localStorage.getItem('ai-tap-users') || '[]');
+                const updatedUsers = users.map(user => {
+                    if (user.id === 999888777) { // Демо-пользователь
+                        return {
+                            ...user,
+                            last_seen: new Date(Date.now() - Math.random() * 60 * 60 * 1000).toISOString() // Случайное время в последний час
+                        };
+                    }
+                    return user;
+                });
+                
+                localStorage.setItem('ai-tap-users', JSON.stringify(updatedUsers));
+                lastUsersUpdate = new Date();
+                localStorage.setItem('ai-tap-last-users-update', lastUsersUpdate.toISOString());
+                
+                // Перезагружаем список с учетом поиска
+                const searchQuery = document.getElementById('usersSearchInput').value;
+                loadUsersList(searchQuery);
+                
+                updateUsersStatus('online', 'Данные обновлены');
+                
+                // Через 3 секунды меняем статус на обычный
+                setTimeout(() => {
+                    updateUsersStatus('online', 'Автообновление активно');
+                }, 3000);
+                
+            }, 1000);
+        }
+
+        function updateUsersStatus(type, text) {
+            const indicator = document.getElementById('statusIndicator');
+            const statusText = document.getElementById('statusText');
+            
+            // Убираем все классы
+            indicator.className = 'status-indicator';
+            
+            if (type === 'updating') {
+                indicator.textContent = '🔄';
+                indicator.classList.add('updating');
+            } else if (type === 'online') {
+                indicator.textContent = '🟢';
+                indicator.classList.add('online');
+            }
+            
+            statusText.textContent = text;
+        }
+
+        // Функции поиска пользователей
+        function searchUsers() {
+            const searchInput = document.getElementById('usersSearchInput');
+            const clearBtn = document.getElementById('clearSearchBtn');
+            const query = searchInput.value.trim();
+            
+            // Показываем/скрываем кнопку очистки
+            clearBtn.style.display = query ? 'block' : 'none';
+            
+            // Загружаем отфильтрованный список
+            loadUsersList(query);
+        }
+
+        function clearUsersSearch() {
+            const searchInput = document.getElementById('usersSearchInput');
+            const clearBtn = document.getElementById('clearSearchBtn');
+            
+            searchInput.value = '';
+            clearBtn.style.display = 'none';
+            
+            // Загружаем полный список
+            loadUsersList();
+        }
+
+        function loadUsersList(searchQuery = '') {
             const users = JSON.parse(localStorage.getItem('ai-tap-users') || '[]');
             const bans = JSON.parse(localStorage.getItem('ai-tap-bans') || '[]');
             const usersContent = document.getElementById('usersContent');
+            const usersCount = document.getElementById('usersCount');
+            
+            // Сохраняем всех пользователей для поиска
+            allUsers = users;
+            
+            // Фильтруем пользователей по поисковому запросу
+            let filteredUsers = users;
+            if (searchQuery) {
+                const query = searchQuery.toLowerCase();
+                filteredUsers = users.filter(user => {
+                    const fullName = `${user.first_name} ${user.last_name}`.toLowerCase();
+                    const username = (user.username || '').toLowerCase();
+                    const id = user.id.toString();
+                    
+                    return fullName.includes(query) || 
+                           username.includes(query) || 
+                           id.includes(query);
+                });
+            }
+            
+            // Обновляем счетчик
+            usersCount.textContent = `Найдено: ${filteredUsers.length} пользователей`;
             
             if (users.length === 0) {
                 usersContent.innerHTML = `
@@ -5413,12 +5674,24 @@
                             💡 <strong>Как это работает:</strong><br>
                             Когда пользователь открывает ваше веб-приложение в Telegram, его данные автоматически сохраняются в системе и появляются здесь.
                         </div>
-                        <div style="margin-top: 15px;">
-                            <button onclick="debugUserRegistration()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">
-                                🔍 Проверить регистрацию
-                            </button>
-                            <button onclick="clearUserData()" style="padding: 10px 20px; background: #e74c3c; color: white; border: none; border-radius: 8px; cursor: pointer; margin-left: 10px;">
-                                🗑️ Очистить данные
+                    </div>
+                `;
+                return;
+            }
+            
+            if (filteredUsers.length === 0 && searchQuery) {
+                usersContent.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: rgba(255, 255, 255, 0.7);">
+                        <div style="font-size: 48px; margin-bottom: 20px;">🔍</div>
+                        <div style="font-size: 18px; font-weight: 600; margin-bottom: 10px; color: white;">
+                            Пользователи не найдены
+                        </div>
+                        <div style="font-size: 14px; line-height: 1.5; max-width: 400px; margin: 0 auto;">
+                            По запросу "${searchQuery}" не найдено ни одного пользователя.
+                        </div>
+                        <div style="margin-top: 20px;">
+                            <button onclick="clearUsersSearch()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                                Показать всех пользователей
                             </button>
                         </div>
                     </div>
@@ -5428,7 +5701,7 @@
             
             const usersHTML = `
                 <div class="users-list">
-                    ${users.map(user => {
+                    ${filteredUsers.map(user => {
                         const userBan = bans.find(ban => ban.userId === user.id && ban.expiresAt > new Date().toISOString());
                         const isBanned = !!userBan;
                         
@@ -5444,6 +5717,7 @@
                                     <div class="user-name">${user.first_name} ${user.last_name}</div>
                                     <div class="user-id">ID: ${user.id}</div>
                                     <div class="user-username">${user.username ? '@' + user.username : 'Без username'}</div>
+                                    <div class="user-last-seen">Последний вход: ${formatLastSeen(user.last_seen)}</div>
                                 </div>
                                 <div class="user-status ${isBanned ? 'banned' : 'online'}">
                                     ${isBanned ? 'Заблокирован' : 'Активен'}
@@ -5616,46 +5890,33 @@
             }
         }
 
+        function formatLastSeen(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMinutes = Math.floor(diffMs / (60 * 1000));
+            const diffHours = Math.floor(diffMs / (60 * 60 * 1000));
+            const diffDays = Math.floor(diffMs / (24 * 60 * 60 * 1000));
+
+            if (diffMinutes < 1) {
+                return 'только что';
+            } else if (diffMinutes < 60) {
+                return `${diffMinutes} мин назад`;
+            } else if (diffHours < 24) {
+                return `${diffHours} ч назад`;
+            } else if (diffDays < 7) {
+                return `${diffDays} дн назад`;
+            } else {
+                return date.toLocaleDateString('ru-RU');
+            }
+        }
+
         function openAISettings() {
             showNotification('🤖 Настройки ИИ - в разработке');
         }
 
         function openAppSettings() {
             showNotification('⚙️ Настройки веб-приложения - в разработке');
-        }
-
-        // Функции отладки для админ панели
-        function debugUserRegistration() {
-            console.log('🔍 === ОТЛАДКА РЕГИСТРАЦИИ ПОЛЬЗОВАТЕЛЕЙ ===');
-            console.log('📱 Telegram WebApp:', window.Telegram?.WebApp);
-            console.log('👤 Текущий пользователь:', currentUser);
-            console.log('🔑 Является админом:', isAdmin);
-            console.log('💾 Данные в localStorage:');
-            console.log('  - Пользователи:', localStorage.getItem('ai-tap-users'));
-            console.log('  - Баны:', localStorage.getItem('ai-tap-bans'));
-            
-            // Проверяем Telegram Web App
-            if (window.Telegram?.WebApp) {
-                console.log('✅ Telegram WebApp доступен');
-                console.log('📊 initDataUnsafe:', window.Telegram.WebApp.initDataUnsafe);
-                console.log('👤 User data:', window.Telegram.WebApp.initDataUnsafe.user);
-            } else {
-                console.log('❌ Telegram WebApp недоступен - возможно, открыто не через Telegram');
-            }
-            
-            // Показываем уведомление
-            const users = JSON.parse(localStorage.getItem('ai-tap-users') || '[]');
-            showNotification(`🔍 Найдено пользователей: ${users.length}. Проверьте консоль браузера (F12)`);
-        }
-
-        function clearUserData() {
-            if (confirm('Очистить все данные пользователей? Это действие нельзя отменить.')) {
-                localStorage.removeItem('ai-tap-users');
-                localStorage.removeItem('ai-tap-bans');
-                console.log('🗑️ Данные пользователей очищены');
-                showNotification('🗑️ Данные пользователей очищены');
-                loadUsersList(); // Обновляем список
-            }
         }
 
         // Анимация появления кнопок
@@ -5700,6 +5961,9 @@
                 console.log('Инициализированы настройки звука по умолчанию');
             }
             
+            // Добавляем демонстрационного пользователя если список пуст
+            initializeDemoUser();
+            
             
             console.log('Настройки инициализированы:', {
                 permissions: JSON.parse(localStorage.getItem('ai-tap-permissions') || '{}'),
@@ -5707,6 +5971,30 @@
                 locationEnabled: locationEnabled,
                 userLocation: userLocation
             });
+        }
+
+        // Функция инициализации демонстрационного пользователя
+        function initializeDemoUser() {
+            const existingUsers = JSON.parse(localStorage.getItem('ai-tap-users') || '[]');
+            
+            // Если пользователей нет (кроме возможного админа), добавляем демо-пользователя
+            if (existingUsers.length === 0 || (existingUsers.length === 1 && existingUsers[0].id === ADMIN_ID)) {
+                const demoUser = {
+                    id: 999888777,
+                    first_name: 'Демо',
+                    last_name: 'Пользователь',
+                    username: 'demo_user',
+                    photo_url: 'https://via.placeholder.com/100x100/4CAF50/ffffff?text=DEMO',
+                    last_seen: new Date(Date.now() - 15 * 60 * 1000).toISOString(), // 15 минут назад
+                    registered: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() // 2 дня назад
+                };
+
+                // Добавляем демо-пользователя
+                const allUsers = [...existingUsers, demoUser];
+                localStorage.setItem('ai-tap-users', JSON.stringify(allUsers));
+                
+                console.log('Добавлен демонстрационный пользователь для показа функционала админ панели');
+            }
         }
 
     </script>
