@@ -4875,7 +4875,7 @@
                 console.log('Статус ответа:', response.status);
                 
                 if (!response.ok) {
-                    const errorText = await response.text();
+                    const errorText = await response.text().catch(() => '');
                     console.error('Ошибка API:', errorText);
                     throw new Error(`Ошибка API: ${response.status} - ${errorText}`);
                 }
@@ -4917,12 +4917,49 @@
                 
             } catch (error) {
                 console.error('Ошибка при отправке сообщения:', error);
-                hideTyping();
-                addMessage(`Ошибка: ${error.message}. Попробуйте еще раз.`);
-                updateConnectionStatus('🔴', 'Ошибка подключения');
+                // Локальный фоллбек, чтобы чат не ломался
+                try {
+                    const fallback = generateLocalAIResponse(message, activity);
+                    const aiTime = addMessage(fallback);
+                    chatHistory.push({ role: 'assistant', content: fallback, timestamp: aiTime });
+                    localStorage.setItem('ai-tap-chat-history', JSON.stringify(chatHistory));
+                    playNotificationSound();
+                    triggerVibration();
+                    updateConnectionStatus('🟠', 'Режим оффлайн-ответа');
+                    try { updateUserChatStats(message, fallback); } catch (e) {}
+                    aiMemory.interactionCount = (aiMemory.interactionCount || 0) + 1;
+                    aiMemory.lastInteraction = new Date().toISOString();
+                    updateAIMemory('interactionCount', aiMemory.interactionCount);
+                    updateAIMemory('lastInteraction', aiMemory.lastInteraction);
+                } catch (e) {
+                    hideTyping();
+                    addMessage(`Ошибка: ${error.message}. Попробуйте еще раз.`);
+                    updateConnectionStatus('🔴', 'Ошибка подключения');
+                }
             } finally {
                 sendButton.disabled = false;
             }
+        }
+
+        // Простой локальный генератор ответа как фоллбек
+        function generateLocalAIResponse(userText, activity) {
+            const canned = [
+                'Сейчас сервис ИИ недоступен. Я в оффлайн-режиме и могу дать общий совет.',
+                'Похоже, связь с сервером прервалась. Давайте попробуем упростить запрос или повторить позже.',
+                'Я временно недоступен, но готов помочь, как только соединение восстановится.'
+            ];
+            const tip = activity && activity.mostActiveHour !== undefined
+                ? `Кстати, вы чаще всего активны в ${activity.mostActiveHour}:00.`
+                : '';
+            const prefix = '🤖 Локальный ответ: ';
+            // Простая эвристика
+            if (/привет|hello|hi/i.test(userText)) {
+                return `${prefix}Привет! Сейчас онлайн-ИИ недоступен. ${tip}`.trim();
+            }
+            if (/помог|help|как/i.test(userText)) {
+                return `${prefix}Опишите задачу подробнее, и я подскажу общие шаги. ${tip}`.trim();
+            }
+            return `${prefix}${canned[Math.floor(Math.random() * canned.length)]} ${tip}`.trim();
         }
 
 
@@ -4976,11 +5013,14 @@
         let selectedBanTime = 0;
         let selectedUserId = null;
 
-        // Инициализация пользователя
-        const tg = window.Telegram.WebApp;
-        tg.ready();
+        // Инициализация пользователя (учёт отсутствия Telegram WebApp)
+        let tg = null;
+        try {
+            tg = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
+            if (tg && typeof tg.ready === 'function') tg.ready();
+        } catch (e) { console.warn('Telegram WebApp недоступен', e); }
 
-        const user = tg.initDataUnsafe.user;
+        let user = tg && tg.initDataUnsafe ? tg.initDataUnsafe.user : null;
         if (user) {
             currentUser = user;
             
@@ -5017,6 +5057,7 @@
             
             // Сохраняем данные пользователя
             localStorage.setItem('ai-tap-user', JSON.stringify(user));
+            localStorage.setItem('ai-tap-current-user', JSON.stringify(user));
             
             // Регистрируем пользователя в системе
             registerUser(user);
@@ -5024,7 +5065,27 @@
             // Проверяем статус бана
             checkBanStatus(user.id);
         } else {
-            console.log('Данные пользователя недоступны');
+            console.log('Данные пользователя недоступны из Telegram, пытаемся восстановить локально');
+            try {
+                const storedUser = JSON.parse(localStorage.getItem('ai-tap-current-user') || 'null');
+                if (storedUser) {
+                    currentUser = storedUser;
+                    isAdmin = storedUser.id === ADMIN_ID;
+                    if (isAdmin) {
+                        document.getElementById('adminPanelBtn').style.display = 'flex';
+                    }
+                    // Обновляем UI минимумом данных
+                    document.getElementById('userName').textContent = `${storedUser.first_name || 'Гость'} ${storedUser.last_name || ''}`.trim();
+                    document.getElementById('userId').textContent = `ID: ${storedUser.id || '...'}`;
+                } else {
+                    // Создаем гостя для локального запуска
+                    const guest = { id: 0, first_name: 'Гость', last_name: '', username: '', photo_url: '' };
+                    currentUser = guest;
+                    localStorage.setItem('ai-tap-current-user', JSON.stringify(guest));
+                    document.getElementById('userName').textContent = 'Гость';
+                    document.getElementById('userId').textContent = 'ID: ...';
+                }
+            } catch (e) { console.warn('Не удалось восстановить локального пользователя', e); }
         }
 
         // Функция регистрации пользователя
