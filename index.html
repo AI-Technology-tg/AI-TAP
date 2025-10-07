@@ -3,17 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI-TAP - Искусственный интеллект нового поколения</title>
-    
-    <!-- Telegram WebApp -->
+    <title>Minko AI - Социальная сеть с ИИ</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
-    <!-- Иконки -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Шрифты -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
     <style>
         * {
             margin: 0;
@@ -21,542 +12,474 @@
             box-sizing: border-box;
         }
 
-        :root {
-            --primary-color: #6C5CE7;
-            --primary-dark: #5A4FCF;
-            --secondary-color: #00CEC9;
-            --accent-color: #FD79A8;
-            --background: #0A0A0A;
-            --surface: #1A1A1A;
-            --surface-light: #2A2A2A;
-            --text-primary: #FFFFFF;
-            --text-secondary: #B0B0B0;
-            --text-muted: #666666;
-            --border-color: #333333;
-            --success-color: #00B894;
-            --warning-color: #FDCB6E;
-            --error-color: #E17055;
-            --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            --gradient-accent: linear-gradient(135deg, var(--accent-color), var(--primary-color));
-            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            --shadow-light: 0 4px 16px rgba(0, 0, 0, 0.2);
-        }
-
         body {
-            font-family: 'Inter', sans-serif;
-            background: var(--background);
-            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #ffffff;
             overflow-x: hidden;
-            line-height: 1.6;
-            /* Оптимизация производительности */
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            text-rendering: optimizeLegibility;
         }
 
-        /* Анимации с оптимизацией производительности */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translate3d(0, 20px, 0); }
-            to { opacity: 1; transform: translate3d(0, 0, 0); }
-        }
-
-        @keyframes slideIn {
-            from { transform: translate3d(-100%, 0, 0); }
-            to { transform: translate3d(0, 0, 0); }
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale3d(1, 1, 1); }
-            50% { transform: scale3d(1.05, 1.05, 1); }
-        }
-
-        @keyframes glow {
-            0%, 100% { box-shadow: 0 0 20px rgba(108, 92, 231, 0.3); }
-            50% { box-shadow: 0 0 30px rgba(108, 92, 231, 0.6); }
-        }
-
-        .fade-in {
-            animation: fadeIn 0.6s ease-out;
-            /* Оптимизация анимации */
-            will-change: opacity, transform;
-        }
-
-        .slide-in {
-            animation: slideIn 0.4s ease-out;
-            /* Оптимизация анимации */
-            will-change: transform;
-        }
-
-        /* Основной контейнер */
-        .app-container {
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            background: #0a0a0a;
         }
 
         /* Заголовок */
         .header {
-            background: var(--gradient-primary);
-            padding: 1rem 1.5rem;
-            box-shadow: var(--shadow);
+            background: linear-gradient(135deg, #00D4FF 0%, #8B5CF6 100%);
+            padding: 20px;
+            text-align: center;
             position: sticky;
             top: 0;
             z-index: 100;
-            backdrop-filter: blur(10px);
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
         }
 
         .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            color: #ffffff;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+            margin-bottom: 5px;
         }
 
-        .logo i {
-            font-size: 2rem;
-            animation: pulse 2s infinite;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--gradient-accent);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            color: white;
-        }
-
-        .admin-badge {
-            background: var(--accent-color);
-            color: white;
-            padding: 0.25rem 0.5rem;
+        .logo-ai {
+            display: inline-block;
+            background: #00D4FF;
+            color: #000;
+            padding: 4px 8px;
             border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 600;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
         }
 
         /* Навигация */
         .nav-tabs {
-            background: var(--surface);
-            padding: 0.5rem 1.5rem;
             display: flex;
-            gap: 0.5rem;
-            overflow-x: auto;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-
-        .nav-tabs::-webkit-scrollbar {
-            display: none;
+            background: #1a1a1a;
+            border-bottom: 1px solid #333;
         }
 
         .nav-tab {
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            padding: 0.75rem 1.5rem;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-            font-weight: 500;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .nav-tab::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: var(--gradient-primary);
-            transition: left 0.3s ease;
-            z-index: -1;
-        }
-
-        .nav-tab:hover::before,
-        .nav-tab.active::before {
-            left: 0;
-        }
-
-        .nav-tab:hover,
-        .nav-tab.active {
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .nav-tab i {
-            margin-right: 0.5rem;
-        }
-
-        /* Основной контент */
-        .main-content {
             flex: 1;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem 1.5rem;
-            width: 100%;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .nav-tab.active {
+            color: #00D4FF;
+            border-bottom-color: #00D4FF;
+        }
+
+        .nav-tab:hover {
+            background: #2a2a2a;
+        }
+
+        /* Контент */
+        .content {
+            padding: 20px;
+            min-height: calc(100vh - 200px);
         }
 
         .tab-content {
             display: none;
-            animation: fadeIn 0.4s ease-out;
         }
 
         .tab-content.active {
             display: block;
         }
 
-        /* Чат интерфейс */
+        /* Приветствие */
+        .welcome-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #333;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
+        }
+
+        .welcome-title {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #00D4FF;
+        }
+
+        .welcome-text {
+            color: #ccc;
+            line-height: 1.5;
+        }
+
+        /* AI Чат */
         .chat-container {
+            height: 400px;
             display: flex;
             flex-direction: column;
-            height: 70vh;
-            background: var(--surface);
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-        }
-
-        .chat-header {
-            background: var(--gradient-primary);
-            padding: 1rem 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .chat-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: white;
-        }
-
-        .chat-controls {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .control-btn {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .control-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: scale(1.1);
         }
 
         .chat-messages {
             flex: 1;
-            padding: 1rem;
             overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            /* Оптимизация прокрутки */
-            -webkit-overflow-scrolling: touch;
-            scroll-behavior: smooth;
+            padding: 10px;
+            background: #1a1a1a;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            border: 1px solid #333;
         }
 
         .message {
-            display: flex;
-            gap: 0.75rem;
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        .message.user {
-            flex-direction: row-reverse;
-        }
-
-        .message-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            color: white;
-            flex-shrink: 0;
-        }
-
-        .message.user .message-avatar {
-            background: var(--gradient-accent);
-        }
-
-        .message.assistant .message-avatar {
-            background: var(--gradient-primary);
-        }
-
-        .message-content {
-            background: var(--surface-light);
-            padding: 0.75rem 1rem;
-            border-radius: 18px;
-            max-width: 70%;
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 12px;
+            max-width: 80%;
             word-wrap: break-word;
         }
 
-        .message.user .message-content {
-            background: var(--primary-color);
-            color: white;
+        .message.user {
+            background: linear-gradient(135deg, #00D4FF 0%, #0099CC 100%);
+            color: #000;
+            margin-left: auto;
+            text-align: right;
         }
 
-        .chat-input-container {
-            padding: 1rem 1.5rem;
-            background: var(--surface-light);
-            display: flex;
-            gap: 0.75rem;
-            align-items: center;
+        .message.ai {
+            background: #2a2a2a;
+            color: #fff;
+            border: 1px solid #333;
+        }
+
+        .message-time {
+            font-size: 10px;
+            opacity: 0.7;
+            margin-top: 5px;
         }
 
         .chat-input {
-            flex: 1;
-            background: var(--surface);
-            border: 2px solid var(--border-color);
-            border-radius: 25px;
-            padding: 0.75rem 1rem;
-            color: var(--text-primary);
-            font-size: 1rem;
-            transition: all 0.3s ease;
+            display: flex;
+            gap: 10px;
         }
 
-        .chat-input:focus {
+        .chat-input input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #333;
+            border-radius: 12px;
+            background: #1a1a1a;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .chat-input input:focus {
             outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+            border-color: #00D4FF;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
         }
 
         .send-btn {
-            background: var(--gradient-primary);
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #00D4FF 0%, #0099CC 100%);
             border: none;
-            color: white;
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
+            border-radius: 12px;
+            color: #000;
+            font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .send-btn:hover {
-            transform: scale(1.1);
-            animation: glow 1s infinite;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4);
         }
 
         .send-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             transform: none;
-            animation: none;
         }
 
-        /* Карточки функций */
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+        /* Посты */
+        .post {
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #333;
         }
 
-        .feature-card {
-            background: var(--surface);
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .post-avatar {
+            width: 40px;
+            height: 40px;
             border-radius: 20px;
-            padding: 2rem;
-            box-shadow: var(--shadow-light);
-            transition: all 0.3s ease;
-            border: 1px solid var(--border-color);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--gradient-primary);
-        }
-
-        .feature-card:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--shadow);
-            border-color: var(--primary-color);
-        }
-
-        .feature-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 15px;
-            background: var(--gradient-primary);
+            background: linear-gradient(135deg, #00D4FF 0%, #8B5CF6 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
-            color: white;
-            margin-bottom: 1rem;
+            margin-right: 10px;
+            font-weight: bold;
+            color: #000;
         }
 
-        .feature-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--text-primary);
+        .post-info h4 {
+            color: #00D4FF;
+            font-size: 14px;
         }
 
-        .feature-description {
-            color: var(--text-secondary);
-            margin-bottom: 1.5rem;
-            line-height: 1.6;
+        .post-info p {
+            color: #999;
+            font-size: 12px;
         }
 
-        .feature-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.875rem;
-            font-weight: 500;
+        .post-content {
+            margin-bottom: 15px;
+            line-height: 1.5;
         }
 
-        .status-developing {
-            background: rgba(253, 203, 110, 0.2);
-            color: var(--warning-color);
+        .post-actions {
+            display: flex;
+            gap: 20px;
+            padding-top: 10px;
+            border-top: 1px solid #333;
         }
 
-        .status-active {
-            background: rgba(0, 184, 148, 0.2);
-            color: var(--success-color);
-        }
-
-        /* Админ панель */
-        .admin-panel {
-            background: var(--surface);
-            border-radius: 20px;
-            padding: 2rem;
-            box-shadow: var(--shadow);
-            border: 2px solid var(--accent-color);
-        }
-
-        .admin-header {
+        .post-action {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border-color);
+            gap: 5px;
+            cursor: pointer;
+            transition: color 0.3s ease;
         }
 
-        .admin-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--accent-color);
+        .post-action:hover {
+            color: #00D4FF;
         }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
+        /* Поиск */
+        .search-container {
+            margin-bottom: 20px;
         }
 
-        .stat-card {
-            background: var(--surface-light);
-            padding: 1.5rem;
-            border-radius: 15px;
+        .search-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #333;
+            border-radius: 12px;
+            background: #1a1a1a;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #00D4FF;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+        }
+
+        .search-results {
+            margin-top: 15px;
+        }
+
+        .search-item {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 1px solid #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-item:hover {
+            border-color: #00D4FF;
+            transform: translateY(-2px);
+        }
+
+        /* Погода */
+        .weather-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #333;
+            margin-bottom: 20px;
+        }
+
+        .weather-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .weather-temp {
+            font-size: 36px;
+            font-weight: bold;
+            color: #00D4FF;
+            margin-bottom: 5px;
+        }
+
+        .weather-desc {
+            color: #ccc;
+            margin-bottom: 15px;
+        }
+
+        .weather-details {
+            display: flex;
+            justify-content: space-around;
+            font-size: 12px;
+            color: #999;
+        }
+
+        /* Новости */
+        .news-item {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .news-item:hover {
+            border-color: #00D4FF;
+            transform: translateY(-2px);
+        }
+
+        .news-title {
+            color: #00D4FF;
+            font-size: 16px;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .news-desc {
+            color: #ccc;
+            font-size: 14px;
+            line-height: 1.4;
+            margin-bottom: 10px;
+        }
+
+        .news-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #999;
+        }
+
+        /* Профиль */
+        .profile-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #333;
+            margin-bottom: 20px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 40px;
+            background: linear-gradient(135deg, #00D4FF 0%, #8B5CF6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 32px;
+            font-weight: bold;
+            color: #000;
+        }
+
+        .profile-name {
+            font-size: 20px;
+            color: #00D4FF;
+            margin-bottom: 5px;
+        }
+
+        .profile-username {
+            color: #999;
+            margin-bottom: 15px;
+        }
+
+        .profile-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .stat {
             text-align: center;
         }
 
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 0.5rem;
+        .stat-number {
+            font-size: 18px;
+            font-weight: bold;
+            color: #00D4FF;
         }
 
         .stat-label {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
+            font-size: 12px;
+            color: #999;
         }
 
-        /* Уведомления */
-        .notification {
-            position: fixed;
-            top: 100px;
-            right: 20px;
-            background: var(--surface);
-            border: 1px solid var(--border-color);
+        .profile-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
             border-radius: 12px;
-            padding: 1rem 1.5rem;
-            box-shadow: var(--shadow);
-            z-index: 1000;
-            transform: translateX(400px);
-            transition: transform 0.3s ease;
-            max-width: 300px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
         }
 
-        .notification.show {
-            transform: translateX(0);
+        .btn-primary {
+            background: linear-gradient(135deg, #00D4FF 0%, #0099CC 100%);
+            color: #000;
         }
 
-        .notification.success {
-            border-left: 4px solid var(--success-color);
+        .btn-secondary {
+            background: #2a2a2a;
+            color: #fff;
+            border: 1px solid #333;
         }
 
-        .notification.error {
-            border-left: 4px solid var(--error-color);
+        .btn:hover {
+            transform: translateY(-2px);
         }
 
         /* Загрузка */
         .loading {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--text-secondary);
+            text-align: center;
+            padding: 40px;
+            color: #00D4FF;
         }
 
-        .loading-spinner {
-            width: 16px;
-            height: 16px;
-            border: 2px solid var(--border-color);
-            border-top: 2px solid var(--primary-color);
+        .spinner {
+            border: 3px solid #333;
+            border-top: 3px solid #00D4FF;
             border-radius: 50%;
+            width: 30px;
+            height: 30px;
             animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
         }
 
         @keyframes spin {
@@ -565,953 +488,430 @@
         }
 
         /* Адаптивность */
-        @media (max-width: 768px) {
-            .header-content {
-                padding: 0 1rem;
-            }
-
-            .nav-tabs {
-                padding: 0.5rem 1rem;
-            }
-
-            .main-content {
-                padding: 1rem;
-            }
-
-            .feature-grid {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-
-            .chat-container {
-                height: 60vh;
-            }
-
-            .message-content {
-                max-width: 85%;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
         @media (max-width: 480px) {
-            .logo {
-                font-size: 1.25rem;
+            .container {
+                max-width: 100%;
             }
-
-            .logo i {
-                font-size: 1.5rem;
+            
+            .content {
+                padding: 15px;
             }
-
+            
             .nav-tab {
-                padding: 0.5rem 1rem;
-                font-size: 0.875rem;
-            }
-
-            .feature-card {
-                padding: 1.5rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
+                padding: 12px 8px;
+                font-size: 12px;
             }
         }
 
-        /* Скрытие элементов */
-        .hidden {
-            display: none !important;
+        /* Скрытие скроллбара */
+        .chat-messages::-webkit-scrollbar {
+            width: 4px;
         }
 
-        /* Специальные эффекты */
-        .glow-effect {
-            animation: glow 2s infinite;
+        .chat-messages::-webkit-scrollbar-track {
+            background: #1a1a1a;
         }
 
-        .pulse-effect {
-            animation: pulse 2s infinite;
-        }
-
-        /* Скроллбар */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--surface);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary-color);
-            border-radius: 3px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--primary-dark);
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #00D4FF;
+            border-radius: 2px;
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
+    <div class="container">
         <!-- Заголовок -->
-        <header class="header">
-            <div class="header-content">
-                <div class="logo">
-                    <i class="fas fa-brain"></i>
-                    <span>AI-TAP</span>
-                </div>
-                <div class="user-info">
-                    <div class="user-avatar" id="userAvatar">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div id="userInfo">
-                        <div id="userName">Загрузка...</div>
-                        <div id="adminBadge" class="admin-badge hidden">Админ</div>
-                    </div>
-                </div>
+        <div class="header">
+            <div class="logo">
+                MINK<span class="logo-ai">AI</span>
             </div>
-        </header>
+            <div class="subtitle">Революционная социальная сеть с ИИ</div>
+        </div>
 
         <!-- Навигация -->
-        <nav class="nav-tabs">
-            <button class="nav-tab active" data-tab="chat">
-                <i class="fas fa-comments"></i>
-                Чат с ИИ
-            </button>
-            <button class="nav-tab" data-tab="image">
-                <i class="fas fa-image"></i>
-                Генератор изображений
-            </button>
-            <button class="nav-tab" data-tab="weather">
-                <i class="fas fa-cloud-sun"></i>
-                Погода
-            </button>
-            <button class="nav-tab" data-tab="news">
-                <i class="fas fa-newspaper"></i>
-                Новости
-            </button>
-            <button class="nav-tab" data-tab="friends">
-                <i class="fas fa-users"></i>
-                Друзья
-            </button>
-            <button class="nav-tab" data-tab="groups">
-                <i class="fas fa-comments"></i>
-                Группы
-            </button>
-            <button class="nav-tab" data-tab="settings">
-                <i class="fas fa-cog"></i>
-                Настройки
-            </button>
-        </nav>
+        <div class="nav-tabs">
+            <div class="nav-tab active" onclick="showTab('home')">🏠 Главная</div>
+            <div class="nav-tab" onclick="showTab('chat')">💬 AI Чат</div>
+            <div class="nav-tab" onclick="showTab('search')">🔍 Поиск</div>
+            <div class="nav-tab" onclick="showTab('profile')">👤 Профиль</div>
+        </div>
 
-        <!-- Основной контент -->
-        <main class="main-content">
-            <!-- Чат с ИИ -->
-            <div class="tab-content active" id="chat">
+        <!-- Контент -->
+        <div class="content">
+            <!-- Главная -->
+            <div id="home" class="tab-content active">
+                <div class="welcome-card">
+                    <h2 class="welcome-title">Добро пожаловать в Minko AI! 👋</h2>
+                    <p class="welcome-text">
+                        Революционная социальная сеть с искусственным интеллектом. 
+                        Общайтесь с умным помощником, создавайте контент с ИИ, 
+                        делитесь мыслями и следите за новостями!
+                    </p>
+                </div>
+
+                <div class="weather-card" id="weatherCard">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Загрузка погоды...
+                    </div>
+                </div>
+
+                <div id="postsContainer">
+                    <div class="post">
+                        <div class="post-header">
+                            <div class="post-avatar">🤖</div>
+                            <div class="post-info">
+                                <h4>AI Помощник</h4>
+                                <p>Только что</p>
+                            </div>
+                        </div>
+                        <div class="post-content">
+                            Привет! Я ваш AI помощник в Minko. Готов помочь с любыми вопросами и творческими задачами! 🚀
+                        </div>
+                        <div class="post-actions">
+                            <div class="post-action">❤️ 12</div>
+                            <div class="post-action">💬 3</div>
+                            <div class="post-action">📤 1</div>
+                        </div>
+                    </div>
+
+                    <div class="post">
+                        <div class="post-header">
+                            <div class="post-avatar">👨‍💻</div>
+                            <div class="post-info">
+                                <h4>Разработчик</h4>
+                                <p>2 часа назад</p>
+                            </div>
+                        </div>
+                        <div class="post-content">
+                            Создал полноценное Telegram Mini App с AI интеграцией! Теперь можно общаться с ИИ прямо в Telegram 🎉
+                        </div>
+                        <div class="post-actions">
+                            <div class="post-action">❤️ 45</div>
+                            <div class="post-action">💬 8</div>
+                            <div class="post-action">📤 12</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Чат -->
+            <div id="chat" class="tab-content">
                 <div class="chat-container">
-                    <div class="chat-header">
-                        <div class="chat-title">
-                            <i class="fas fa-robot"></i>
-                            AI Assistant
-                        </div>
-                        <div class="chat-controls">
-                            <button class="control-btn" title="Очистить чат">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                            <button class="control-btn" title="Экспорт чата">
-                                <i class="fas fa-download"></i>
-                            </button>
-                        </div>
-                    </div>
                     <div class="chat-messages" id="chatMessages">
-                        <div class="message assistant">
-                            <div class="message-avatar">
-                                <i class="fas fa-robot"></i>
+                        <div class="message ai">
+                            <div>Привет! Я ваш AI помощник в Minko. Чем могу помочь? 🤖</div>
+                            <div class="message-time">Сейчас</div>
+                        </div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" id="chatInput" placeholder="Напишите сообщение..." maxlength="500">
+                        <button class="send-btn" onclick="sendMessage()" id="sendBtn">Отправить</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Поиск -->
+            <div id="search" class="tab-content">
+                <div class="search-container">
+                    <input type="text" class="search-input" id="searchInput" placeholder="Поиск новостей, погоды, пользователей...">
+                    <div class="search-results" id="searchResults">
+                        <div class="search-item">
+                            <div class="news-title">🌤️ Погода в Москве</div>
+                            <div class="news-desc">+15°C, облачно. Влажность 65%, ветер 3 м/с</div>
+                            <div class="news-meta">
+                                <span>OpenWeatherMap</span>
+                                <span>Сейчас</span>
                             </div>
-                            <div class="message-content">
-                                Привет! Я AI-TAP, ваш персональный ИИ-помощник. Чем могу помочь?
-                            </div>
                         </div>
-                    </div>
-                    <div class="chat-input-container">
-                        <input type="text" class="chat-input" id="chatInput" placeholder="Введите ваше сообщение...">
-                        <button class="send-btn" id="sendBtn">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Генератор изображений -->
-            <div class="tab-content" id="image">
-                <div class="feature-grid">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-paint-brush"></i>
-                        </div>
-                        <div class="feature-title">Генератор изображений</div>
-                        <div class="feature-description">
-                            Создавайте уникальные изображения с помощью ИИ. Просто опишите что хотите увидеть!
-                        </div>
-                        <div class="feature-status status-developing">
-                            <i class="fas fa-hammer"></i>
-                            В разработке
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Погода -->
-            <div class="tab-content" id="weather">
-                <div class="feature-grid">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-cloud-sun"></i>
-                        </div>
-                        <div class="feature-title">Погода</div>
-                        <div class="feature-description">
-                            Актуальная погода в вашем городе и прогноз на несколько дней вперед.
-                        </div>
-                        <div class="feature-status status-developing">
-                            <i class="fas fa-hammer"></i>
-                            В разработке
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Новости -->
-            <div class="tab-content" id="news">
-                <div class="feature-grid">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-newspaper"></i>
-                        </div>
-                        <div class="feature-title">Новости</div>
-                        <div class="feature-description">
-                            Свежие новости со всего мира, персонализированные под ваши интересы.
-                        </div>
-                        <div class="feature-status status-developing">
-                            <i class="fas fa-hammer"></i>
-                            В разработке
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Друзья -->
-            <div class="tab-content" id="friends">
-                <div class="feature-grid">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-user-plus"></i>
-                        </div>
-                        <div class="feature-title">Система друзей</div>
-                        <div class="feature-description">
-                            Добавляйте друзей, обменивайтесь сообщениями и делитесь контентом.
-                        </div>
-                        <div class="feature-status status-developing">
-                            <i class="fas fa-hammer"></i>
-                            В разработке
-                        </div>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="feature-title">Поиск друзей</div>
-                        <div class="feature-description">
-                            Найдите новых друзей по интересам, местоположению или общим знакомым.
-                        </div>
-                        <div class="feature-status status-developing">
-                            <i class="fas fa-hammer"></i>
-                            В разработке
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Группы -->
-            <div class="tab-content" id="groups">
-                <div class="feature-grid">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-comments"></i>
-                        </div>
-                        <div class="feature-title">Групповые чаты</div>
-                        <div class="feature-description">
-                            Создавайте и участвуйте в групповых чатах с друзьями и коллегами.
-                        </div>
-                        <div class="feature-status status-developing">
-                            <i class="fas fa-hammer"></i>
-                            В разработке
-                        </div>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-video"></i>
-                        </div>
-                        <div class="feature-title">Видеозвонки</div>
-                        <div class="feature-description">
-                            Проводите видеозвонки и конференции прямо в приложении.
-                        </div>
-                        <div class="feature-status status-developing">
-                            <i class="fas fa-hammer"></i>
-                            В разработке
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Настройки -->
-            <div class="tab-content" id="settings">
-                <div class="feature-grid">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-palette"></i>
-                        </div>
-                        <div class="feature-title">Темы</div>
-                        <div class="feature-description">
-                            Настройте внешний вид приложения под свои предпочтения.
-                        </div>
-                        <div class="feature-status status-developing">
-                            <i class="fas fa-hammer"></i>
-                            В разработке
-                        </div>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-language"></i>
-                        </div>
-                        <div class="feature-title">Язык</div>
-                        <div class="feature-description">
-                            Выберите язык интерфейса приложения.
-                        </div>
-                        <div class="feature-status status-developing">
-                            <i class="fas fa-hammer"></i>
-                            В разработке
-                        </div>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-bell"></i>
-                        </div>
-                        <div class="feature-title">Уведомления</div>
-                        <div class="feature-description">
-                            Настройте уведомления для различных событий.
-                        </div>
-                        <div class="feature-status status-developing">
-                            <i class="fas fa-hammer"></i>
-                            В разработке
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Админ панель (только для админа) -->
-                <div id="adminPanel" class="admin-panel hidden">
-                    <div class="admin-header">
-                        <i class="fas fa-shield-alt" style="color: var(--accent-color); font-size: 1.5rem;"></i>
-                        <div class="admin-title">Панель администратора</div>
-                    </div>
-                    
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-value" id="totalUsers">-</div>
-                            <div class="stat-label">Всего пользователей</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="activeUsers">-</div>
-                            <div class="stat-label">Активных сегодня</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="totalMessages">-</div>
-                            <div class="stat-label">Сообщений</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="apiRequests">-</div>
-                            <div class="stat-label">API запросов</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Уведомления -->
-    <div id="notification" class="notification">
-        <div id="notificationText"></div>
-    </div>
-
-    <!-- Подключение скриптов -->
-    <script src="config.js"></script>
-    <script src="database.js"></script>
-    <script src="cache.js"></script>
-    <script src="ai-service.js"></script>
-    
-    <script>
-        // Основной класс приложения
-        class AITAPApp {
-            constructor() {
-                this.database = new Database();
-                this.cache = new ResponseCache();
-                this.aiService = new AIService();
-                this.currentUser = null;
-                this.isAdmin = false;
-                this.currentTab = 'chat';
-                this.chatHistory = [];
-                
-                this.init();
-            }
-
-            async init() {
-                try {
-                // Инициализация Telegram WebApp
-                    await this.initTelegram();
-                
-                // Загрузка кэша
-                this.cache.loadFromLocalStorage();
-                
-                // Настройка событий
-                this.setupEventListeners();
-                
-                // Инициализация чата
-                    await this.initChat();
-                
-                // Проверка прав администратора
-                await this.checkAdminRights();
-                
-                // Показать уведомление о загрузке
-                this.showNotification('AI-TAP успешно загружен!', 'success');
-                } catch (error) {
-                    console.error('Ошибка инициализации приложения:', error);
-                    this.showNotification('Ошибка загрузки приложения. Попробуйте перезагрузить страницу.', 'error');
-                }
-            }
-
-            async initTelegram() {
-                try {
-                if (window.Telegram && window.Telegram.WebApp) {
-                    const tg = window.Telegram.WebApp;
-                    
-                    // Расширение приложения на весь экран
-                    tg.expand();
-                    
-                    // Включение закрытия по свайпу
-                    tg.enableClosingConfirmation();
-                    
-                    // Получение данных пользователя
-                    this.currentUser = tg.initDataUnsafe?.user || tg.initData?.user;
-                    
-                    if (this.currentUser) {
-                        this.updateUserInterface();
-                            await this.saveUserToDatabase();
-                    }
-                    
-                    // Настройка темы Telegram
-                    if (tg.colorScheme === 'dark') {
-                        document.body.classList.add('dark-theme');
-                    }
-                    } else {
-                        // Для тестирования вне Telegram
-                        this.currentUser = {
-                            id: 123456789,
-                            first_name: 'Тестовый',
-                            last_name: 'Пользователь',
-                            username: 'test_user'
-                        };
-                        this.updateUserInterface();
-                    }
-                } catch (error) {
-                    console.error('Ошибка инициализации Telegram:', error);
-                    // Fallback для тестирования
-                    this.currentUser = {
-                        id: 123456789,
-                        first_name: 'Тестовый',
-                        last_name: 'Пользователь',
-                        username: 'test_user'
-                    };
-                    this.updateUserInterface();
-                }
-            }
-
-            updateUserInterface() {
-                if (!this.currentUser) return;
-                
-                try {
-                    // Обновление аватара
-                    const avatar = document.getElementById('userAvatar');
-                    if (avatar) {
-                    if (this.currentUser.photo_url) {
-                        avatar.style.backgroundImage = `url(${this.currentUser.photo_url})`;
-                        avatar.style.backgroundSize = 'cover';
-                        avatar.innerHTML = '';
-                    } else {
-                        const initials = this.getUserInitials();
-                        avatar.innerHTML = initials;
-                        }
-                    }
-                    
-                    // Обновление имени пользователя
-                    const userNameElement = document.getElementById('userName');
-                    if (userNameElement) {
-                        userNameElement.textContent = this.currentUser.first_name || 'Пользователь';
-                    }
-                    
-                    // Проверка на администратора
-                    if (this.isAdmin) {
-                        const adminBadge = document.getElementById('adminBadge');
-                        const adminPanel = document.getElementById('adminPanel');
                         
-                        if (adminBadge) adminBadge.classList.remove('hidden');
-                        if (adminPanel) adminPanel.classList.remove('hidden');
-                    }
-                } catch (error) {
-                    console.error('Ошибка обновления интерфейса пользователя:', error);
-                }
-            }
-
-            getUserInitials() {
-                if (!this.currentUser) return '?';
-                
-                const firstName = this.currentUser.first_name || '';
-                const lastName = this.currentUser.last_name || '';
-                
-                return (firstName.charAt(0) + lastName.charAt(0)).toUpperCase() || '?';
-            }
-
-            async saveUserToDatabase() {
-                if (!this.currentUser || !this.database) return;
-                
-                try {
-                    await this.database.saveUser(
-                        this.currentUser.id,
-                        this.currentUser.username,
-                        this.currentUser.first_name
-                    );
-                } catch (error) {
-                    console.error('Ошибка сохранения пользователя в базу данных:', error);
-                    // Не показываем ошибку пользователю, так как это не критично
-                }
-            }
-
-            async checkAdminRights() {
-                if (!this.currentUser) return;
-                
-                try {
-                    // Используем конфигурацию для проверки прав администратора
-                    if (window.ConfigUtils && window.ConfigUtils.isAdmin(this.currentUser.id)) {
-                        this.isAdmin = true;
-                        await this.loadAdminStats();
-                    }
-                } catch (error) {
-                    console.error('Ошибка проверки прав администратора:', error);
-                }
-            }
-
-            async loadAdminStats() {
-                if (!this.database) return;
-                
-                try {
-                    const stats = await this.database.getApiStats();
-                    
-                    // Безопасное обновление элементов DOM
-                    const updateElement = (id, value) => {
-                        const element = document.getElementById(id);
-                        if (element) {
-                            element.textContent = value || '0';
-                        }
-                    };
-                    
-                    updateElement('totalUsers', stats.totalUsers);
-                    updateElement('activeUsers', stats.requestsPerHour);
-                    updateElement('totalMessages', stats.totalRequests);
-                    updateElement('apiRequests', stats.totalRequests);
-                } catch (error) {
-                    console.error('Ошибка загрузки статистики:', error);
-                }
-            }
-
-            setupEventListeners() {
-                try {
-                // Навигация по табам
-                document.querySelectorAll('.nav-tab').forEach(tab => {
-                    tab.addEventListener('click', (e) => {
-                            e.preventDefault();
-                            const tabName = e.currentTarget.dataset.tab;
-                            if (tabName) {
-                                this.switchTab(tabName);
-                            }
-                    });
-                });
-
-                // Чат
-                const chatInput = document.getElementById('chatInput');
-                const sendBtn = document.getElementById('sendBtn');
-
-                    if (sendBtn) {
-                        sendBtn.addEventListener('click', (e) => {
-                            e.preventDefault();
-                    this.sendMessage();
-                });
-                    }
-
-                    if (chatInput) {
-                        // Debounce для ввода
-                        let inputTimeout;
-                        chatInput.addEventListener('input', () => {
-                            clearTimeout(inputTimeout);
-                            inputTimeout = setTimeout(() => {
-                                this.handleInputChange();
-                            }, 300);
-                        });
-
-                chatInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        this.sendMessage();
-                    }
-                });
-                    }
-
-                    // Кнопка очистки чата
-                    const clearChatBtn = document.querySelector('.control-btn[title="Очистить чат"]');
-                    if (clearChatBtn) {
-                        clearChatBtn.addEventListener('click', () => {
-                            this.clearChat();
-                        });
-                    }
-
-                    // Кнопка экспорта чата
-                    const exportChatBtn = document.querySelector('.control-btn[title="Экспорт чата"]');
-                    if (exportChatBtn) {
-                        exportChatBtn.addEventListener('click', () => {
-                            this.exportChat();
-                        });
-                    }
-
-                    // Автосохранение кэша каждые 5 минут
-                    setInterval(() => {
-                        try {
-                            this.cache.saveToLocalStorage();
-                        } catch (error) {
-                            console.error('Ошибка автосохранения кэша:', error);
-                        }
-                    }, 5 * 60 * 1000);
-                } catch (error) {
-                    console.error('Ошибка настройки обработчиков событий:', error);
-                }
-            }
-
-            // Обработка изменений в поле ввода
-            handleInputChange() {
-                const chatInput = document.getElementById('chatInput');
-                const sendBtn = document.getElementById('sendBtn');
-                
-                if (chatInput && sendBtn) {
-                    const hasText = chatInput.value.trim().length > 0;
-                    sendBtn.disabled = !hasText;
-                }
-            }
-
-            switchTab(tabName) {
-                try {
-                // Обновление активного таба
-                document.querySelectorAll('.nav-tab').forEach(tab => {
-                    tab.classList.remove('active');
-                });
-                    
-                    const activeTab = document.querySelector(`[data-tab="${tabName}"]`);
-                    if (activeTab) {
-                        activeTab.classList.add('active');
-                    }
-
-                // Показ соответствующего контента
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.remove('active');
-                });
-                    
-                    const activeContent = document.getElementById(tabName);
-                    if (activeContent) {
-                        activeContent.classList.add('active');
-                    }
-
-                this.currentTab = tabName;
-                } catch (error) {
-                    console.error('Ошибка переключения таба:', error);
-                }
-            }
-
-            async initChat() {
-                try {
-                    await this.loadChatHistory();
-                } catch (error) {
-                    console.error('Ошибка инициализации чата:', error);
-                }
-            }
-
-            async loadChatHistory() {
-                if (!this.currentUser || !this.database) return;
-                
-                    try {
-                        const history = await this.database.getChatHistory(this.currentUser.id);
-                    this.chatHistory = history || [];
-                        this.renderChatHistory();
-                    } catch (error) {
-                        console.error('Ошибка загрузки истории чата:', error);
-                    this.chatHistory = [];
-                }
-            }
-
-            renderChatHistory() {
-                const messagesContainer = document.getElementById('chatMessages');
-                if (!messagesContainer) return;
-                
-                try {
-                // Очищаем контейнер, оставляя только приветственное сообщение
-                const welcomeMessage = messagesContainer.querySelector('.message.assistant');
-                messagesContainer.innerHTML = '';
-                
-                if (welcomeMessage) {
-                    messagesContainer.appendChild(welcomeMessage);
-                }
-
-                // Добавляем историю сообщений
-                    if (Array.isArray(this.chatHistory)) {
-                this.chatHistory.forEach(msg => {
-                            if (msg && msg.content && msg.role) {
-                    this.addMessageToChat(msg.content, msg.role === 'user' ? 'user' : 'assistant');
-                            }
-                });
-                    }
-                } catch (error) {
-                    console.error('Ошибка рендеринга истории чата:', error);
-                }
-            }
-
-            async sendMessage() {
-                const input = document.getElementById('chatInput');
-                const sendBtn = document.getElementById('sendBtn');
-
-                if (!input || !sendBtn) return;
-                
-                const message = input.value.trim();
-                if (!message) return;
-
-                try {
-                // Добавляем сообщение пользователя
-                this.addMessageToChat(message, 'user');
-                input.value = '';
-                sendBtn.disabled = true;
-                    this.handleInputChange(); // Обновляем состояние кнопки
-
-                // Сохраняем в базу данных
-                if (this.currentUser && this.database) {
-                        try {
-                    await this.database.saveMessage(this.currentUser.id, 'user', message);
-                        } catch (dbError) {
-                            console.error('Ошибка сохранения сообщения пользователя:', dbError);
-                        }
-                }
-
-                    // Генерация ответа с помощью реального AI API
-                    setTimeout(async () => {
-                        try {
-                            // Показываем индикатор загрузки
-                            this.addMessageToChat('Думаю...', 'assistant');
-                            
-                            const response = await this.aiService.generateResponse(message);
-                            
-                            // Удаляем сообщение "Думаю..." и добавляем реальный ответ
-                            const messagesContainer = document.getElementById('chatMessages');
-                            if (messagesContainer) {
-                                const lastMessage = messagesContainer.lastElementChild;
-                                if (lastMessage && lastMessage.querySelector('.message-content').textContent === 'Думаю...') {
-                                    lastMessage.remove();
-                                }
-                            }
-                            
-                            this.addMessageToChat(response, 'assistant');
-                            
-                            // Сохраняем ответ в базу данных
-                            if (this.currentUser && this.database) {
-                                try {
-                                    await this.database.saveMessage(this.currentUser.id, 'assistant', response);
-                                } catch (dbError) {
-                                    console.error('Ошибка сохранения ответа ИИ:', dbError);
-                                }
-                            }
-                        } catch (error) {
-                            console.error('Ошибка генерации ответа ИИ:', error);
-                            
-                            // Удаляем сообщение "Думаю..." если оно есть
-                            const messagesContainer = document.getElementById('chatMessages');
-                            if (messagesContainer) {
-                                const lastMessage = messagesContainer.lastElementChild;
-                                if (lastMessage && lastMessage.querySelector('.message-content').textContent === 'Думаю...') {
-                                    lastMessage.remove();
-                                }
-                            }
-                            
-                            this.addMessageToChat('Извините, произошла ошибка при генерации ответа. Попробуйте еще раз.', 'assistant');
-                        } finally {
-                            sendBtn.disabled = false;
-                        }
-                    }, 500); // Небольшая задержка для UX
-                } catch (error) {
-                    console.error('Ошибка отправки сообщения:', error);
-                    sendBtn.disabled = false;
-                    this.showNotification('Ошибка отправки сообщения', 'error');
-                }
-            }
-
-            addMessageToChat(content, role) {
-                const messagesContainer = document.getElementById('chatMessages');
-                if (!messagesContainer || !content) return;
-                
-                try {
-                    const messageDiv = document.createElement('div');
-                    messageDiv.className = `message ${role} fade-in`;
-
-                    const avatar = document.createElement('div');
-                    avatar.className = 'message-avatar';
-                    avatar.innerHTML = role === 'user' ? 
-                        this.getUserInitials() : 
-                        '<i class="fas fa-robot"></i>';
-
-                    const messageContent = document.createElement('div');
-                    messageContent.className = 'message-content';
-                    messageContent.textContent = content; // textContent автоматически экранирует HTML
-
-                    messageDiv.appendChild(avatar);
-                    messageDiv.appendChild(messageContent);
-                    messagesContainer.appendChild(messageDiv);
-
-                    // Прокрутка к последнему сообщению
-                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                } catch (error) {
-                    console.error('Ошибка добавления сообщения в чат:', error);
-                }
-            }
-
-            generateAIResponse(userMessage) {
-                // Простые заглушки для ответов
-                const responses = [
-                    "Интересный вопрос! Я работаю над улучшением своих возможностей.",
-                    "Спасибо за сообщение! В настоящее время я изучаю новые данные.",
-                    "Это важная тема. Давайте обсудим это подробнее.",
-                    "Я понимаю ваш запрос. Как я могу помочь вам лучше?",
-                    "Отличная мысль! AI-TAP постоянно развивается и улучшается.",
-                    "Благодарю за обращение! Я всегда готов помочь.",
-                    "Интересно! Расскажите больше о том, что вас интересует.",
-                    "Я в процессе обучения новым навыкам. Скоро смогу помочь лучше!"
-                ];
-
-                return responses[Math.floor(Math.random() * responses.length)];
-            }
-
-            showNotification(message, type = 'success') {
-                const notification = document.getElementById('notification');
-                const notificationText = document.getElementById('notificationText');
-                
-                if (!notification || !notificationText) return;
-                
-                try {
-                    notificationText.textContent = message;
-                    notification.className = `notification ${type}`;
-                    notification.classList.add('show');
-
-                    setTimeout(() => {
-                        notification.classList.remove('show');
-                    }, 3000);
-                } catch (error) {
-                    console.error('Ошибка показа уведомления:', error);
-                }
-            }
-
-            // Очистка чата
-            clearChat() {
-                try {
-                    const messagesContainer = document.getElementById('chatMessages');
-                    if (messagesContainer) {
-                        messagesContainer.innerHTML = `
-                            <div class="message assistant">
-                                <div class="message-avatar">
-                                    <i class="fas fa-robot"></i>
-                                </div>
-                                <div class="message-content">
-                                    Привет! Я AI-TAP, ваш персональный ИИ-помощник. Чем могу помочь?
-                                </div>
+                        <div class="search-item">
+                            <div class="news-title">📰 Технологические новости</div>
+                            <div class="news-desc">ИИ продолжает развиваться, новые возможности для разработчиков</div>
+                            <div class="news-meta">
+                                <span>NewsAPI</span>
+                                <span>1 час назад</span>
                             </div>
-                        `;
-                    }
-                    
-                    // Очищаем историю в AI сервисе
-                    if (this.aiService) {
-                        this.aiService.clearHistory();
-                    }
-                    
-                    this.chatHistory = [];
-                    this.showNotification('Чат очищен', 'success');
-                } catch (error) {
-                    console.error('Ошибка очистки чата:', error);
-                    this.showNotification('Ошибка очистки чата', 'error');
-                }
-            }
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            // Экспорт чата
-            exportChat() {
-                try {
-                    const messagesContainer = document.getElementById('chatMessages');
-                    if (!messagesContainer) return;
+            <!-- Профиль -->
+            <div id="profile" class="tab-content">
+                <div class="profile-card">
+                    <div class="profile-avatar" id="userAvatar">U</div>
+                    <div class="profile-name" id="userName">Пользователь</div>
+                    <div class="profile-username" id="userUsername">@user123</div>
                     
-                    const messages = messagesContainer.querySelectorAll('.message');
-                    let chatText = `AI-TAP - Экспорт чата\nДата: ${new Date().toLocaleString()}\n\n`;
+                    <div class="profile-stats">
+                        <div class="stat">
+                            <div class="stat-number">12</div>
+                            <div class="stat-label">Постов</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">156</div>
+                            <div class="stat-label">Подписчиков</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">89</div>
+                            <div class="stat-label">Подписок</div>
+                        </div>
+                    </div>
                     
-                    messages.forEach(message => {
-                        const role = message.classList.contains('user') ? 'Пользователь' : 'AI-TAP';
-                        const content = message.querySelector('.message-content').textContent;
-                        chatText += `${role}: ${content}\n\n`;
-                    });
-                    
-                    // Создаем и скачиваем файл
-                    const blob = new Blob([chatText], { type: 'text/plain;charset=utf-8' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `ai-tap-chat-${new Date().toISOString().split('T')[0]}.txt`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                    
-                    this.showNotification('Чат экспортирован', 'success');
-                } catch (error) {
-                    console.error('Ошибка экспорта чата:', error);
-                    this.showNotification('Ошибка экспорта чата', 'error');
-                }
+                    <div class="profile-actions">
+                        <button class="btn btn-primary" onclick="editProfile()">Редактировать</button>
+                        <button class="btn btn-secondary" onclick="settings()">Настройки</button>
+                    </div>
+                </div>
+
+                <div class="post">
+                    <div class="post-header">
+                        <div class="post-avatar">👤</div>
+                        <div class="post-info">
+                            <h4>Ваши посты</h4>
+                            <p>Последняя активность</p>
+                        </div>
+                    </div>
+                    <div class="post-content">
+                        Здесь будут отображаться ваши посты и активности в сети Minko AI.
+                    </div>
+                    <div class="post-actions">
+                        <div class="post-action">❤️ 5</div>
+                        <div class="post-action">💬 2</div>
+                        <div class="post-action">📤 0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Инициализация Telegram WebApp
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.ready();
+
+        // Получение данных пользователя из Telegram
+        const user = tg.initDataUnsafe?.user;
+        if (user) {
+            document.getElementById('userName').textContent = user.first_name || 'Пользователь';
+            document.getElementById('userUsername').textContent = '@' + (user.username || 'user123');
+            document.getElementById('userAvatar').textContent = user.first_name?.[0] || 'U';
+        }
+
+        // Навигация между табами
+        function showTab(tabName) {
+            // Скрыть все табы
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Показать выбранный таб
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+
+            // Загрузить данные для таба
+            if (tabName === 'search') {
+                loadNews();
+            } else if (tabName === 'home') {
+                loadWeather();
             }
         }
 
-        // Инициализация приложения при загрузке страницы
-        document.addEventListener('DOMContentLoaded', () => {
-            window.aiTapApp = new AITAPApp();
-        });
+        // AI Чат
+        let chatMessages = [];
+        
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
 
-        // Обработка ошибок
-        window.addEventListener('error', (event) => {
-            console.error('Ошибка приложения:', event.error);
-            if (window.aiTapApp) {
-                window.aiTapApp.showNotification('Произошла ошибка. Попробуйте перезагрузить страницу.', 'error');
+            // Добавить сообщение пользователя
+            addMessage(message, 'user');
+            input.value = '';
+
+            // Отправить запрос к AI
+            sendToAI(message);
+        }
+
+        function addMessage(text, sender) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const time = new Date().toLocaleTimeString('ru-RU', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            messageDiv.innerHTML = `
+                <div>${text}</div>
+                <div class="message-time">${time}</div>
+            `;
+
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        async function sendToAI(message) {
+            // Добавить индикатор загрузки
+            const messagesContainer = document.getElementById('chatMessages');
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'message ai';
+            loadingDiv.innerHTML = `
+                <div>🤖 Думаю...</div>
+                <div class="message-time">Сейчас</div>
+            `;
+            messagesContainer.appendChild(loadingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            try {
+                // Имитация AI ответа (в реальном приложении здесь был бы API запрос)
+                const responses = [
+                    "Интересный вопрос! Позвольте мне подумать...",
+                    "Это отличная тема для обсуждения!",
+                    "Я понимаю ваш интерес к этой области.",
+                    "Давайте разберем это подробнее.",
+                    "Спасибо за вопрос! Вот что я думаю...",
+                    "Это важная тема, которая требует внимания.",
+                    "Отличная идея! Вот мой ответ...",
+                    "Позвольте мне помочь с этим вопросом."
+                ];
+
+                // Удалить индикатор загрузки
+                messagesContainer.removeChild(loadingDiv);
+
+                // Добавить ответ AI
+                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                addMessage(randomResponse + " 🤖", 'ai');
+
+            } catch (error) {
+                messagesContainer.removeChild(loadingDiv);
+                addMessage("Извините, произошла ошибка. Попробуйте еще раз.", 'ai');
+            }
+        }
+
+        // Поиск
+        function loadNews() {
+            const resultsContainer = document.getElementById('searchResults');
+            
+            // Имитация загрузки новостей
+            setTimeout(() => {
+                const newsItems = [
+                    {
+                        title: "🌤️ Погода в Москве",
+                        desc: "+15°C, облачно с прояснениями. Влажность 65%, ветер 3 м/с",
+                        source: "OpenWeatherMap",
+                        time: "Сейчас"
+                    },
+                    {
+                        title: "📰 ИИ технологии развиваются",
+                        desc: "Новые возможности искусственного интеллекта открывают перспективы для разработчиков",
+                        source: "NewsAPI",
+                        time: "1 час назад"
+                    },
+                    {
+                        title: "🚀 Telegram Mini Apps",
+                        desc: "Новая платформа для создания мини-приложений в Telegram",
+                        source: "TechNews",
+                        time: "3 часа назад"
+                    }
+                ];
+
+                resultsContainer.innerHTML = newsItems.map(item => `
+                    <div class="search-item">
+                        <div class="news-title">${item.title}</div>
+                        <div class="news-desc">${item.desc}</div>
+                        <div class="news-meta">
+                            <span>${item.source}</span>
+                            <span>${item.time}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }, 500);
+        }
+
+        // Погода
+        async function loadWeather() {
+            const weatherCard = document.getElementById('weatherCard');
+            
+            try {
+                // Имитация загрузки погоды
+                setTimeout(() => {
+                    const weather = {
+                        temp: Math.floor(Math.random() * 20) + 5,
+                        desc: "Облачно с прояснениями",
+                        humidity: Math.floor(Math.random() * 40) + 40,
+                        wind: Math.floor(Math.random() * 10) + 2
+                    };
+
+                    weatherCard.innerHTML = `
+                        <div class="weather-icon">🌤️</div>
+                        <div class="weather-temp">+${weather.temp}°C</div>
+                        <div class="weather-desc">${weather.desc}</div>
+                        <div class="weather-details">
+                            <div>💧 ${weather.humidity}%</div>
+                            <div>💨 ${weather.wind} м/с</div>
+                        </div>
+                    `;
+                }, 1000);
+
+            } catch (error) {
+                weatherCard.innerHTML = `
+                    <div class="weather-icon">❌</div>
+                    <div class="weather-temp">Ошибка</div>
+                    <div class="weather-desc">Не удалось загрузить погоду</div>
+                `;
+            }
+        }
+
+        // Профиль
+        function editProfile() {
+            tg.showAlert('Функция редактирования профиля будет доступна в следующей версии!');
+        }
+
+        function settings() {
+            tg.showAlert('Настройки будут доступны в следующей версии!');
+        }
+
+        // Обработка Enter в чате
+        document.getElementById('chatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
             }
         });
 
-        // Предотвращение случайного закрытия
-        window.addEventListener('beforeunload', (event) => {
-            if (window.aiTapApp && window.aiTapApp.cache) {
-                window.aiTapApp.cache.saveToLocalStorage();
-            }
+        // Поиск в реальном времени
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase();
+            const items = document.querySelectorAll('.search-item');
+            
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(query) ? 'block' : 'none';
+            });
         });
+
+        // Загрузка погоды при старте
+        loadWeather();
+
+        // Telegram WebApp события
+        tg.onEvent('backButtonClicked', () => {
+            tg.close();
+        });
+
+        tg.onEvent('mainButtonClicked', () => {
+            tg.showAlert('Спасибо за использование Minko AI!');
+        });
+
+        // Показать главную кнопку
+        tg.MainButton.text = 'Понравилось приложение?';
+        tg.MainButton.show();
     </script>
 </body>
 </html>
