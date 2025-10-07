@@ -1,11 +1,24 @@
 // database.js - Работа с базой данных через Supabase (бесплатно)
 class Database {
     constructor() {
-        // Supabase конфигурация (бесплатная)
-        this.supabaseUrl = 'https://ytkewgcwlybjkvejuttd.supabase.co';
-        this.supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl0a2V3Z2N3bHliamt2ZWp1dHRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzNTA3OTcsImV4cCI6MjA3NDkyNjc5N30.NouWNVtNG6hmnXhMWRy9Xzv3oSNa1K8TwPwefm1BAQY';
+        // Supabase конфигурация (используем переменные окружения)
+        this.supabaseUrl = this.getConfigValue('SUPABASE_URL', 'https://ytkewgcwlybjkvejuttd.supabase.co');
+        this.supabaseKey = this.getConfigValue('SUPABASE_ANON_KEY', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl0a2V3Z2N3bHliamt2ZWp1dHRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzNTA3OTcsImV4cCI6MjA3NDkyNjc5N30.NouWNVtNG6hmnXhMWRy9Xzv3oSNa1K8TwPwefm1BAQY');
         this.supabase = null;
         this.init();
+    }
+
+    // Безопасное получение конфигурации
+    getConfigValue(key, defaultValue) {
+        // Используем ConfigUtils если доступен
+        if (typeof window !== 'undefined' && window.ConfigUtils) {
+            return window.ConfigUtils.get(key, defaultValue);
+        }
+        // Fallback на прямое обращение к ENV
+        if (typeof window !== 'undefined' && window.ENV && window.ENV[key]) {
+            return window.ENV[key];
+        }
+        return defaultValue;
     }
 
     async init() {
@@ -16,18 +29,70 @@ class Database {
         }
     }
 
+    // Валидация входных данных
+    validateInput(data, rules) {
+        for (const [field, rule] of Object.entries(rules)) {
+            const value = data[field];
+            
+            if (rule.required && (!value || value.toString().trim() === '')) {
+                throw new Error(`Поле ${field} обязательно для заполнения`);
+            }
+            
+            if (value && rule.maxLength && value.toString().length > rule.maxLength) {
+                throw new Error(`Поле ${field} не должно превышать ${rule.maxLength} символов`);
+            }
+            
+            if (value && rule.type === 'number' && isNaN(Number(value))) {
+                throw new Error(`Поле ${field} должно быть числом`);
+            }
+            
+            if (value && rule.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+                throw new Error(`Поле ${field} должно быть валидным email`);
+            }
+        }
+        return true;
+    }
+
+    // Санитизация контента для предотвращения XSS
+    sanitizeContent(content) {
+        if (typeof content !== 'string') return '';
+        
+        return content
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#x27;')
+            .replace(/\//g, '&#x2F;')
+            .trim();
+    }
+
     // Сохранение сообщения в базу
     async saveMessage(telegramId, role, content) {
-        if (!this.supabase) return;
+        if (!this.supabase) {
+            throw new Error('База данных не инициализирована');
+        }
         
         try {
+            // Валидация входных данных
+            this.validateInput(
+                { telegramId, role, content },
+                {
+                    telegramId: { required: true, type: 'number' },
+                    role: { required: true, maxLength: 20 },
+                    content: { required: true, maxLength: 4000 }
+                }
+            );
+            
+            // Санитизация контента
+            const sanitizedContent = this.sanitizeContent(content);
+            
             const { data, error } = await this.supabase
                 .from('messages')
                 .insert([
                     {
                         telegram_id: telegramId,
                         role: role,
-                        content: content,
+                        content: sanitizedContent,
                         created_at: new Date().toISOString()
                     }
                 ]);
@@ -36,20 +101,33 @@ class Database {
             return data;
         } catch (error) {
             console.error('Ошибка сохранения сообщения:', error);
+            throw error; // Пробрасываем ошибку для обработки в UI
         }
     }
 
     // Получение истории чата
     async getChatHistory(telegramId, limit = 20) {
-        if (!this.supabase) return [];
+        if (!this.supabase) {
+            console.warn('База данных не инициализирована');
+            return [];
+        }
         
         try {
+            // Валидация входных данных
+            this.validateInput(
+                { telegramId, limit },
+                {
+                    telegramId: { required: true, type: 'number' },
+                    limit: { type: 'number' }
+                }
+            );
+            
             const { data, error } = await this.supabase
                 .from('messages')
                 .select('*')
                 .eq('telegram_id', telegramId)
                 .order('created_at', { ascending: true })
-                .limit(limit);
+                .limit(Math.min(limit, 100)); // Ограничиваем максимум 100 сообщений
             
             if (error) throw error;
             return data || [];
@@ -61,16 +139,29 @@ class Database {
 
     // Сохранение пользователя
     async saveUser(telegramId, username, firstName) {
-        if (!this.supabase) return;
+        if (!this.supabase) {
+            console.warn('База данных не инициализирована');
+            return null;
+        }
         
         try {
+            // Валидация входных данных
+            this.validateInput(
+                { telegramId, username, firstName },
+                {
+                    telegramId: { required: true, type: 'number' },
+                    username: { maxLength: 50 },
+                    firstName: { maxLength: 100 }
+                }
+            );
+            
             const { data, error } = await this.supabase
                 .from('users')
                 .upsert([
                     {
                         telegram_id: telegramId,
-                        username: username,
-                        first_name: firstName,
+                        username: this.sanitizeContent(username || ''),
+                        first_name: this.sanitizeContent(firstName || ''),
                         last_seen: new Date().toISOString()
                     }
                 ]);
@@ -79,6 +170,7 @@ class Database {
             return data;
         } catch (error) {
             console.error('Ошибка сохранения пользователя:', error);
+            throw error;
         }
     }
 

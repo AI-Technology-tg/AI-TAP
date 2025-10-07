@@ -3,8 +3,16 @@ class ResponseCache {
     constructor() {
         this.cache = new Map();
         this.popularQueries = new Map();
-        this.maxCacheSize = 100;
-        this.cacheExpiry = 24 * 60 * 60 * 1000; // 24 часа
+        this.maxCacheSize = this.getConfigValue('CACHE_SIZE', 100);
+        this.cacheExpiry = this.getConfigValue('CACHE_EXPIRY', 24 * 60 * 60 * 1000); // 24 часа
+    }
+
+    // Получение значения конфигурации
+    getConfigValue(key, defaultValue) {
+        if (typeof window !== 'undefined' && window.ConfigUtils) {
+            return window.ConfigUtils.get(key, defaultValue);
+        }
+        return defaultValue;
     }
 
     // Генерация ключа кэша
@@ -26,6 +34,8 @@ class ResponseCache {
 
     // Сохранение в кэш
     setCache(message, language, response) {
+        if (!message || !response) return;
+        
         const key = this.generateCacheKey(message, language);
         const cacheData = {
             response: response,
@@ -46,6 +56,8 @@ class ResponseCache {
 
     // Получение из кэша
     getCache(message, language) {
+        if (!message) return null;
+        
         const key = this.generateCacheKey(message, language);
         const cached = this.cache.get(key);
         
@@ -116,24 +128,55 @@ class ResponseCache {
     // Сохранение кэша в localStorage
     saveToLocalStorage() {
         try {
+            if (typeof localStorage === 'undefined') {
+                console.warn('localStorage недоступен');
+                return;
+            }
+            
             const cacheData = {
                 cache: Array.from(this.cache.entries()),
                 popularQueries: Array.from(this.popularQueries.entries()),
                 timestamp: Date.now()
             };
-            localStorage.setItem('ai-tap-cache', JSON.stringify(cacheData));
+            
+            const serialized = JSON.stringify(cacheData);
+            
+            // Проверяем размер данных (localStorage имеет ограничения)
+            if (serialized.length > 5 * 1024 * 1024) { // 5MB
+                console.warn('Кэш слишком большой, очищаем старые записи');
+                this.cleanupCache();
+                return this.saveToLocalStorage(); // Рекурсивный вызов после очистки
+            }
+            
+            localStorage.setItem('ai-tap-cache', serialized);
         } catch (error) {
             console.error('Ошибка сохранения кэша:', error);
+            // Если localStorage переполнен, очищаем кэш
+            if (error.name === 'QuotaExceededError') {
+                this.clearCache();
+            }
         }
     }
 
     // Загрузка кэша из localStorage
     loadFromLocalStorage() {
         try {
+            if (typeof localStorage === 'undefined') {
+                console.warn('localStorage недоступен');
+                return;
+            }
+            
             const cacheData = localStorage.getItem('ai-tap-cache');
             if (!cacheData) return;
             
             const parsed = JSON.parse(cacheData);
+            
+            // Проверяем структуру данных
+            if (!parsed || typeof parsed.timestamp !== 'number') {
+                console.warn('Неверный формат кэша, очищаем');
+                localStorage.removeItem('ai-tap-cache');
+                return;
+            }
             
             // Проверяем не устарел ли кэш (больше 7 дней)
             if (Date.now() - parsed.timestamp > 7 * 24 * 60 * 60 * 1000) {
@@ -141,10 +184,22 @@ class ResponseCache {
                 return;
             }
             
-            this.cache = new Map(parsed.cache);
-            this.popularQueries = new Map(parsed.popularQueries);
+            // Восстанавливаем кэш с проверкой данных
+            if (Array.isArray(parsed.cache)) {
+                this.cache = new Map(parsed.cache);
+            }
+            
+            if (Array.isArray(parsed.popularQueries)) {
+                this.popularQueries = new Map(parsed.popularQueries);
+            }
         } catch (error) {
             console.error('Ошибка загрузки кэша:', error);
+            // Очищаем поврежденный кэш
+            try {
+                localStorage.removeItem('ai-tap-cache');
+            } catch (e) {
+                console.error('Не удалось очистить поврежденный кэш:', e);
+            }
         }
     }
 }
