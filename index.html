@@ -2,1277 +2,614 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Minko AI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minko AI - Социальная сеть ИИ</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-            background: #000;
-            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: white;
             overflow-x: hidden;
-            height: 100vh;
-            position: relative;
+            min-height: 100vh;
         }
 
-        /* Анимированный фон */
-        .bg-animation {
+        /* Экран загрузки */
+        .loading-screen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -1;
-            background: radial-gradient(circle at 20% 80%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 40% 40%, rgba(255, 51, 102, 0.05) 0%, transparent 50%);
-            animation: bgPulse 8s ease-in-out infinite;
-        }
-
-        @keyframes bgPulse {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.6; }
-        }
-
-        /* Главный контейнер */
-        .app {
-            height: 100vh;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
             display: flex;
             flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .logo-container {
             position: relative;
-        }
-
-        /* Заголовок */
-        .header {
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
-            padding: 15px 20px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            margin-bottom: 2rem;
         }
 
         .logo-text {
-            font-size: 24px;
-            font-weight: 900;
-            background: linear-gradient(45deg, #00D4FF, #8B5CF6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
-        }
-
-        .logo-ai {
-            width: 24px;
-            height: 24px;
-            background: linear-gradient(45deg, #00D4FF, #8B5CF6);
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
+            font-size: 3rem;
             font-weight: bold;
-            color: #000;
-            animation: logoGlow 2s ease-in-out infinite;
+            color: #00d4ff;
+            text-shadow: 0 0 20px #00d4ff, 0 0 40px #00d4ff;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
         }
 
-        @keyframes logoGlow {
-            0%, 100% { box-shadow: 0 0 10px rgba(0, 212, 255, 0.5); }
-            50% { box-shadow: 0 0 20px rgba(0, 212, 255, 0.8); }
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 12px;
-        }
-
-        .header-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 18px;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
+        .ai-badge {
+            position: absolute;
+            right: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 60px;
+            height: 60px;
+            border: 2px solid #00d4ff;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #00D4FF;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .header-btn:hover {
-            background: rgba(0, 212, 255, 0.2);
-            transform: scale(1.1);
-        }
-
-        /* Основной контент */
-        .main-content {
-            flex: 1;
-            overflow: hidden;
-            position: relative;
-        }
-
-        /* Навигация */
-        .nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0, 0, 0, 0.95);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(0, 212, 255, 0.2);
-            padding: 12px 0 calc(12px + env(safe-area-inset-bottom));
-            z-index: 100;
-        }
-
-        .nav-items {
-            display: flex;
-            justify-content: space-around;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            padding: 8px 16px;
-            border-radius: 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .nav-item.active {
             background: rgba(0, 212, 255, 0.1);
+            box-shadow: 0 0 20px #00d4ff;
         }
 
-        .nav-item.active .nav-icon {
-            color: #00D4FF;
-            transform: scale(1.1);
+        .ai-badge span {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #00d4ff;
         }
 
-        .nav-icon {
-            font-size: 20px;
-            transition: all 0.3s ease;
+        .loading-dots {
+            display: flex;
+            gap: 0.5rem;
         }
 
-        .nav-label {
-            font-size: 10px;
-            font-weight: 500;
-            opacity: 0.7;
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ff3366;
+            animation: pulse 1.5s infinite;
         }
 
-        .nav-item.active .nav-label {
-            opacity: 1;
-            color: #00D4FF;
+        .dot:nth-child(2) {
+            animation-delay: 0.3s;
         }
 
-        /* Контент страниц */
-        .page {
+        .dot:nth-child(3) {
+            animation-delay: 0.6s;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 0.7;
+            }
+        }
+
+        .loading-text {
+            margin-top: 1rem;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        /* Главное приложение */
+        .app-container {
             display: none;
-            height: 100%;
-            overflow-y: auto;
-            padding-bottom: 80px;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
         }
 
-        .page.active {
+        .app-container.visible {
             display: block;
         }
 
-        /* Лента */
-        .feed {
-            padding: 20px;
-        }
-
-        .story-section {
-            margin-bottom: 30px;
-        }
-
-        .story-container {
-            display: flex;
-            gap: 12px;
-            overflow-x: auto;
-            padding: 0 20px;
-            margin: 0 -20px;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-
-        .story-container::-webkit-scrollbar {
-            display: none;
-        }
-
-        .story-item {
-            flex-shrink: 0;
-            width: 60px;
-            text-align: center;
-        }
-
-        .story-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 30px;
-            background: linear-gradient(45deg, #00D4FF, #8B5CF6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 8px;
-            position: relative;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .story-avatar:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
-        }
-
-        .story-avatar::before {
-            content: '';
-            position: absolute;
-            inset: -2px;
-            border-radius: 32px;
-            background: linear-gradient(45deg, #00D4FF, #8B5CF6);
-            z-index: -1;
-        }
-
-        .story-name {
-            font-size: 11px;
-            opacity: 0.8;
-        }
-
-        /* Посты */
-        .post {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .header {
+            background: rgba(0, 0, 0, 0.3);
             backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
-        .post:hover {
-            border-color: rgba(0, 212, 255, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .post-header {
+        .header-content {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 15px;
-        }
-
-        .post-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 20px;
-            background: linear-gradient(45deg, #00D4FF, #8B5CF6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: #000;
-        }
-
-        .post-info h4 {
-            color: #00D4FF;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .post-info p {
-            font-size: 12px;
-            opacity: 0.6;
-        }
-
-        .post-content {
-            font-size: 16px;
-            line-height: 1.5;
-            margin-bottom: 15px;
-        }
-
-        .post-actions {
-            display: flex;
             justify-content: space-between;
-            padding-top: 15px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 600px;
+            margin: 0 auto;
         }
 
-        .post-action {
+        .app-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00d4ff;
             display: flex;
             align-items: center;
-            gap: 6px;
-            padding: 8px 12px;
+            gap: 0.5rem;
+        }
+
+        .app-logo .ai-mini {
+            width: 25px;
+            height: 25px;
+            border: 1px solid #00d4ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff3366, #00d4ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .main-content {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .welcome-section {
+            text-align: center;
+            margin: 2rem 0;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+        }
+
+        .welcome-title {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #00d4ff, #ff3366);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .welcome-text {
+            color: #ccc;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 12px;
-            cursor: pointer;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid rgba(0, 212, 255, 0.1);
             transition: all 0.3s ease;
-            font-size: 14px;
+            cursor: pointer;
         }
 
-        .post-action:hover {
-            background: rgba(255, 255, 255, 0.1);
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: #00d4ff;
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.2);
         }
 
-        .post-action.liked {
-            color: #FF3366;
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
         }
 
-        /* AI Чат */
-        .chat {
-            height: 100%;
+        .feature-title {
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #00d4ff;
+        }
+
+        .feature-desc {
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+
+        .action-buttons {
             display: flex;
             flex-direction: column;
-            padding: 20px;
-        }
-
-        .chat-header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .chat-ai-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 30px;
-            background: linear-gradient(45deg, #00D4FF, #8B5CF6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 12px;
-            font-size: 24px;
-            animation: chatPulse 3s ease-in-out infinite;
-        }
-
-        @keyframes chatPulse {
-            0%, 100% { box-shadow: 0 0 20px rgba(0, 212, 255, 0.3); }
-            50% { box-shadow: 0 0 30px rgba(0, 212, 255, 0.6); }
-        }
-
-        .chat-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #00D4FF;
-            margin-bottom: 4px;
-        }
-
-        .chat-subtitle {
-            font-size: 12px;
-            opacity: 0.7;
-        }
-
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 0 10px;
-            margin-bottom: 20px;
-        }
-
-        .message {
-            margin-bottom: 16px;
-            display: flex;
-            align-items: flex-end;
-            gap: 8px;
-        }
-
-        .message.user {
-            flex-direction: row-reverse;
-        }
-
-        .message-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 16px;
-            background: linear-gradient(45deg, #00D4FF, #8B5CF6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
-            color: #000;
-            flex-shrink: 0;
-        }
-
-        .message.user .message-avatar {
-            background: linear-gradient(45deg, #8B5CF6, #FF3366);
-        }
-
-        .message-bubble {
-            max-width: 70%;
-            padding: 12px 16px;
-            border-radius: 20px;
-            position: relative;
-            word-wrap: break-word;
-        }
-
-        .message.ai .message-bubble {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-bottom-left-radius: 8px;
-        }
-
-        .message.user .message-bubble {
-            background: linear-gradient(45deg, #00D4FF, #8B5CF6);
-            color: #000;
-            border-bottom-right-radius: 8px;
-        }
-
-        .message-time {
-            font-size: 10px;
-            opacity: 0.5;
-            margin-top: 4px;
-            text-align: right;
-        }
-
-        .message.user .message-time {
-            text-align: left;
-        }
-
-        .typing-indicator {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 16px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            border-bottom-left-radius: 8px;
-            max-width: 70%;
-        }
-
-        .typing-dots {
-            display: flex;
-            gap: 4px;
-        }
-
-        .typing-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 3px;
-            background: #00D4FF;
-            animation: typingDot 1.4s infinite ease-in-out;
-        }
-
-        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
-        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
-
-        @keyframes typingDot {
-            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
-            40% { transform: scale(1); opacity: 1; }
-        }
-
-        .chat-input-container {
-            display: flex;
-            gap: 12px;
-            align-items: flex-end;
-        }
-
-        .chat-input {
-            flex: 1;
-            padding: 12px 16px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            color: #fff;
-            font-size: 16px;
-            resize: none;
-            max-height: 100px;
-            backdrop-filter: blur(10px);
-        }
-
-        .chat-input:focus {
-            outline: none;
-            border-color: #00D4FF;
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
-        }
-
-        .chat-input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .send-btn {
-            width: 44px;
-            height: 44px;
-            border-radius: 22px;
-            background: linear-gradient(45deg, #00D4FF, #8B5CF6);
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: #000;
-            font-size: 18px;
-        }
-
-        .send-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
-        }
-
-        .send-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* Поиск */
-        .search {
-            padding: 20px;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 16px 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            color: #fff;
-            font-size: 16px;
-            margin-bottom: 20px;
-            backdrop-filter: blur(10px);
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: #00D4FF;
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
-        }
-
-        .search-results {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .search-item {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            padding: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .search-item:hover {
-            border-color: rgba(0, 212, 255, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .search-item-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 20px;
-            background: linear-gradient(45deg, #00D4FF, #8B5CF6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 12px;
-            font-size: 18px;
-        }
-
-        .search-item-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #00D4FF;
-            margin-bottom: 4px;
-        }
-
-        .search-item-desc {
-            font-size: 14px;
-            opacity: 0.8;
-            line-height: 1.4;
-        }
-
-        /* Профиль */
-        .profile {
-            padding: 20px;
-        }
-
-        .profile-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            padding: 24px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            margin-bottom: 20px;
-        }
-
-        .profile-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 40px;
-            background: linear-gradient(45deg, #00D4FF, #8B5CF6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 16px;
-            font-size: 32px;
-            font-weight: bold;
-            color: #000;
-            position: relative;
-            animation: profileGlow 4s ease-in-out infinite;
-        }
-
-        @keyframes profileGlow {
-            0%, 100% { box-shadow: 0 0 20px rgba(0, 212, 255, 0.3); }
-            50% { box-shadow: 0 0 30px rgba(0, 212, 255, 0.6); }
-        }
-
-        .profile-name {
-            font-size: 20px;
-            font-weight: 700;
-            color: #00D4FF;
-            margin-bottom: 4px;
-        }
-
-        .profile-username {
-            font-size: 14px;
-            opacity: 0.7;
-            margin-bottom: 20px;
-        }
-
-        .profile-stats {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 24px;
-        }
-
-        .stat {
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 20px;
-            font-weight: 700;
-            color: #00D4FF;
-            margin-bottom: 4px;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            opacity: 0.7;
-        }
-
-        .profile-actions {
-            display: flex;
-            gap: 12px;
+            gap: 1rem;
+            margin-top: 2rem;
         }
 
         .btn {
-            flex: 1;
-            padding: 12px 20px;
-            border-radius: 16px;
+            padding: 1rem 2rem;
             border: none;
-            font-weight: 600;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .btn-primary {
-            background: linear-gradient(45deg, #00D4FF, #8B5CF6);
-            color: #000;
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
+            color: white;
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.4);
         }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: linear-gradient(45deg, #ff3366, #cc1144);
+            color: white;
+            box-shadow: 0 5px 15px rgba(255, 51, 102, 0.3);
         }
 
-        .btn:hover {
+        .btn-secondary:hover {
             transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 51, 102, 0.4);
         }
 
-        /* Адаптивность */
-        @media (max-width: 480px) {
-            .feed, .chat, .search, .profile {
-                padding: 16px;
+        .floating-orbs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .orb.blue {
+            background: radial-gradient(circle, #00d4ff, transparent);
+            box-shadow: 0 0 50px #00d4ff;
+        }
+
+        .orb.red {
+            background: radial-gradient(circle, #ff3366, transparent);
+            box-shadow: 0 0 50px #ff3366;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+            }
+        }
+
+        .orb:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .orb:nth-child(2) {
+            width: 120px;
+            height: 120px;
+            top: 60%;
+            right: 15%;
+            animation-delay: 2s;
+        }
+
+        .orb:nth-child(3) {
+            width: 60px;
+            height: 60px;
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+
+        .orb:nth-child(4) {
+            width: 100px;
+            height: 100px;
+            top: 30%;
+            right: 30%;
+            animation-delay: 1s;
+        }
+
+        /* Адаптивность для мобильных устройств */
+        @media (max-width: 768px) {
+            .logo-text {
+                font-size: 2rem;
             }
             
-            .post {
-                padding: 16px;
+            .ai-badge {
+                right: -20px;
+                width: 45px;
+                height: 45px;
             }
             
-            .profile-card {
-                padding: 20px;
+            .ai-badge span {
+                font-size: 1rem;
             }
-        }
-
-        /* Скрытие скроллбара */
-        .chat-messages::-webkit-scrollbar,
-        .page::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .chat-messages::-webkit-scrollbar-track,
-        .page::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .chat-messages::-webkit-scrollbar-thumb,
-        .page::-webkit-scrollbar-thumb {
-            background: rgba(0, 212, 255, 0.3);
-            border-radius: 2px;
-        }
-
-        /* Анимации появления */
-        .page.active {
-            animation: pageSlideIn 0.3s ease-out;
-        }
-
-        @keyframes pageSlideIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .post {
-            animation: postSlideIn 0.5s ease-out;
-        }
-
-        @keyframes postSlideIn {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+            
+            .main-content {
+                padding: 0.5rem;
+            }
+            
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .feature-card {
+                padding: 1rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="bg-animation"></div>
-    
-    <div class="app">
-        <!-- Заголовок -->
-        <div class="header">
-            <div class="logo">
-                <div class="logo-text">MINK</div>
-                <div class="logo-ai">AI</div>
-            </div>
-            <div class="header-actions">
-                <button class="header-btn" onclick="toggleNotifications()">🔔</button>
-                <button class="header-btn" onclick="openSettings()">⚙️</button>
+    <!-- Экран загрузки -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="logo-container">
+            <div class="logo-text">MINK</div>
+            <div class="ai-badge">
+                <span>AI</span>
             </div>
         </div>
+        <div class="loading-dots">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+        <div class="loading-text">Загрузка Minko AI...</div>
+    </div>
+
+    <!-- Плавающие орбы для фона -->
+    <div class="floating-orbs">
+        <div class="orb blue"></div>
+        <div class="orb red"></div>
+        <div class="orb blue"></div>
+        <div class="orb red"></div>
+    </div>
+
+    <!-- Главное приложение -->
+    <div class="app-container" id="appContainer">
+        <!-- Шапка -->
+        <header class="header">
+            <div class="header-content">
+                <div class="app-logo">
+                    MINK
+                    <div class="ai-mini">AI</div>
+                </div>
+                <div class="user-avatar" id="userAvatar">U</div>
+            </div>
+        </header>
 
         <!-- Основной контент -->
-        <div class="main-content">
-            <!-- Лента -->
-            <div id="feed" class="page active">
-                <div class="feed">
-                    <!-- Истории -->
-                    <div class="story-section">
-                        <div class="story-container">
-                            <div class="story-item">
-                                <div class="story-avatar">+</div>
-                                <div class="story-name">Ваша</div>
-                            </div>
-                            <div class="story-item">
-                                <div class="story-avatar">🤖</div>
-                                <div class="story-name">AI</div>
-                            </div>
-                            <div class="story-item">
-                                <div class="story-avatar">👨‍💻</div>
-                                <div class="story-name">Dev</div>
-                            </div>
-                            <div class="story-item">
-                                <div class="story-avatar">🎨</div>
-                                <div class="story-name">Art</div>
-                            </div>
-                            <div class="story-item">
-                                <div class="story-avatar">🚀</div>
-                                <div class="story-name">Tech</div>
-                            </div>
-                        </div>
-                    </div>
+        <main class="main-content">
+            <!-- Приветственная секция -->
+            <section class="welcome-section">
+                <h1 class="welcome-title">Добро пожаловать в Minko AI</h1>
+                <p class="welcome-text">
+                    Первая в мире социальная сеть, управляемая искусственным интеллектом. 
+                    Здесь вы можете общаться, создавать контент и взаимодействовать с ИИ-помощниками.
+                </p>
+            </section>
 
-                    <!-- Посты -->
-                    <div class="post">
-                        <div class="post-header">
-                            <div class="post-avatar">🤖</div>
-                            <div class="post-info">
-                                <h4>AI Помощник</h4>
-                                <p>Только что</p>
-                            </div>
-                        </div>
-                        <div class="post-content">
-                            Добро пожаловать в будущее социальных сетей! 🚀 
-                            Здесь каждый может общаться с ИИ, создавать уникальный контент 
-                            и быть частью революции в технологиях!
-                        </div>
-                        <div class="post-actions">
-                            <div class="post-action" onclick="toggleLike(this)">
-                                <span>❤️</span>
-                                <span>127</span>
-                            </div>
-                            <div class="post-action">
-                                <span>💬</span>
-                                <span>23</span>
-                            </div>
-                            <div class="post-action">
-                                <span>📤</span>
-                                <span>8</span>
-                            </div>
-                            <div class="post-action">
-                                <span>⭐</span>
-                                <span>15</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="post">
-                        <div class="post-header">
-                            <div class="post-avatar">👨‍💻</div>
-                            <div class="post-info">
-                                <h4>Разработчик</h4>
-                                <p>2 часа назад</p>
-                            </div>
-                        </div>
-                        <div class="post-content">
-                            Создал революционную социальную сеть с ИИ интеграцией! 
-                            Теперь можно общаться с умным помощником прямо в Telegram 🎉
-                            
-                            #AI #Telegram #Innovation #Future
-                        </div>
-                        <div class="post-actions">
-                            <div class="post-action" onclick="toggleLike(this)">
-                                <span>❤️</span>
-                                <span>89</span>
-                            </div>
-                            <div class="post-action">
-                                <span>💬</span>
-                                <span>12</span>
-                            </div>
-                            <div class="post-action">
-                                <span>📤</span>
-                                <span>34</span>
-                            </div>
-                            <div class="post-action">
-                                <span>⭐</span>
-                                <span>7</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="post">
-                        <div class="post-header">
-                            <div class="post-avatar">🎨</div>
-                            <div class="post-info">
-                                <h4>AI Художник</h4>
-                                <p>5 часов назад</p>
-                            </div>
-                        </div>
-                        <div class="post-content">
-                            Генерирую уникальные изображения с помощью ИИ! 
-                            Каждое изображение - это произведение искусства будущего ✨
-                        </div>
-                        <div class="post-actions">
-                            <div class="post-action" onclick="toggleLike(this)">
-                                <span>❤️</span>
-                                <span>156</span>
-                            </div>
-                            <div class="post-action">
-                                <span>💬</span>
-                                <span>28</span>
-                            </div>
-                            <div class="post-action">
-                                <span>📤</span>
-                                <span>45</span>
-                            </div>
-                            <div class="post-action">
-                                <span>⭐</span>
-                                <span>22</span>
-                            </div>
-                        </div>
-                    </div>
+            <!-- Функции -->
+            <div class="features-grid">
+                <div class="feature-card" onclick="openFeature('chat')">
+                    <div class="feature-icon">💬</div>
+                    <div class="feature-title">ИИ Чат</div>
+                    <div class="feature-desc">Общение с умными помощниками</div>
+                </div>
+                
+                <div class="feature-card" onclick="openFeature('posts')">
+                    <div class="feature-icon">📝</div>
+                    <div class="feature-title">Посты</div>
+                    <div class="feature-desc">Создание контента с ИИ</div>
+                </div>
+                
+                <div class="feature-card" onclick="openFeature('media')">
+                    <div class="feature-icon">🎨</div>
+                    <div class="feature-title">Медиа</div>
+                    <div class="feature-desc">Генерация изображений и видео</div>
+                </div>
+                
+                <div class="feature-card" onclick="openFeature('network')">
+                    <div class="feature-icon">👥</div>
+                    <div class="feature-title">Сеть</div>
+                    <div class="feature-desc">Поиск единомышленников</div>
+                </div>
+                
+                <div class="feature-card" onclick="openFeature('ai-assistant')">
+                    <div class="feature-icon">🤖</div>
+                    <div class="feature-title">Ассистент</div>
+                    <div class="feature-desc">Персональный ИИ-помощник</div>
+                </div>
+                
+                <div class="feature-card" onclick="openFeature('settings')">
+                    <div class="feature-icon">⚙️</div>
+                    <div class="feature-title">Настройки</div>
+                    <div class="feature-desc">Персонализация опыта</div>
                 </div>
             </div>
 
-            <!-- AI Чат -->
-            <div id="chat" class="page">
-                <div class="chat">
-                    <div class="chat-header">
-                        <div class="chat-ai-avatar">🤖</div>
-                        <div class="chat-title">AI Помощник</div>
-                        <div class="chat-subtitle">Всегда готов помочь</div>
-                    </div>
-
-                    <div class="chat-messages" id="chatMessages">
-                        <div class="message ai">
-                            <div class="message-avatar">🤖</div>
-                            <div class="message-bubble">
-                                Привет! Я ваш AI помощник в Minko. Чем могу помочь? 
-                                Могу ответить на вопросы, помочь с творчеством, обсудить технологии или просто поболтать! ✨
-                                <div class="message-time">Сейчас</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="chat-input-container">
-                        <textarea class="chat-input" id="chatInput" placeholder="Напишите сообщение..." rows="1"></textarea>
-                        <button class="send-btn" id="sendBtn" onclick="sendMessage()">
-                            ➤
-                        </button>
-                    </div>
-                </div>
+            <!-- Кнопки действий -->
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="startChat()">
+                    Начать общение с ИИ
+                </button>
+                <button class="btn btn-secondary" onclick="exploreNetwork()">
+                    Исследовать сеть
+                </button>
             </div>
-
-            <!-- Поиск -->
-            <div id="search" class="page">
-                <div class="search">
-                    <input type="text" class="search-input" id="searchInput" placeholder="Поиск пользователей, постов, новостей...">
-                    
-                    <div class="search-results" id="searchResults">
-                        <div class="search-item" onclick="openSearchResult('weather')">
-                            <div class="search-item-icon">🌤️</div>
-                            <div class="search-item-title">Погода в Москве</div>
-                            <div class="search-item-desc">+18°C, ясно. Идеальная погода для прогулок!</div>
-                        </div>
-
-                        <div class="search-item" onclick="openSearchResult('news')">
-                            <div class="search-item-icon">📰</div>
-                            <div class="search-item-title">ИИ технологии</div>
-                            <div class="search-item-desc">Новые возможности искусственного интеллекта открывают перспективы для разработчиков</div>
-                        </div>
-
-                        <div class="search-item" onclick="openSearchResult('user')">
-                            <div class="search-item-icon">👤</div>
-                            <div class="search-item-title">AI Художник</div>
-                            <div class="search-item-desc">Создает уникальные изображения с помощью ИИ. 2.5k подписчиков</div>
-                        </div>
-
-                        <div class="search-item" onclick="openSearchResult('trending')">
-                            <div class="search-item-icon">🔥</div>
-                            <div class="search-item-title">#AI #Innovation</div>
-                            <div class="search-item-desc">Трендовые теги в Minko AI</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Профиль -->
-            <div id="profile" class="page">
-                <div class="profile">
-                    <div class="profile-card">
-                        <div class="profile-avatar" id="userAvatar">U</div>
-                        <div class="profile-name" id="userName">Пользователь</div>
-                        <div class="profile-username" id="userUsername">@user123</div>
-                        
-                        <div class="profile-stats">
-                            <div class="stat">
-                                <div class="stat-number">24</div>
-                                <div class="stat-label">Постов</div>
-                            </div>
-                            <div class="stat">
-                                <div class="stat-number">1.2k</div>
-                                <div class="stat-label">Подписчиков</div>
-                            </div>
-                            <div class="stat">
-                                <div class="stat-number">567</div>
-                                <div class="stat-label">Подписок</div>
-                            </div>
-                        </div>
-                        
-                        <div class="profile-actions">
-                            <button class="btn btn-primary" onclick="editProfile()">Редактировать</button>
-                            <button class="btn btn-secondary" onclick="openSettings()">Настройки</button>
-                        </div>
-                    </div>
-
-                    <div class="post">
-                        <div class="post-header">
-                            <div class="post-avatar">👤</div>
-                            <div class="post-info">
-                                <h4>Ваша активность</h4>
-                                <p>Последние посты</p>
-                            </div>
-                        </div>
-                        <div class="post-content">
-                            Здесь будут отображаться ваши посты, лайки и активность в сети Minko AI. 
-                            Создавайте контент, общайтесь с ИИ и будьте частью будущего! 🚀
-                        </div>
-                        <div class="post-actions">
-                            <div class="post-action">
-                                <span>❤️</span>
-                                <span>45</span>
-                            </div>
-                            <div class="post-action">
-                                <span>💬</span>
-                                <span>12</span>
-                            </div>
-                            <div class="post-action">
-                                <span>📤</span>
-                                <span>8</span>
-                            </div>
-                            <div class="post-action">
-                                <span>⭐</span>
-                                <span>23</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Навигация -->
-        <div class="nav">
-            <div class="nav-items">
-                <div class="nav-item active" onclick="showPage('feed')">
-                    <div class="nav-icon">🏠</div>
-                    <div class="nav-label">Главная</div>
-                </div>
-                <div class="nav-item" onclick="showPage('chat')">
-                    <div class="nav-icon">💬</div>
-                    <div class="nav-label">AI Чат</div>
-                </div>
-                <div class="nav-item" onclick="showPage('search')">
-                    <div class="nav-icon">🔍</div>
-                    <div class="nav-label">Поиск</div>
-                </div>
-                <div class="nav-item" onclick="showPage('profile')">
-                    <div class="nav-icon">👤</div>
-                    <div class="nav-label">Профиль</div>
-                </div>
-            </div>
-        </div>
+        </main>
     </div>
 
     <script>
-        // Инициализация Telegram WebApp
+        // Инициализация Telegram Web App
         let tg = window.Telegram.WebApp;
-        tg.expand();
+        
+        // Настройка темы Telegram
         tg.ready();
+        tg.expand();
 
-        // Получение данных пользователя
+        // Получение информации о пользователе
         const user = tg.initDataUnsafe?.user;
         if (user) {
-            document.getElementById('userName').textContent = user.first_name || 'Пользователь';
-            document.getElementById('userUsername').textContent = '@' + (user.username || 'user123');
-            document.getElementById('userAvatar').textContent = user.first_name?.[0] || 'U';
+            document.getElementById('userAvatar').textContent = user.first_name?.charAt(0) || 'U';
         }
 
-        // Навигация
-        function showPage(pageId) {
-            // Скрыть все страницы
-            document.querySelectorAll('.page').forEach(page => {
-                page.classList.remove('active');
-            });
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
-
-            // Показать выбранную страницу
-            document.getElementById(pageId).classList.add('active');
-            event.currentTarget.classList.add('active');
-
-            // Обновить заголовок
-            updateHeader(pageId);
-        }
-
-        function updateHeader(pageId) {
-            const titles = {
-                'feed': 'MINK AI',
-                'chat': 'AI Помощник',
-                'search': 'Поиск',
-                'profile': 'Профиль'
-            };
-            document.querySelector('.logo-text').textContent = titles[pageId] || 'MINK AI';
-        }
-
-        // Лайки
-        function toggleLike(element) {
-            const span = element.querySelector('span:last-child');
-            const count = parseInt(span.textContent);
-            const isLiked = element.classList.contains('liked');
+        // Симуляция загрузки
+        setTimeout(() => {
+            document.getElementById('loadingScreen').classList.add('hidden');
+            document.getElementById('appContainer').classList.add('visible');
             
-            if (isLiked) {
-                element.classList.remove('liked');
-                span.textContent = count - 1;
-            } else {
-                element.classList.add('liked');
-                span.textContent = count + 1;
+            // Отправка события готовности в Telegram
+            tg.MainButton.setText('Готов к работе');
+            tg.MainButton.show();
+        }, 3000);
+
+        // Функции для обработки действий
+        function openFeature(feature) {
+            tg.showAlert(`Открытие функции: ${feature}`);
+            
+            switch(feature) {
+                case 'chat':
+                    tg.showAlert('Открываем ИИ чат...');
+                    break;
+                case 'posts':
+                    tg.showAlert('Переходим к созданию постов...');
+                    break;
+                case 'media':
+                    tg.showAlert('Открываем медиа-генератор...');
+                    break;
+                case 'network':
+                    tg.showAlert('Исследуем социальную сеть...');
+                    break;
+                case 'ai-assistant':
+                    tg.showAlert('Запускаем персонального ассистента...');
+                    break;
+                case 'settings':
+                    tg.showAlert('Открываем настройки...');
+                    break;
             }
         }
 
-        // AI Чат
-        let isTyping = false;
-
-        function sendMessage() {
-            const input = document.getElementById('chatInput');
-            const message = input.value.trim();
-            
-            if (!message || isTyping) return;
-
-            // Добавить сообщение пользователя
-            addMessage(message, 'user');
-            input.value = '';
-            input.style.height = 'auto';
-
-            // Показать индикатор печати
-            showTypingIndicator();
-
-            // Отправить запрос к AI
-            setTimeout(() => {
-                hideTypingIndicator();
-                sendAIResponse(message);
-            }, 1000 + Math.random() * 2000);
+        function startChat() {
+            tg.showAlert('Запускаем чат с ИИ...');
+            // Здесь будет логика открытия чата
         }
 
-        function addMessage(text, sender) {
-            const messagesContainer = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${sender}`;
-            
-            const time = new Date().toLocaleTimeString('ru-RU', {
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-
-            const avatar = sender === 'user' ? '👤' : '🤖';
-            const bubbleClass = sender === 'user' ? 'user' : 'ai';
-
-            messageDiv.innerHTML = `
-                <div class="message-avatar">${avatar}</div>
-                <div class="message-bubble ${bubbleClass}">
-                    ${text}
-                    <div class="message-time">${time}</div>
-                </div>
-            `;
-
-            messagesContainer.appendChild(messageDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        function exploreNetwork() {
+            tg.showAlert('Исследуем социальную сеть...');
+            // Здесь будет логика исследования сети
         }
 
-        function showTypingIndicator() {
-            const messagesContainer = document.getElementById('chatMessages');
-            const typingDiv = document.createElement('div');
-            typingDiv.className = 'message ai';
-            typingDiv.id = 'typingIndicator';
-            
-            typingDiv.innerHTML = `
-                <div class="message-avatar">🤖</div>
-                <div class="typing-indicator">
-                    <div class="typing-dots">
-                        <div class="typing-dot"></div>
-                        <div class="typing-dot"></div>
-                        <div class="typing-dot"></div>
-                    </div>
-                </div>
-            `;
-
-            messagesContainer.appendChild(typingDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        function hideTypingIndicator() {
-            const typingIndicator = document.getElementById('typingIndicator');
-            if (typingIndicator) {
-                typingIndicator.remove();
-            }
-        }
-
-        function sendAIResponse(userMessage) {
-            const responses = [
-                "Отличный вопрос! 🤖 Позвольте мне подумать...",
-                "Интересная тема! Я всегда рад помочь с такими вопросами.",
-                "Это очень актуально! Вот что я думаю об этом...",
-                "Спасибо за вопрос! Позвольте поделиться своими знаниями.",
-                "Прекрасная идея! Давайте разберем это подробнее.",
-                "Я понимаю ваш интерес к этой области. Это действительно важно!",
-                "Отличный выбор темы! Вот мой взгляд на это...",
-                "Это захватывающая тема! Давайте обсудим детали.",
-                "Интересный подход! Я готов помочь разобраться.",
-                "Прекрасно! Это именно то, что мне нравится обсуждать. ✨"
-            ];
-
-            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-            addMessage(randomResponse, 'ai');
-        }
-
-        // Поиск
-        function openSearchResult(type) {
-            const messages = {
-                'weather': '🌤️ Погода загружена! Сегодня отличная погода для прогулок.',
-                'news': '📰 Новости загружены! ИИ технологии продолжают развиваться.',
-                'user': '👤 Профиль пользователя открыт!',
-                'trending': '🔥 Тренды загружены! #AI и #Innovation набирают популярность.'
-            };
-            
-            tg.showAlert(messages[type] || 'Результат найден!');
-        }
-
-        // Профиль
-        function editProfile() {
-            tg.showAlert('Редактирование профиля будет доступно в следующей версии! 🚀');
-        }
-
-        function openSettings() {
-            tg.showAlert('Настройки будут доступны в следующей версии! ⚙️');
-        }
-
-        function toggleNotifications() {
-            tg.showAlert('Уведомления настроены! 🔔');
-        }
-
-        // Обработка Enter в чате
-        document.getElementById('chatInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
+        // Обработка нажатия главной кнопки
+        tg.MainButton.onClick(function() {
+            tg.showAlert('Minko AI готов к работе!');
         });
 
-        // Авторесайз текстового поля
-        document.getElementById('chatInput').addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = Math.min(this.scrollHeight, 100) + 'px';
-        });
-
-        // Поиск в реальном времени
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            const query = e.target.value.toLowerCase();
-            const items = document.querySelectorAll('.search-item');
-            
-            items.forEach(item => {
-                const text = item.textContent.toLowerCase();
-                item.style.display = text.includes(query) ? 'block' : 'none';
-            });
-        });
-
-        // Telegram WebApp события
-        tg.onEvent('backButtonClicked', () => {
+        // Обработка кнопки "Назад"
+        tg.BackButton.onClick(function() {
             tg.close();
         });
 
-        tg.onEvent('mainButtonClicked', () => {
-            tg.showAlert('Спасибо за использование Minko AI! 🚀');
+        // Показываем кнопку "Назад" когда нужно
+        function showBackButton() {
+            tg.BackButton.show();
+        }
+
+        function hideBackButton() {
+            tg.BackButton.hide();
+        }
+
+        // Анимация появления орбов
+        document.addEventListener('DOMContentLoaded', function() {
+            const orbs = document.querySelectorAll('.orb');
+            orbs.forEach((orb, index) => {
+                setTimeout(() => {
+                    orb.style.opacity = '0.3';
+                }, index * 500);
+            });
         });
 
-        // Настройка главной кнопки
-        tg.MainButton.text = 'Понравилось приложение?';
-        tg.MainButton.show();
+        // Обработка свайпов для мобильных устройств
+        let startY = 0;
+        let currentY = 0;
 
-        // Инициализация
-        console.log('Minko AI запущен! 🚀');
+        document.addEventListener('touchstart', function(e) {
+            startY = e.touches[0].clientY;
+        });
+
+        document.addEventListener('touchmove', function(e) {
+            currentY = e.touches[0].clientY;
+        });
+
+        document.addEventListener('touchend', function(e) {
+            const diffY = startY - currentY;
+            
+            if (Math.abs(diffY) > 50) {
+                if (diffY > 0) {
+                    // Свайп вверх - показать больше контента
+                    tg.showAlert('Обновляем ленту...');
+                } else {
+                    // Свайп вниз - обновить
+                    tg.showAlert('Обновляем данные...');
+                }
+            }
+        });
+
+        // Вибрация при взаимодействии (если поддерживается)
+        function vibrate() {
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        }
+
+        // Добавляем вибрацию к кнопкам
+        document.querySelectorAll('.btn, .feature-card').forEach(element => {
+            element.addEventListener('click', vibrate);
+        });
     </script>
 </body>
 </html>
