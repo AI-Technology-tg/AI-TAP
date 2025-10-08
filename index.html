@@ -33,7 +33,7 @@
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            transition: opacity 0.5s ease-out;
+            transition: opacity 0.8s ease-out;
         }
 
         .loading-screen.hidden {
@@ -41,78 +41,113 @@
             pointer-events: none;
         }
 
-        .logo-container {
+        .loading-container {
+            text-align: center;
             position: relative;
-            margin-bottom: 2rem;
         }
 
-        .logo-text {
-            font-size: 3rem;
-            font-weight: bold;
-            color: #00d4ff;
-            text-shadow: 0 0 20px #00d4ff, 0 0 40px #00d4ff;
-            letter-spacing: 2px;
+        .minko-logo {
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, #00d4ff, #ff3366, #00d4ff);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease-in-out infinite;
             margin-bottom: 1rem;
+            letter-spacing: 3px;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
         }
 
-        .ai-badge {
-            position: absolute;
-            right: -30px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 60px;
-            height: 60px;
-            border: 2px solid #00d4ff;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 212, 255, 0.1);
-            box-shadow: 0 0 20px #00d4ff;
-        }
-
-        .ai-badge span {
-            font-size: 1.2rem;
+        .ai-logo {
+            font-size: 2rem;
             font-weight: bold;
-            color: #00d4ff;
+            color: #ff3366;
+            text-shadow: 0 0 20px #ff3366;
+            margin-bottom: 2rem;
+            letter-spacing: 1px;
         }
 
-        .loading-dots {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #ff3366;
-            animation: pulse 1.5s infinite;
-        }
-
-        .dot:nth-child(2) {
-            animation-delay: 0.3s;
-        }
-
-        .dot:nth-child(3) {
-            animation-delay: 0.6s;
-        }
-
-        @keyframes pulse {
+        @keyframes gradientShift {
             0%, 100% {
-                transform: scale(1);
-                opacity: 1;
+                background-position: 0% 50%;
             }
             50% {
-                transform: scale(1.2);
-                opacity: 0.7;
+                background-position: 100% 50%;
+            }
+        }
+
+        .loading-progress {
+            width: 250px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 2rem auto;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #ff3366);
+            border-radius: 2px;
+            width: 0%;
+            animation: progressLoad 3s ease-in-out;
+        }
+
+        @keyframes progressLoad {
+            0% {
+                width: 0%;
+            }
+            100% {
+                width: 100%;
             }
         }
 
         .loading-text {
+            color: #aaa;
+            font-size: 1rem;
             margin-top: 1rem;
-            color: #888;
-            font-size: 0.9rem;
+            animation: textPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes textPulse {
+            0%, 100% {
+                opacity: 0.7;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        .loading-features {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            opacity: 0;
+            animation: fadeInUp 1s ease-out 1.5s forwards;
+        }
+
+        .feature-tag {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            color: #00d4ff;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Главное приложение */
@@ -186,8 +221,35 @@
             margin: 2rem 0;
             padding: 2rem;
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
+            border-radius: 20px;
             border: 1px solid rgba(0, 212, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .stats-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 2rem;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #00d4ff;
+            text-shadow: 0 0 10px #00d4ff;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #aaa;
+            margin-top: 0.5rem;
         }
 
         .welcome-title {
@@ -205,63 +267,147 @@
             margin-bottom: 1.5rem;
         }
 
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        .main-sections {
+            display: flex;
+            flex-direction: column;
             gap: 1rem;
             margin: 2rem 0;
         }
 
-        .feature-card {
+        .section-card {
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
+            border-radius: 15px;
             padding: 1.5rem;
-            text-align: center;
             border: 1px solid rgba(0, 212, 255, 0.1);
             transition: all 0.3s ease;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
+            overflow: hidden;
         }
 
-        .feature-card:hover {
-            transform: translateY(-5px);
+        .section-card.primary {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(255, 51, 102, 0.1));
+            border-color: #00d4ff;
+        }
+
+        .section-card:hover {
+            transform: translateX(5px);
             border-color: #00d4ff;
             box-shadow: 0 10px 30px rgba(0, 212, 255, 0.2);
         }
 
-        .feature-icon {
-            font-size: 2rem;
-            margin-bottom: 1rem;
+        .section-icon {
+            font-size: 2.5rem;
+            min-width: 60px;
+            text-align: center;
         }
 
-        .feature-title {
-            font-size: 1rem;
+        .section-content {
+            flex: 1;
+        }
+
+        .section-content h3 {
+            font-size: 1.2rem;
             font-weight: bold;
-            margin-bottom: 0.5rem;
             color: #00d4ff;
+            margin-bottom: 0.5rem;
         }
 
-        .feature-desc {
-            font-size: 0.8rem;
+        .section-content p {
+            font-size: 0.9rem;
             color: #aaa;
+            margin: 0;
         }
 
-        .action-buttons {
+        .section-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: linear-gradient(45deg, #ff3366, #ff6699);
+            color: white;
+            padding: 0.2rem 0.8rem;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .section-arrow {
+            font-size: 1.5rem;
+            color: #00d4ff;
+            transition: transform 0.3s ease;
+        }
+
+        .section-card:hover .section-arrow {
+            transform: translateX(5px);
+        }
+
+        .quick-actions {
             display: flex;
-            flex-direction: column;
             gap: 1rem;
-            margin-top: 2rem;
+            margin: 2rem 0;
         }
 
         .btn {
-            padding: 1rem 2rem;
+            flex: 1;
+            padding: 1rem 1.5rem;
             border: none;
-            border-radius: 25px;
+            border-radius: 15px;
             font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-icon {
+            font-size: 1.2rem;
+        }
+
+        .recent-activity {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .recent-activity h3 {
+            color: #00d4ff;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            font-size: 1.5rem;
+            min-width: 40px;
+        }
+
+        .activity-title {
+            font-weight: bold;
+            color: white;
+            margin-bottom: 0.2rem;
+        }
+
+        .activity-time {
+            font-size: 0.8rem;
+            color: #888;
         }
 
         .btn-primary {
@@ -356,30 +502,42 @@
 
         /* Адаптивность для мобильных устройств */
         @media (max-width: 768px) {
-            .logo-text {
-                font-size: 2rem;
+            .minko-logo {
+                font-size: 2.5rem;
             }
             
-            .ai-badge {
-                right: -20px;
-                width: 45px;
-                height: 45px;
+            .ai-logo {
+                font-size: 1.5rem;
             }
             
-            .ai-badge span {
-                font-size: 1rem;
+            .loading-progress {
+                width: 200px;
             }
             
             .main-content {
                 padding: 0.5rem;
             }
             
-            .features-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .section-card {
+                padding: 1rem;
             }
             
-            .feature-card {
-                padding: 1rem;
+            .section-icon {
+                font-size: 2rem;
+                min-width: 50px;
+            }
+            
+            .quick-actions {
+                flex-direction: column;
+            }
+            
+            .stats-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .stat-number {
+                font-size: 1.5rem;
             }
         }
     </style>
@@ -387,18 +545,20 @@
 <body>
     <!-- Экран загрузки -->
     <div class="loading-screen" id="loadingScreen">
-        <div class="logo-container">
-            <div class="logo-text">MINK</div>
-            <div class="ai-badge">
-                <span>AI</span>
+        <div class="loading-container">
+            <div class="minko-logo">MINKO</div>
+            <div class="ai-logo">AI</div>
+            <div class="loading-progress">
+                <div class="progress-bar"></div>
+            </div>
+            <div class="loading-text">Инициализация ИИ системы...</div>
+            <div class="loading-features">
+                <div class="feature-tag">Нейросети</div>
+                <div class="feature-tag">Машинное обучение</div>
+                <div class="feature-tag">Генерация контента</div>
+                <div class="feature-tag">Социальные связи</div>
             </div>
         </div>
-        <div class="loading-dots">
-            <div class="dot"></div>
-            <div class="dot"></div>
-            <div class="dot"></div>
-        </div>
-        <div class="loading-text">Загрузка Minko AI...</div>
     </div>
 
     <!-- Плавающие орбы для фона -->
@@ -415,7 +575,7 @@
         <header class="header">
             <div class="header-content">
                 <div class="app-logo">
-                    MINK
+                    MINKO
                     <div class="ai-mini">AI</div>
                 </div>
                 <div class="user-avatar" id="userAvatar">U</div>
@@ -428,58 +588,94 @@
             <section class="welcome-section">
                 <h1 class="welcome-title">Добро пожаловать в Minko AI</h1>
                 <p class="welcome-text">
-                    Первая в мире социальная сеть, управляемая искусственным интеллектом. 
-                    Здесь вы можете общаться, создавать контент и взаимодействовать с ИИ-помощниками.
+                    Революционная социальная сеть нового поколения, где искусственный интеллект 
+                    становится вашим творческим партнером. Создавайте, общайтесь и развивайтесь вместе с ИИ.
                 </p>
+                <div class="stats-container">
+                    <div class="stat-item">
+                        <div class="stat-number">10K+</div>
+                        <div class="stat-label">Активных пользователей</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">1M+</div>
+                        <div class="stat-label">Созданного контента</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">24/7</div>
+                        <div class="stat-label">ИИ поддержка</div>
+                    </div>
+                </div>
             </section>
 
-            <!-- Функции -->
-            <div class="features-grid">
-                <div class="feature-card" onclick="openFeature('chat')">
-                    <div class="feature-icon">💬</div>
-                    <div class="feature-title">ИИ Чат</div>
-                    <div class="feature-desc">Общение с умными помощниками</div>
+            <!-- Основные разделы -->
+            <div class="main-sections">
+                <div class="section-card primary" onclick="openFeature('ai-chat')">
+                    <div class="section-icon">🤖</div>
+                    <div class="section-content">
+                        <h3>ИИ Диалоги</h3>
+                        <p>Общайтесь с продвинутыми ИИ-моделями</p>
+                        <div class="section-badge">Популярно</div>
+                    </div>
+                    <div class="section-arrow">→</div>
                 </div>
-                
-                <div class="feature-card" onclick="openFeature('posts')">
-                    <div class="feature-icon">📝</div>
-                    <div class="feature-title">Посты</div>
-                    <div class="feature-desc">Создание контента с ИИ</div>
+
+                <div class="section-card" onclick="openFeature('create')">
+                    <div class="section-icon">✨</div>
+                    <div class="section-content">
+                        <h3>Создание контента</h3>
+                        <p>Тексты, изображения, видео с ИИ</p>
+                    </div>
+                    <div class="section-arrow">→</div>
                 </div>
-                
-                <div class="feature-card" onclick="openFeature('media')">
-                    <div class="feature-icon">🎨</div>
-                    <div class="feature-title">Медиа</div>
-                    <div class="feature-desc">Генерация изображений и видео</div>
+
+                <div class="section-card" onclick="openFeature('community')">
+                    <div class="section-icon">🌐</div>
+                    <div class="section-content">
+                        <h3>Сообщество</h3>
+                        <p>Общение с единомышленниками</p>
+                    </div>
+                    <div class="section-arrow">→</div>
                 </div>
-                
-                <div class="feature-card" onclick="openFeature('network')">
-                    <div class="feature-icon">👥</div>
-                    <div class="feature-title">Сеть</div>
-                    <div class="feature-desc">Поиск единомышленников</div>
-                </div>
-                
-                <div class="feature-card" onclick="openFeature('ai-assistant')">
-                    <div class="feature-icon">🤖</div>
-                    <div class="feature-title">Ассистент</div>
-                    <div class="feature-desc">Персональный ИИ-помощник</div>
-                </div>
-                
-                <div class="feature-card" onclick="openFeature('settings')">
-                    <div class="feature-icon">⚙️</div>
-                    <div class="feature-title">Настройки</div>
-                    <div class="feature-desc">Персонализация опыта</div>
+
+                <div class="section-card" onclick="openFeature('learning')">
+                    <div class="section-icon">📚</div>
+                    <div class="section-content">
+                        <h3>Обучение с ИИ</h3>
+                        <p>Персональные курсы и навыки</p>
+                    </div>
+                    <div class="section-arrow">→</div>
                 </div>
             </div>
 
-            <!-- Кнопки действий -->
-            <div class="action-buttons">
-                <button class="btn btn-primary" onclick="startChat()">
-                    Начать общение с ИИ
+            <!-- Быстрые действия -->
+            <div class="quick-actions">
+                <button class="btn btn-primary" onclick="startAIChat()">
+                    <span class="btn-icon">🚀</span>
+                    Начать с ИИ
                 </button>
-                <button class="btn btn-secondary" onclick="exploreNetwork()">
-                    Исследовать сеть
+                <button class="btn btn-secondary" onclick="exploreContent()">
+                    <span class="btn-icon">🔍</span>
+                    Исследовать
                 </button>
+            </div>
+
+            <!-- Последняя активность -->
+            <div class="recent-activity">
+                <h3>Недавняя активность</h3>
+                <div class="activity-item">
+                    <div class="activity-icon">💬</div>
+                    <div class="activity-content">
+                        <div class="activity-title">Диалог с GPT-4</div>
+                        <div class="activity-time">2 минуты назад</div>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon">🎨</div>
+                    <div class="activity-content">
+                        <div class="activity-title">Создан арт "Космический пейзаж"</div>
+                        <div class="activity-time">1 час назад</div>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
@@ -510,43 +706,37 @@
 
         // Функции для обработки действий
         function openFeature(feature) {
-            tg.showAlert(`Открытие функции: ${feature}`);
+            tg.showAlert(`Открытие: ${feature}`);
             
             switch(feature) {
-                case 'chat':
-                    tg.showAlert('Открываем ИИ чат...');
+                case 'ai-chat':
+                    tg.showAlert('🤖 Запускаем ИИ диалоги...');
                     break;
-                case 'posts':
-                    tg.showAlert('Переходим к созданию постов...');
+                case 'create':
+                    tg.showAlert('✨ Открываем создание контента...');
                     break;
-                case 'media':
-                    tg.showAlert('Открываем медиа-генератор...');
+                case 'community':
+                    tg.showAlert('🌐 Переходим в сообщество...');
                     break;
-                case 'network':
-                    tg.showAlert('Исследуем социальную сеть...');
-                    break;
-                case 'ai-assistant':
-                    tg.showAlert('Запускаем персонального ассистента...');
-                    break;
-                case 'settings':
-                    tg.showAlert('Открываем настройки...');
+                case 'learning':
+                    tg.showAlert('📚 Запускаем обучение с ИИ...');
                     break;
             }
         }
 
-        function startChat() {
-            tg.showAlert('Запускаем чат с ИИ...');
+        function startAIChat() {
+            tg.showAlert('🚀 Запускаем персонального ИИ-помощника...');
             // Здесь будет логика открытия чата
         }
 
-        function exploreNetwork() {
-            tg.showAlert('Исследуем социальную сеть...');
-            // Здесь будет логика исследования сети
+        function exploreContent() {
+            tg.showAlert('🔍 Исследуем созданный контент...');
+            // Здесь будет логика исследования контента
         }
 
         // Обработка нажатия главной кнопки
         tg.MainButton.onClick(function() {
-            tg.showAlert('Minko AI готов к работе!');
+            tg.showAlert('🚀 Minko AI готов к работе!');
         });
 
         // Обработка кнопки "Назад"
