@@ -120,23 +120,14 @@
             }
         }
 
-        .loading-features {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 1rem;
+        .loading-tech-text {
             margin-top: 2rem;
+            color: #aaa;
+            font-size: 1rem;
+            font-weight: 300;
+            letter-spacing: 2px;
             opacity: 0;
-            animation: fadeInUp 1s ease-out 1.5s forwards;
-        }
-
-        .feature-tag {
-            background: rgba(0, 212, 255, 0.1);
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            border-radius: 20px;
-            padding: 0.5rem 1rem;
-            font-size: 0.8rem;
-            color: #00d4ff;
+            animation: fadeInUp 1s ease-out 2s forwards;
         }
 
         @keyframes fadeInUp {
@@ -826,12 +817,7 @@
                 <div class="progress-bar"></div>
             </div>
             <div class="loading-text">Инициализация ИИ системы...</div>
-            <div class="loading-features">
-                <div class="feature-tag">Нейросети</div>
-                <div class="feature-tag">Машинное обучение</div>
-                <div class="feature-tag">Генерация контента</div>
-                <div class="feature-tag">Социальные связи</div>
-            </div>
+            <div class="loading-tech-text">AI - Технологии</div>
         </div>
     </div>
 
@@ -1077,26 +1063,61 @@
 
     <script>
         // Инициализация Telegram Web App
-        let tg = window.Telegram.WebApp;
+        let tg = window.Telegram?.WebApp;
         
-        // Настройка темы Telegram
-        tg.ready();
-        tg.expand();
+        // Проверяем, загружен ли Telegram Web App
+        if (tg) {
+            // Настройка темы Telegram
+            tg.ready();
+            tg.expand();
+        } else {
+            // Для тестирования вне Telegram
+            tg = {
+                showAlert: function(text) { console.log('Alert:', text); },
+                MainButton: {
+                    setText: function(text) { console.log('MainButton text:', text); },
+                    show: function() { console.log('MainButton shown'); },
+                    onClick: function(callback) { console.log('MainButton click handler set'); }
+                },
+                BackButton: {
+                    onClick: function(callback) { console.log('BackButton click handler set'); },
+                    hide: function() { console.log('BackButton hidden'); }
+                },
+                initDataUnsafe: { user: { first_name: 'User' } },
+                close: function() { console.log('App closed'); }
+            };
+        }
 
         // Получение информации о пользователе
         const user = tg.initDataUnsafe?.user;
         if (user) {
-            document.getElementById('userAvatar').textContent = user.first_name?.charAt(0) || 'U';
+            // Обновляем аватар в навигации если есть
+            const navAvatar = document.querySelector('.nav-avatar');
+            if (navAvatar) {
+                navAvatar.textContent = user.first_name?.charAt(0) || 'U';
+            }
         }
 
         // Симуляция загрузки
         setTimeout(() => {
-            document.getElementById('loadingScreen').classList.add('hidden');
-            document.getElementById('appContainer').classList.add('visible');
+            console.log('Загрузка завершена, открываем главный экран');
             
-            // Отправка события готовности в Telegram
-            tg.MainButton.setText('Готов к работе');
-            tg.MainButton.show();
+            const loadingScreen = document.getElementById('loadingScreen');
+            const appContainer = document.getElementById('appContainer');
+            
+            if (loadingScreen && appContainer) {
+                loadingScreen.classList.add('hidden');
+                appContainer.classList.add('visible');
+                console.log('Главный экран открыт');
+                
+                // Отправка события готовности в Telegram
+                if (tg.MainButton) {
+                    tg.MainButton.setText('Готов к работе');
+                    tg.MainButton.show();
+                }
+            } else {
+                console.error('Элементы не найдены:', { loadingScreen, appContainer });
+            }
         }, 3000);
 
         // Функции для взаимодействия с постами
