@@ -155,6 +155,7 @@
             display: none;
             min-height: 100vh;
             background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            padding-bottom: 80px; /* Место для нижней навигации */
         }
 
         .app-container.visible {
@@ -162,7 +163,7 @@
         }
 
         .header {
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.9);
             backdrop-filter: blur(10px);
             padding: 1rem;
             border-bottom: 1px solid rgba(0, 212, 255, 0.2);
@@ -199,21 +200,251 @@
             font-size: 0.8rem;
         }
 
-        .user-avatar {
-            width: 35px;
-            height: 35px;
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .header-icon {
+            font-size: 1.5rem;
+            color: #00d4ff;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .header-icon:hover {
+            color: #ff3366;
+        }
+
+        .main-content {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        /* Лента постов */
+        .feed-container {
+            padding: 1rem 0;
+        }
+
+        .post {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(0, 212, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            gap: 0.8rem;
+        }
+
+        .post-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #00d4ff, #ff3366);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+
+        .post-user-info {
+            flex: 1;
+        }
+
+        .post-username {
+            font-weight: bold;
+            color: #00d4ff;
+            font-size: 0.9rem;
+        }
+
+        .post-location {
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+
+        .post-menu {
+            font-size: 1.2rem;
+            color: #aaa;
+            cursor: pointer;
+        }
+
+        .post-image {
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(255, 51, 102, 0.2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #00d4ff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .post-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(0,212,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .post-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+        }
+
+        .post-actions-left {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .post-action {
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .post-action.tap {
+            color: #ff3366;
+        }
+
+        .post-action.tap.active {
+            color: #ff3366;
+            transform: scale(1.2);
+        }
+
+        .post-action:hover {
+            transform: scale(1.1);
+        }
+
+        .post-action.bookmark {
+            margin-left: auto;
+        }
+
+        .post-likes {
+            padding: 0 1rem;
+            font-weight: bold;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .post-caption {
+            padding: 0 1rem 1rem;
+            color: #ccc;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .post-caption .username {
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .post-comments {
+            padding: 0 1rem 1rem;
+        }
+
+        .post-comment {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-bottom: 0.5rem;
+        }
+
+        .post-comment .username {
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .post-time {
+            padding: 0 1rem 1rem;
+            font-size: 0.8rem;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        /* Нижняя навигация */
+        .bottom-navigation {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(0, 212, 255, 0.2);
+            padding: 0.8rem;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 0.5rem;
+            border-radius: 10px;
+        }
+
+        .nav-item.active {
+            color: #00d4ff;
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .nav-icon {
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-item:hover .nav-icon {
+            transform: scale(1.1);
+        }
+
+        .nav-label {
+            font-size: 0.7rem;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-item.active .nav-label {
+            color: #00d4ff;
+        }
+
+        .nav-avatar {
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
             background: linear-gradient(45deg, #ff3366, #00d4ff);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-        }
-
-        .main-content {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 1rem;
+            color: white;
+            font-size: 0.8rem;
         }
 
         .welcome-section {
@@ -514,30 +745,73 @@
                 width: 200px;
             }
             
-            .main-content {
-                padding: 0.5rem;
+            .feed-container {
+                padding: 0.5rem 0;
             }
             
-            .section-card {
-                padding: 1rem;
+            .post {
+                margin-bottom: 0.8rem;
+                border-radius: 12px;
             }
             
-            .section-icon {
-                font-size: 2rem;
-                min-width: 50px;
+            .post-header {
+                padding: 0.8rem;
             }
             
-            .quick-actions {
-                flex-direction: column;
+            .post-avatar {
+                width: 35px;
+                height: 35px;
             }
             
-            .stats-container {
-                flex-direction: column;
-                gap: 1rem;
+            .post-image {
+                height: 250px;
             }
             
-            .stat-number {
-                font-size: 1.5rem;
+            .post-actions {
+                padding: 0.8rem;
+            }
+            
+            .post-action {
+                font-size: 1.3rem;
+            }
+            
+            .post-caption {
+                padding: 0 0.8rem 0.8rem;
+                font-size: 0.85rem;
+            }
+            
+            .post-comments {
+                padding: 0 0.8rem 0.8rem;
+            }
+            
+            .post-time {
+                padding: 0 0.8rem 0.8rem;
+            }
+            
+            .bottom-navigation {
+                padding: 0.6rem;
+            }
+            
+            .nav-icon {
+                font-size: 1.3rem;
+            }
+            
+            .nav-label {
+                font-size: 0.6rem;
+            }
+            
+            .nav-avatar {
+                width: 25px;
+                height: 25px;
+                font-size: 0.7rem;
+            }
+            
+            .header-actions {
+                gap: 0.8rem;
+            }
+            
+            .header-icon {
+                font-size: 1.3rem;
             }
         }
     </style>
@@ -578,106 +852,227 @@
                     MINKO
                     <div class="ai-mini">AI</div>
                 </div>
-                <div class="user-avatar" id="userAvatar">U</div>
+                <div class="header-actions">
+                    <div class="header-icon" onclick="openNotifications()">🔔</div>
+                    <div class="header-icon" onclick="openMessages()">💬</div>
+                </div>
             </div>
         </header>
 
         <!-- Основной контент -->
         <main class="main-content">
-            <!-- Приветственная секция -->
-            <section class="welcome-section">
-                <h1 class="welcome-title">Добро пожаловать в Minko AI</h1>
-                <p class="welcome-text">
-                    Революционная социальная сеть нового поколения, где искусственный интеллект 
-                    становится вашим творческим партнером. Создавайте, общайтесь и развивайтесь вместе с ИИ.
-                </p>
-                <div class="stats-container">
-                    <div class="stat-item">
-                        <div class="stat-number">10K+</div>
-                        <div class="stat-label">Активных пользователей</div>
+            <!-- Лента постов -->
+            <div class="feed-container">
+                <!-- Пост 1 -->
+                <div class="post">
+                    <div class="post-header">
+                        <div class="post-avatar">AI</div>
+                        <div class="post-user-info">
+                            <div class="post-username">minko_ai_creator</div>
+                            <div class="post-location">Minko AI Studio</div>
+                        </div>
+                        <div class="post-menu">⋯</div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-number">1M+</div>
-                        <div class="stat-label">Созданного контента</div>
+                    
+                    <div class="post-image">
+                        🎨
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-number">24/7</div>
-                        <div class="stat-label">ИИ поддержка</div>
+                    
+                    <div class="post-actions">
+                        <div class="post-actions-left">
+                            <div class="post-action tap" onclick="toggleTap(this)">👆</div>
+                            <div class="post-action" onclick="openComments()">💬</div>
+                            <div class="post-action" onclick="sharePost()">📤</div>
+                        </div>
+                        <div class="post-action bookmark" onclick="toggleBookmark(this)">🔖</div>
                     </div>
-                </div>
-            </section>
-
-            <!-- Основные разделы -->
-            <div class="main-sections">
-                <div class="section-card primary" onclick="openFeature('ai-chat')">
-                    <div class="section-icon">🤖</div>
-                    <div class="section-content">
-                        <h3>ИИ Диалоги</h3>
-                        <p>Общайтесь с продвинутыми ИИ-моделями</p>
-                        <div class="section-badge">Популярно</div>
+                    
+                    <div class="post-likes">
+                        <span id="likes-1">127</span> тапов
                     </div>
-                    <div class="section-arrow">→</div>
-                </div>
-
-                <div class="section-card" onclick="openFeature('create')">
-                    <div class="section-icon">✨</div>
-                    <div class="section-content">
-                        <h3>Создание контента</h3>
-                        <p>Тексты, изображения, видео с ИИ</p>
+                    
+                    <div class="post-caption">
+                        <span class="username">minko_ai_creator</span> 
+                        Создал новый арт с помощью ИИ! 🤖✨ 
+                        #MinkoAI #ИИ #Творчество #ЦифровоеИскусство
                     </div>
-                    <div class="section-arrow">→</div>
-                </div>
-
-                <div class="section-card" onclick="openFeature('community')">
-                    <div class="section-icon">🌐</div>
-                    <div class="section-content">
-                        <h3>Сообщество</h3>
-                        <p>Общение с единомышленниками</p>
+                    
+                    <div class="post-comments">
+                        <div class="post-comment">
+                            <span class="username">art_lover_99</span> Невероятно! Как ИИ это создал?
+                        </div>
+                        <div class="post-comment">
+                            <span class="username">ai_enthusiast</span> Поклонники: 2.3K 🔥
+                        </div>
                     </div>
-                    <div class="section-arrow">→</div>
+                    
+                    <div class="post-time">2 ЧАСА НАЗАД</div>
                 </div>
 
-                <div class="section-card" onclick="openFeature('learning')">
-                    <div class="section-icon">📚</div>
-                    <div class="section-content">
-                        <h3>Обучение с ИИ</h3>
-                        <p>Персональные курсы и навыки</p>
+                <!-- Пост 2 -->
+                <div class="post">
+                    <div class="post-header">
+                        <div class="post-avatar">M</div>
+                        <div class="post-user-info">
+                            <div class="post-username">max_innovator</div>
+                            <div class="post-location">Москва, Россия</div>
+                        </div>
+                        <div class="post-menu">⋯</div>
                     </div>
-                    <div class="section-arrow">→</div>
+                    
+                    <div class="post-image">
+                        🚀
+                    </div>
+                    
+                    <div class="post-actions">
+                        <div class="post-actions-left">
+                            <div class="post-action tap" onclick="toggleTap(this)">👆</div>
+                            <div class="post-action" onclick="openComments()">💬</div>
+                            <div class="post-action" onclick="sharePost()">📤</div>
+                        </div>
+                        <div class="post-action bookmark" onclick="toggleBookmark(this)">🔖</div>
+                    </div>
+                    
+                    <div class="post-likes">
+                        <span id="likes-2">89</span> тапов
+                    </div>
+                    
+                    <div class="post-caption">
+                        <span class="username">max_innovator</span> 
+                        Обновление Minko AI вышло! Новые возможности ИИ-генерации контента 🎉
+                    </div>
+                    
+                    <div class="post-comments">
+                        <div class="post-comment">
+                            <span class="username">tech_reviewer</span> Поклонники: 1.8K 👏
+                        </div>
+                        <div class="post-comment">
+                            <span class="username">ai_fan</span> Когда следующий апдейт?
+                        </div>
+                    </div>
+                    
+                    <div class="post-time">5 ЧАСОВ НАЗАД</div>
                 </div>
-            </div>
 
-            <!-- Быстрые действия -->
-            <div class="quick-actions">
-                <button class="btn btn-primary" onclick="startAIChat()">
-                    <span class="btn-icon">🚀</span>
-                    Начать с ИИ
-                </button>
-                <button class="btn btn-secondary" onclick="exploreContent()">
-                    <span class="btn-icon">🔍</span>
-                    Исследовать
-                </button>
-            </div>
-
-            <!-- Последняя активность -->
-            <div class="recent-activity">
-                <h3>Недавняя активность</h3>
-                <div class="activity-item">
-                    <div class="activity-icon">💬</div>
-                    <div class="activity-content">
-                        <div class="activity-title">Диалог с GPT-4</div>
-                        <div class="activity-time">2 минуты назад</div>
+                <!-- Пост 3 -->
+                <div class="post">
+                    <div class="post-header">
+                        <div class="post-avatar">E</div>
+                        <div class="post-user-info">
+                            <div class="post-username">elena_ai_artist</div>
+                            <div class="post-location">Санкт-Петербург</div>
+                        </div>
+                        <div class="post-menu">⋯</div>
                     </div>
+                    
+                    <div class="post-image">
+                        🌟
+                    </div>
+                    
+                    <div class="post-actions">
+                        <div class="post-actions-left">
+                            <div class="post-action tap active" onclick="toggleTap(this)">👆</div>
+                            <div class="post-action" onclick="openComments()">💬</div>
+                            <div class="post-action" onclick="sharePost()">📤</div>
+                        </div>
+                        <div class="post-action bookmark" onclick="toggleBookmark(this)">🔖</div>
+                    </div>
+                    
+                    <div class="post-likes">
+                        <span id="likes-3">256</span> тапов
+                    </div>
+                    
+                    <div class="post-caption">
+                        <span class="username">elena_ai_artist</span> 
+                        Моя новая коллекция "Цифровые мечты" создана полностью с помощью Minko AI! 
+                        Поклонники: 5.2K 💫
+                    </div>
+                    
+                    <div class="post-comments">
+                        <div class="post-comment">
+                            <span class="username">art_collector</span> Хочу купить! Где продается?
+                        </div>
+                        <div class="post-comment">
+                            <span class="username">digital_art_lover</span> Поклонники: 892 🔥
+                        </div>
+                    </div>
+                    
+                    <div class="post-time">1 ДЕНЬ НАЗАД</div>
                 </div>
-                <div class="activity-item">
-                    <div class="activity-icon">🎨</div>
-                    <div class="activity-content">
-                        <div class="activity-title">Создан арт "Космический пейзаж"</div>
-                        <div class="activity-time">1 час назад</div>
+
+                <!-- Пост 4 -->
+                <div class="post">
+                    <div class="post-header">
+                        <div class="post-avatar">D</div>
+                        <div class="post-user-info">
+                            <div class="post-username">dmitry_coder</div>
+                            <div class="post-location">Minko AI Labs</div>
+                        </div>
+                        <div class="post-menu">⋯</div>
                     </div>
+                    
+                    <div class="post-image">
+                        💻
+                    </div>
+                    
+                    <div class="post-actions">
+                        <div class="post-actions-left">
+                            <div class="post-action tap" onclick="toggleTap(this)">👆</div>
+                            <div class="post-action" onclick="openComments()">💬</div>
+                            <div class="post-action" onclick="sharePost()">📤</div>
+                        </div>
+                        <div class="post-action bookmark" onclick="toggleBookmark(this)">🔖</div>
+                    </div>
+                    
+                    <div class="post-likes">
+                        <span id="likes-4">312</span> тапов
+                    </div>
+                    
+                    <div class="post-caption">
+                        <span class="username">dmitry_coder</span> 
+                        За кулисами разработки Minko AI: как мы обучаем нейросети понимать творчество 🧠
+                        Поклонники: 8.9K
+                    </div>
+                    
+                    <div class="post-comments">
+                        <div class="post-comment">
+                            <span class="username">ai_researcher</span> Поклонники: 1.2K 🔬
+                        </div>
+                        <div class="post-comment">
+                            <span class="username">tech_student</span> Можно ли поступить к вам на стажировку?
+                        </div>
+                    </div>
+                    
+                    <div class="post-time">2 ДНЯ НАЗАД</div>
                 </div>
             </div>
         </main>
+
+        <!-- Нижняя навигация -->
+        <nav class="bottom-navigation">
+            <div class="nav-container">
+                <div class="nav-item active" onclick="switchTab('home')">
+                    <div class="nav-icon">🏠</div>
+                    <div class="nav-label">Главная</div>
+                </div>
+                <div class="nav-item" onclick="switchTab('search')">
+                    <div class="nav-icon">🔍</div>
+                    <div class="nav-label">Поиск</div>
+                </div>
+                <div class="nav-item" onclick="switchTab('create')">
+                    <div class="nav-icon">➕</div>
+                    <div class="nav-label">Создать</div>
+                </div>
+                <div class="nav-item" onclick="switchTab('ai-chat')">
+                    <div class="nav-icon">🤖</div>
+                    <div class="nav-label">ИИ Чат</div>
+                </div>
+                <div class="nav-item" onclick="switchTab('profile')">
+                    <div class="nav-avatar">U</div>
+                    <div class="nav-label">Профиль</div>
+                </div>
+            </div>
+        </nav>
     </div>
 
     <script>
@@ -704,34 +1099,91 @@
             tg.MainButton.show();
         }, 3000);
 
-        // Функции для обработки действий
-        function openFeature(feature) {
-            tg.showAlert(`Открытие: ${feature}`);
+        // Функции для взаимодействия с постами
+        function toggleTap(element) {
+            element.classList.toggle('active');
+            const post = element.closest('.post');
+            const likesElement = post.querySelector('.post-likes span');
+            let currentLikes = parseInt(likesElement.textContent);
             
-            switch(feature) {
-                case 'ai-chat':
-                    tg.showAlert('🤖 Запускаем ИИ диалоги...');
-                    break;
-                case 'create':
-                    tg.showAlert('✨ Открываем создание контента...');
-                    break;
-                case 'community':
-                    tg.showAlert('🌐 Переходим в сообщество...');
-                    break;
-                case 'learning':
-                    tg.showAlert('📚 Запускаем обучение с ИИ...');
-                    break;
+            if (element.classList.contains('active')) {
+                currentLikes++;
+                element.style.transform = 'scale(1.3)';
+                setTimeout(() => {
+                    element.style.transform = 'scale(1)';
+                }, 200);
+            } else {
+                currentLikes--;
+            }
+            
+            likesElement.textContent = currentLikes;
+            
+            // Вибрация при тапе
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+            
+            tg.showAlert(`👆 ${currentLikes} тапов!`);
+        }
+
+        function toggleBookmark(element) {
+            element.classList.toggle('active');
+            const isBookmarked = element.classList.contains('active');
+            
+            if (isBookmarked) {
+                element.textContent = '🔖';
+                element.style.color = '#ff3366';
+                tg.showAlert('Пост добавлен в закладки!');
+            } else {
+                element.textContent = '🔖';
+                element.style.color = '#aaa';
+                tg.showAlert('Пост удален из закладок');
             }
         }
 
-        function startAIChat() {
-            tg.showAlert('🚀 Запускаем персонального ИИ-помощника...');
-            // Здесь будет логика открытия чата
+        function openComments() {
+            tg.showAlert('💬 Открываем комментарии...');
         }
 
-        function exploreContent() {
-            tg.showAlert('🔍 Исследуем созданный контент...');
-            // Здесь будет логика исследования контента
+        function sharePost() {
+            tg.showAlert('📤 Поделиться постом...');
+        }
+
+        function openNotifications() {
+            tg.showAlert('🔔 Уведомления');
+        }
+
+        function openMessages() {
+            tg.showAlert('💬 Сообщения');
+        }
+
+        // Функции навигации
+        function switchTab(tab) {
+            // Убираем активный класс со всех элементов
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Добавляем активный класс к выбранному элементу
+            event.target.closest('.nav-item').classList.add('active');
+            
+            switch(tab) {
+                case 'home':
+                    tg.showAlert('🏠 Главная лента');
+                    break;
+                case 'search':
+                    tg.showAlert('🔍 Поиск контента');
+                    break;
+                case 'create':
+                    tg.showAlert('➕ Создать новый пост');
+                    break;
+                case 'ai-chat':
+                    tg.showAlert('🤖 ИИ чат');
+                    break;
+                case 'profile':
+                    tg.showAlert('👤 Профиль');
+                    break;
+            }
         }
 
         // Обработка нажатия главной кнопки
